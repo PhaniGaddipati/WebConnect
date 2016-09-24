@@ -11,6 +11,7 @@ export const GRAPH_ID       = "_id";
 export const NODES          = "nodes";
 export const EDGES          = "edges";
 export const OWNER          = "owner";
+export const FIRST_NODE     = "firstNode";
 export const NODE_ID        = "_id";
 export const NODE_NAME      = "name";
 export const NODE_DETAILS   = "details";
@@ -125,6 +126,10 @@ Graphs.schema.graphSchema = new SimpleSchema({
         type: [Graphs.schema.edgeSchema],
         optional: false,
         defaultValue: []
+    },
+    firstNode: {
+        type: SimpleSchema.RegEx.Id,
+        optional: false
     }
 });
 

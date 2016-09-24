@@ -20,6 +20,7 @@ let TEST_CHART = {
 let TEST_GRAPH = {
     _id: "testgraph99999999",
     owner: "wjQyQ6sGjzvNMDLiJ",
+    firstNode: "somenode999999999",
     nodes: [
         {
             _id: "somenode999999999",
@@ -37,7 +38,7 @@ let TEST_GRAPH = {
             ]
         }
     ],
-    "edges": [
+    edges: [
         {
             _id: "someedge999999999",
             name: "test edge",

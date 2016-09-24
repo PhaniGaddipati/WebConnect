@@ -34,6 +34,7 @@ export const FLOWCHART_TYPE         = "type";
  */
 export const GRAPH_NODES          = "vertices";
 export const GRAPH_EDGES          = "edges";
+export const GRAPH_FIRST_VERTEX   = "firstVertex";
 export const GRAPH_NODE_ID        = "_id";
 export const GRAPH_NODE_NAME      = "name";
 export const GRAPH_NODE_DETAILS   = "details";
@@ -99,6 +100,8 @@ export const formatGraphForREST = function (rawGraph) {
     graph[GRAPH_EDGES] = _.map(rawGraph[Graphs.EDGES], function (rawEdge) {
         return formatEdgeForREST(rawEdge);
     });
+
+    graph[GRAPH_FIRST_VERTEX] = rawGraph[Graphs.FIRST_NODE];
     return graph;
 };
 
