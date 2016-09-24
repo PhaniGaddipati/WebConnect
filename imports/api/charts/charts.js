@@ -20,8 +20,11 @@ export const GRAPH_ID      = "graph";
 export const COMMENTS      = "comments";
 export const RESOURCES     = "resources";
 export const IMAGE         = "image";
-export const TYPE          = "type";
-export const ALLOWED_TYPES = ["misc", "device", "problem"];
+
+export const TYPE         = "type";
+export const TYPE_MISC    = "misc";
+export const TYPE_DEVICE  = "device";
+export const TYPE_PROBLEM = "problem";
 
 export const Charts = new Mongo.Collection("charts");
 
@@ -111,9 +114,9 @@ Charts.schema = new SimpleSchema({
     },
     type: {
         type: String,
-        allowedValues: ALLOWED_TYPES,
+        allowedValues: [TYPE_MISC, TYPE_DEVICE, TYPE_PROBLEM],
         optional: false,
-        defaultValue: ALLOWED_TYPES[0]
+        defaultValue: TYPE_MISC
     },
     image: {
         type: String,

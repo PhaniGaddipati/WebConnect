@@ -13,7 +13,8 @@ let TEST_CHART = {
     name: "Device Name",
     description: "A description of the device",
     owner: "wjQyQ6sGjzvNMDLiJ",
-    graph: "testgraph99999999"
+    graph: "testgraph99999999",
+    type: "device"
 };
 
 let TEST_GRAPH = {
