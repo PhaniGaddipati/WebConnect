@@ -14,10 +14,15 @@ const RESPONSE_DATA           = "data";
 const RESPONSE_STATUS_SUCCESS = "success";
 const RESPONSE_STATUS_ERROR   = "error";
 
-/**
- * Returns the flowchart catalog.
- */
 RestAPI.addRoute("catalog", {
+    /**
+     * @api {get} /catalog Request Catalog
+     * @apiName GetCatalog
+     * @apiGroup Charts
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.flowcharts Flowcharts in the catalog.
+     */
     get: function () {
         console.log("GET v1/catalog");
         let rawChartsInCatalog = getChartsInCatalog.call();
@@ -40,6 +45,17 @@ RestAPI.addRoute("catalog", {
  * Returns a flowchart by id.
  */
 RestAPI.addRoute("chart/:id", {
+    /**
+     * @api {get} /chart/:id Request a Chart
+     * @apiName GetChart
+     * @apiGroup Charts
+     *
+     * @apiParam {String} id Chart unique ID.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.flowchart Flowchart that was requested.
+     * @apiError ChartNotFound The id of the Chart was not found
+     */
     get: function () {
         let id = this.urlParams.id;
         console.log("GET chart/" + id);
@@ -71,6 +87,17 @@ RestAPI.addRoute("chart/:id", {
  * Returns multiple flowcharts by id.
  */
 RestAPI.addRoute("charts", {
+    /**
+     * @api {post} /charts Request multiple Charts
+     * @apiName PostCharts
+     * @apiGroup Charts
+     *
+     * @apiParam {String[]} ids Chart unique IDs.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.flowcharts Flowcharts that were requested.
+     * @apiSuccess (200) {Object} data.bad_ids Flowchart IDs that were requested but not found.
+     */
     post: function () {
         let ids = this.bodyParams.ids;
         console.log("POST charts/ with ids: " + ids);
@@ -103,6 +130,22 @@ RestAPI.addRoute("charts", {
 });
 
 RestAPI.addRoute("chart/:id/comment", {authRequired: true}, {
+    /**
+     * @api {post} /chart/:id/comment Post a comment on a Chart.
+     * @apiName PostComment
+     * @apiGroup Charts
+     *
+     * @apiHeader {String} X-Auth-Token The auth token for the user.
+     * @apiHeader {String} X-User-Id The ID of the user posting the comment.
+     *
+     * @apiParam {String} text Comment text.
+     * @apiParam {String} attachment URL of an attachment.
+     * @apiParam {String} nodeId The id of the node to post to. Optional.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.comment Comment that was posted.
+     * @apiError (401) PermissionDenied The user cannot perform this operation.
+     */
     post: function () {
         let chartId = this.urlParams.id;
         let nodeId  = this.bodyParams.nodeId;
@@ -131,6 +174,20 @@ RestAPI.addRoute("chart/:id/comment", {authRequired: true}, {
             };
         }
     },
+    /**
+     * @api {delete} /chart/:id/comment Delete a comment on a Chart.
+     * @apiName PostComment
+     * @apiGroup Charts
+     *
+     * @apiHeader {String} X-Auth-Token The auth token for the user.
+     * @apiHeader {String} X-User-Id The ID of the user posting the comment.
+     *
+     * @apiParam {String} commentId ID of the comment to delete.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.flowchart The new flowchart object.
+     * @apiError (401) PermissionDenied The user cannot perform this operation.
+     */
     delete: function () {
         let chartId   = this.urlParams.id;
         let commentId = this.bodyParams.commentId;
