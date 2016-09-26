@@ -117,7 +117,7 @@ function computeScore(chart) {
     if (up == 0 && down == 0) {
         return -1;
     }
-    return parseInt(parseFloat(up) / parseFloat(up + down));
+    return parseInt(100.0 * parseFloat(up) / parseFloat(up + down));
 }
 
 function formatNodeForREST(rawNode) {
