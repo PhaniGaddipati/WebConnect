@@ -3,7 +3,13 @@
  */
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Charts from "/imports/api/charts/charts.js";
-import {getChartsInCatalog, getChart, getCharts, incrementChartDownload} from "/imports/api/charts/methods.js";
+import {
+    getChartsInCatalog,
+    getChart,
+    getCharts,
+    incrementChartDownload,
+    updateUserChartFeedback
+} from "/imports/api/charts/methods.js";
 import * as Comments from "/imports/api/comments/comments.js";
 import {insertComment, getComment, deleteComment} from "/imports/api/comments/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
@@ -193,12 +199,12 @@ RestAPI.addRoute("chart/:id/comment", {authRequired: true}, {
         let commentId = this.bodyParams.commentId;
         console.log("DELETE chart/" + chartId + "/comment: " + commentId);
 
-        let comment = getComment.call({chartId, commentId});
+        let response = {};
+        let comment  = getComment.call({chartId, commentId});
+
         if (comment && comment[Comments.OWNER] == this.userId) {
             // Comment exists somewhere, try and delete it
-            let res      = deleteComment.call({chartId: chartId, commentId: commentId});
-            let response = {};
-
+            let res = deleteComment.call({chartId: chartId, commentId: commentId});
             if (res) {
                 response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
                 response[RESPONSE_DATA]   = {
@@ -208,7 +214,6 @@ RestAPI.addRoute("chart/:id/comment", {authRequired: true}, {
             }
         }
         // Comment doesn't exist
-        let response              = {};
         response[RESPONSE_STATUS] = RESPONSE_STATUS_ERROR;
         if (comment) {
             response[RESPONSE_MESSAGE] = "You don't have permission to do this.";
@@ -220,5 +225,47 @@ RestAPI.addRoute("chart/:id/comment", {authRequired: true}, {
             body: response
         };
 
+    }
+});
+
+RestAPI.addRoute("chart/:id/feedback", {authRequired: true}, {
+    /**
+     * @api {post} /chart/:id/feedback Post feedback on a Chart.
+     * @apiName PostFeedback
+     * @apiGroup Charts
+     *
+     * @apiHeader {String} X-Auth-Token The auth token for the user.
+     * @apiHeader {String} X-User-Id The ID of the user posting the comment.
+     *
+     * @apiParam {String} feedback Feedback, "true" if upvoting.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.flowchart Comment that was posted.
+     * @apiError (401) PermissionDenied The user cannot perform this operation.
+     * @apiError (400) BadRequest The chart ID wasn't found or feedback wasn't provided.
+     */
+    post: function () {
+        let chartId  = this.urlParams.id;
+        let feedback = this.bodyParams.feedback == "true";
+        console.log("POST chart/" + chartId + "/feedback");
+
+        let response = {};
+
+        if (this.userId) {
+            let res = updateUserChartFeedback.call({chartId: chartId, userId: this.userId, feedback: feedback});
+            if (res) {
+                response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+                response[RESPONSE_DATA]   = {
+                    flowchart: RESTUtils.formatChartForREST(getChart.call(chartId))
+                };
+                return response;
+            }
+        }
+        response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+        response[RESPONSE_MESSAGE] = "The chart ID wasn't found or malformed request";
+        return {
+            statusCode: 400,
+            body: response
+        }
     }
 });

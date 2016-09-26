@@ -193,9 +193,47 @@ export const getAllChartResources = new ValidatedMethod({
             resList = resList.concat(node[Graphs.NODE_RESOURCES]);
         });
         _.each(cmnts, function (cmnt) {
-            // Add the comment's  attachments
+            // Add the comment's attachments
             resList.push(cmnt[Comments.ATTACHMENT]);
         });
         return _.without(_.uniq(resList), null);
+    }
+});
+
+/**
+ * Updates a user's feedback on a chart as an upvote or a downvote.
+ * If feedback is true, then any downvote is removed and an upvote is marked.
+ *
+ * Returns whether the operation was successful
+ */
+export const updateUserChartFeedback = new ValidatedMethod({
+    name: "charts.updateUserChartFeedback",
+    validate: new SimpleSchema({
+        chartId: {
+            type: SimpleSchema.RegEx.Id,
+            optional: false
+        },
+        userId: {
+            type: SimpleSchema.RegEx.Id,
+            optional: false
+        },
+        feedback: {
+            type: Boolean,
+            optional: false
+        }
+    }).validator(),
+    run({chartId:chartId, userId:userId, feedback:feedback}){
+        let selector = {};
+        let addToSet = {};
+        let pop      = {};
+
+        selector[Charts.CHART_ID]                                      = chartId;
+        addToSet[feedback ? Charts.UPVOTED_IDS : Charts.DOWNVOTED_IDS] = userId;
+        pop[feedback ? Charts.DOWNVOTED_IDS : Charts.UPVOTED_IDS]      = userId;
+
+        return Charts.Charts.update({_id: chartId}, {
+                $pop: pop,
+                $addToSet: addToSet
+            }) > 0;
     }
 });
