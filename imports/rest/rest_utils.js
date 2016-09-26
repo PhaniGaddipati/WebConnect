@@ -72,7 +72,7 @@ export const formatChartForREST = function (rawChart) {
     chart[FLOWCHART_RESOURCES]    = rawChart[Charts.RESOURCES];
     chart[FLOWCHART_TYPE]         = rawChart[Charts.TYPE];
     chart[FLOWCHART_IMAGE]        = rawChart[Charts.IMAGE];
-    chart[FLOWCHART_SCORE]        = rawChart[Charts.UPVOTED_IDS].length - rawChart[Charts.DOWNVOTED_IDS].length;
+    chart[FLOWCHART_SCORE]        = computeScore(rawChart);
     chart[FLOWCHART_GRAPH]        = formatGraphForREST(getGraph.call(rawChart[Charts.GRAPH_ID]));
     chart[FLOWCHART_ALL_RES]      = getAllChartResources.call(rawChart[Charts.CHART_ID]);
 
@@ -104,6 +104,21 @@ export const formatGraphForREST = function (rawGraph) {
     graph[GRAPH_FIRST_VERTEX] = rawGraph[Graphs.FIRST_NODE];
     return graph;
 };
+
+/**
+ * Computes the score of a chart as the percentage upvotes.
+ * If no feedback exists, -1 is returned.
+ * @param chart
+ * @returns {*}
+ */
+function computeScore(chart) {
+    let up   = chart[Charts.UPVOTED_IDS].length;
+    let down = chart[Charts.DOWNVOTED_IDS].length;
+    if (up == 0 && down == 0) {
+        return -1;
+    }
+    return parseInt(parseFloat(up) / parseFloat(up + down));
+}
 
 function formatNodeForREST(rawNode) {
     let node                   = {};
