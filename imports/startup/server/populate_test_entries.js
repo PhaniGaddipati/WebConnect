@@ -2,10 +2,6 @@
  * Created by Phani on 9/15/2016.
  */
 
-import * as Charts from "/imports/api/charts/charts.js";
-import * as Graphs from "/imports/api/graphs/graphs.js";
-import {getChart} from "/imports/api/charts/methods.js";
-import {getGraph} from "/imports/api/graphs/methods.js";
 import {Random} from "meteor/random";
 
 let TEST_CHART = {
@@ -296,6 +292,7 @@ let TEST_GRAPH = {
         }]
 };
 
+/*
 if (!getGraph.call(TEST_GRAPH[Graphs.GRAPH_ID])) {
     Graphs.Graphs.insert(TEST_GRAPH);
     console.log("Added TEST_GRAPH");
@@ -303,4 +300,4 @@ if (!getGraph.call(TEST_GRAPH[Graphs.GRAPH_ID])) {
 if (!getChart.call(TEST_CHART[Charts.CHART_ID])) {
     Charts.Charts.insert(TEST_CHART);
     console.log("Added TEST_CHART");
-}
+ }*/
