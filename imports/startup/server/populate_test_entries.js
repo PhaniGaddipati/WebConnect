@@ -2,6 +2,8 @@
  * Created by Phani on 9/15/2016.
  */
 
+import * as Charts from "/imports/api/charts/charts.js";
+import * as Graphs from "/imports/api/graphs/graphs.js";
 import {Random} from "meteor/random";
 
 let TEST_CHART = {
@@ -292,6 +294,8 @@ let TEST_GRAPH = {
         }]
 };
 
+Graphs.Graphs.remove({_id: TEST_GRAPH[Graphs.GRAPH_ID]});
+Charts.Charts.remove({_id: TEST_CHART[Charts.CHART_ID]});
 /*
 if (!getGraph.call(TEST_GRAPH[Graphs.GRAPH_ID])) {
     Graphs.Graphs.insert(TEST_GRAPH);
@@ -300,4 +304,5 @@ if (!getGraph.call(TEST_GRAPH[Graphs.GRAPH_ID])) {
 if (!getChart.call(TEST_CHART[Charts.CHART_ID])) {
     Charts.Charts.insert(TEST_CHART);
     console.log("Added TEST_CHART");
- }*/
+ }
+ */
