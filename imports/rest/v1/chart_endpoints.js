@@ -6,6 +6,7 @@ import * as Charts from "/imports/api/charts/charts.js";
 import {
     getChartsInCatalog,
     getChart,
+    removeChart,
     getCharts,
     incrementChartDownload,
     updateUserChartFeedback
@@ -60,7 +61,7 @@ RestAPI.addRoute("chart/:id", {
      *
      * @apiSuccess (200) {Object} status
      * @apiSuccess (200) {Object} data.flowchart Flowchart that was requested.
-     * @apiError ChartNotFound The id of the Chart was not found
+     * @apiError ChartNotFound The id of the Chart was not found.
      */
     get: function () {
         let id = this.urlParams.id;
@@ -86,6 +87,55 @@ RestAPI.addRoute("chart/:id", {
             flowchart: chart
         };
         return response;
+    },
+    /**
+     * @api {delete} /chart/:id Delete a Chart
+     * @apiName DeleteChart
+     * @apiGroup Charts
+     *
+     * @apiHeader {String} X-Auth-Token The auth token for the user.
+     * @apiHeader {String} X-User-Id The ID of the user deleting the chart.
+     *
+     * @apiParam {String} id Chart unique ID.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.deletedId Id of the chart that was deleted.
+     * @apiError (400) NotFound The chart was not found.
+     * @apiError (404) PermissionDenied The user cannot delete the given chart.
+     */
+    delete: {
+        authRequired: true,
+        action: function () {
+            let id = this.urlParams.id;
+            console.log("DELETE chart/" + id);
+
+            let response = {};
+            let chart    = getChart.call(id);
+
+            if (!chart) {
+                response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                response[RESPONSE_MESSAGE] = "The given chart id wasn't found.";
+                return {
+                    statusCode: 400,
+                    body: response
+                };
+            }
+            if (chart[Charts.OWNER] != this.userId) {
+                // User is not the owner, can't delete it
+                response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                response[RESPONSE_MESSAGE] = "The user cannot delete the given chart.";
+                return {
+                    statusCode: 404,
+                    body: response
+                };
+            }
+            removeChart.call({_id: id});
+            response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+            response[RESPONSE_DATA]   = {
+                deletedId: id
+            };
+            return response;
+        }
     }
 });
 

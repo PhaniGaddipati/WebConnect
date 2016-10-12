@@ -66,6 +66,22 @@ export const upsertChart = new ValidatedMethod({
 });
 
 /**
+ * Removes a chart by ID.
+ */
+export const removeChart = new ValidatedMethod({
+    name: "charts.removeChart",
+    validate: new SimpleSchema({
+        _id: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        }
+    }).validator(),
+    run({_id:id}){
+        return Charts.Charts.remove({_id: id});
+    }
+});
+
+/**
  * Returns an array of the current user's charts. An empty array
  * returned if either there is no user logged in or there are no charts.
  */
