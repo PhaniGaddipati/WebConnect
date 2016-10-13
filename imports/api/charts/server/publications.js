@@ -14,5 +14,5 @@ Meteor.publish("topCharts", function (n) {
 });
 
 Meteor.publish("userCharts", function () {
-    return Charts.Charts.find({_id: this.userId}).fetch();
+    return Charts.Charts.find({_id: this.userId});
 });
