@@ -1,8 +1,8 @@
 {
-  "tc": "Tech Connect",
+  "tc": "TechConnect",
   "home": "Home",
   "about": "About",
-  "about_tc": "About Tech Connect",
+  "about_tc": "About TechConnect",
   "loading": "Loading",
   "signin_register": "Sign In or Register",
   "logout": "Logout",
@@ -29,6 +29,6 @@
   "your_charts": "Your Flowcharts",
   "signin_to_see_your_charts": "Please sign in to see your charts",
   "home_intro": "Search for a device or problem, or select an example",
-  "home_title": "Welcome to Tech Connect",
+  "home_title": "Welcome to TechConnect",
   "search_hint": "e.g Pulse Oximeter"
 }
