@@ -14,6 +14,7 @@ export const PROFILE              = "profile";
 export const PROFILE_ORGANIZATION = "organization";
 export const PROFILE_NAME         = "name";
 export const PROFILE_COUNTRY      = "country";
+export const PROFILE_EXPERTISES   = "expertises";
 export const COUNTRY_CODE         = "code";
 export const COUNTRY_NAME         = "name";
 
@@ -40,8 +41,7 @@ Users.schema.userCountry = new SimpleSchema({
 
 Users.schema.userProfile = new SimpleSchema({
     name: {
-        type: String,
-        optional: false
+        type: String
     },
     organization: {
         type: String,
@@ -51,6 +51,14 @@ Users.schema.userProfile = new SimpleSchema({
     country: {
         type: Users.schema.userCountry,
         optional: true
+    },
+    expertises: {
+        type: Array,
+        defaultValue: []
+    },
+    'expertises.$': {
+        type: String,
+        regEx: /[a-z]{3,}/
     }
 });
 
