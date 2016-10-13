@@ -2,3 +2,4 @@ node_modules/
 .idea/
 **/jsPlumbToolkit*.js
 mup.json
+doc/
