@@ -4,7 +4,7 @@
 import {Meteor} from "meteor/meteor";
 import {Accounts} from "meteor/accounts-base";
 import {CountryCodes} from "meteor/3stack:country-codes";
-import "./signin-register.html";
+import "./signin_register.html";
 import * as User from "/imports/api/users/users.js";
 
 signinError   = new ReactiveVar(false);
