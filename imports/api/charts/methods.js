@@ -212,6 +212,7 @@ export const getAllChartResources = new ValidatedMethod({
             // Add the comment's attachments
             resList.push(cmnt[Comments.ATTACHMENT]);
         });
+        resList.push(chart[Charts.IMAGE]);
         return _.without(_.uniq(resList), null);
     }
 });
