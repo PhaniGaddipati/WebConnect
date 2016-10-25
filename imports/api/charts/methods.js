@@ -210,9 +210,13 @@ export const getAllChartResources = new ValidatedMethod({
         });
         _.each(cmnts, function (cmnt) {
             // Add the comment's attachments
-            resList.push(cmnt[Comments.ATTACHMENT]);
+            if (cmnt[Comments.ATTACHMENT] != null) {
+                resList.push(cmnt[Comments.ATTACHMENT]);
+            }
         });
-        resList.push(chart[Charts.IMAGE]);
+        if (chart[Charts.IMAGE] != null) {
+            resList.push(chart[Charts.IMAGE]);
+        }
         return _.without(_.uniq(resList), null);
     }
 });
