@@ -2,7 +2,7 @@
  * Created by Phani on 7/23/2016.
  */
 import "./account.html";
-import "./signin-register.js";
+import "./signin_register.js";
 import "/imports/ui/components/user_charts/user_charts.js";
 import * as User from "/imports/api/users/users.js";
 import {currentUser} from "/imports/api/users/methods.js";

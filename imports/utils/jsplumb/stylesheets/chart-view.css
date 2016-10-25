@@ -1,0 +1,31 @@
+.jtk-node {
+    background-color: #3E7E9C;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    position: absolute;
+    z-index: 11;
+    overflow: auto;
+    min-width: 230px;
+    min-height: 30px;
+    width: auto;
+}
+
+.jtk-node .name {
+    background-color: #3E7E9C;
+    color: #f7ebca;
+    cursor: move;
+    font-size: 12px;
+    line-height: 13px;
+    padding: 6px;
+    text-align: center;
+}
+
+.jtk-node .name span {
+    cursor: pointer;
+}
+
+.endpoint {
+    color: transparent;
+    background-color: transparent;
+}

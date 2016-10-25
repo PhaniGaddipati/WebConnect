@@ -35,7 +35,7 @@
     <div class="container">
         <div id="content-container">
             {{#if Template.subscriptionsReady}}
-                {{> Template.dynamic template=main}}
+                {{> Template.dynamic template=main data=dataContext}}
             {{else}}
                 {{> app_loading}}
             {{/if}}
