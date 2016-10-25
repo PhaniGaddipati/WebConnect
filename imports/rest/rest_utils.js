@@ -9,6 +9,7 @@
 import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
+import * as Users from "/imports/api/users/users.js";
 import {getGraph} from "/imports/api/graphs/methods.js";
 import {getAllChartResources} from "/imports/api/charts/methods";
 
@@ -52,6 +53,7 @@ export const GRAPH_EDGE_DETAILS   = "details";
  */
 export const COMMENT_ID           = "_id";
 export const COMMENT_OWNER        = "owner";
+export const COMMENT_OWNER_NAME   = "ownerName";
 export const COMMENT_TEXT         = "text";
 export const COMMENT_CREATED_DATE = "createdDate";
 export const COMMENT_ATTACHMENT   = "attachment";
@@ -150,6 +152,7 @@ function formatCommentForREST(rawComment) {
     comment[COMMENT_TEXT]         = rawComment[Comments.TEXT];
     comment[COMMENT_CREATED_DATE] = rawComment[Comments.CREATED_DATE];
     comment[COMMENT_ATTACHMENT]   = rawComment[Comments.ATTACHMENT];
+    comment[COMMENT_OWNER_NAME]   = Users.Users.findOne({_id: rawComment[Comments.OWNER]})[Users.PROFILE][Users.PROFILE_NAME];
     if (!comment[COMMENT_ATTACHMENT]) {
         comment[COMMENT_ATTACHMENT] = null;
     }
