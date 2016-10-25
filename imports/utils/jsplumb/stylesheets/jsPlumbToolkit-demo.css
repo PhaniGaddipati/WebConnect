@@ -2,16 +2,6 @@
 /* --- page structure --------------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------- */
 
-body {
-    background-color: #FFF;
-    color: #434343;
-    font-family: "Lato", sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    height: 100%;
-    padding: 0;
-}
-
 .jtk-demo-main {
     background-color: transparent;
     font-family: Arial, sans-serif;
@@ -235,28 +225,8 @@ path {
     padding: 4px;
 }
 
-.navbar-top {
-    background-color: #58775d;
-    border: none;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.navbar-nav > li > a {
-    border: none;
-    color: #FFF;
-    padding: 6px 10px;
-    text-decoration: none;
-}
-
 .social-nav {
     color: #FFF;
     float: right;
     font-size: 22px;
-}
-
-.nav > li > a:hover, .nav > li > a:focus {
-    background-color: transparent;
-    color: #cdcc73;
-    text-decoration: none;
 }
