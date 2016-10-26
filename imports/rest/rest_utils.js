@@ -14,6 +14,17 @@ import {getGraph} from "/imports/api/graphs/methods.js";
 import {getAllChartResources} from "/imports/api/charts/methods";
 
 /**
+ * Names of the user REST json fields
+ */
+export const USER_ID           = "_id";
+export const USER_EMAIL        = "email";
+export const USER_NAME         = "name";
+export const USER_COUNTRY_CODE = "countryCode";
+export const USER_COUNTRY      = "country";
+export const USER_ORGANIZATION = "organization";
+export const USER_EXPERTISES   = "expertises";
+
+/**
  * Names of the flowchart REST json fields.
  */
 export const FLOWCHART_ID           = "_id";
@@ -57,6 +68,19 @@ export const COMMENT_OWNER_NAME   = "ownerName";
 export const COMMENT_TEXT         = "text";
 export const COMMENT_CREATED_DATE = "createdDate";
 export const COMMENT_ATTACHMENT   = "attachment";
+
+
+export const formatUserForREST = function (rawUser) {
+    let user                = {};
+    user[USER_ID]           = rawUser[Users.USER_ID];
+    user[USER_EMAIL]        = rawUser[Users.EMAILS][0][Users.EMAIL_ADDRESS];
+    user[USER_NAME]         = rawUser[Users.PROFILE][Users.PROFILE_NAME];
+    user[USER_COUNTRY_CODE] = rawUser[Users.PROFILE][Users.PROFILE_COUNTRY][Users.COUNTRY_CODE];
+    user[USER_COUNTRY]      = rawUser[Users.PROFILE][Users.PROFILE_COUNTRY][Users.COUNTRY_NAME];
+    user[USER_ORGANIZATION] = rawUser[Users.PROFILE][Users.PROFILE_ORGANIZATION];
+    user[USER_EXPERTISES]   = rawUser[Users.PROFILE][Users.PROFILE_EXPERTISES];
+    return user;
+};
 
 /**
  * Converts the MongoDB representation of a chart into

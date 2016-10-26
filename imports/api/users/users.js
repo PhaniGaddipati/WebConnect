@@ -6,6 +6,7 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 
 // Constants for fields in user documents
 export const Users                = Meteor.users;
+export const USER_ID              = "_id";
 export const USERNAME             = "username";
 export const CREATED_AT           = "createdAt";
 export const EMAILS               = "emails";
