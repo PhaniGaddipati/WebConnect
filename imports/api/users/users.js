@@ -54,12 +54,8 @@ Users.schema.userProfile = new SimpleSchema({
         optional: true
     },
     expertises: {
-        type: Array,
+        type: [String],
         defaultValue: []
-    },
-    'expertises.$': {
-        type: String,
-        regEx: /[a-z]{3,}/
     }
 });
 
