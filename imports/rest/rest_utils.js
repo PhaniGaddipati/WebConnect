@@ -169,7 +169,7 @@ function formatEdgeForREST(rawEdge) {
     return edge;
 }
 
-function formatCommentForREST(rawComment) {
+export const formatCommentForREST = function (rawComment) {
     let comment                   = {};
     comment[COMMENT_ID]           = rawComment[Comments.COMMENT_ID];
     comment[COMMENT_OWNER]        = rawComment[Comments.OWNER];
@@ -181,4 +181,4 @@ function formatCommentForREST(rawComment) {
         comment[COMMENT_ATTACHMENT] = null;
     }
     return comment;
-}
+};

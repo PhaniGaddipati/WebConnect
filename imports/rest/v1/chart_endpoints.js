@@ -215,7 +215,7 @@ RestAPI.addRoute("chart/:id/comment", {authRequired: true}, {
         let commentId = insertComment.call({comment: comment, chartId: chartId, nodeId: nodeId});
         let response  = {};
         if (commentId) {
-            comment                   = getComment.call({chartId, commentId});
+            comment                   = RESTUtils.formatCommentForREST(getComment.call({chartId, commentId}));
             response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
             response[RESPONSE_DATA]   = {
                 comment: comment
