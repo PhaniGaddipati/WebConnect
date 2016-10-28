@@ -102,9 +102,13 @@ export const formatChartForREST = function (rawChart) {
     chart[FLOWCHART_GRAPH]        = formatGraphForREST(getGraph.call(rawChart[Charts.GRAPH_ID]));
     chart[FLOWCHART_ALL_RES]      = getAllChartResources.call(rawChart[Charts.CHART_ID]);
 
-    chart[FLOWCHART_COMMENTS] = _.map(rawChart[Charts.COMMENTS], function (rawComment) {
-        return formatCommentForREST(rawComment);
-    });
+    let sortedComments        = _.sortBy(rawChart[Charts.COMMENTS], function (cmnt) {
+        return new Date(cmnt[Comments.CREATED_DATE]).getTime();
+    }).reverse();
+    chart[FLOWCHART_COMMENTS] = _.map(sortedComments, function (rawComment) {
+            return formatCommentForREST(rawComment);
+        }
+    );
 
     if (!chart[FLOWCHART_IMAGE]) {
         chart[FLOWCHART_IMAGE] = null;
@@ -153,7 +157,11 @@ function formatNodeForREST(rawNode) {
     node[GRAPH_NODE_DETAILS]   = rawNode[Graphs.NODE_DETAILS];
     node[GRAPH_NODE_RESOURCES] = rawNode[Graphs.NODE_RESOURCES];
     node[GRAPH_NODE_IMAGES]    = rawNode[Graphs.NODE_IMAGES];
-    node[GRAPH_NODE_COMMENTS]  = _.map(rawNode[Charts.COMMENTS], function (rawComment) {
+
+    let sortedComments        = _.sortBy(rawNode[Graphs.NODE_COMMENTS], function (cmnt) {
+        return new Date(cmnt[Comments.CREATED_DATE]).getTime();
+    }).reverse();
+    node[GRAPH_NODE_COMMENTS] = _.map(sortedComments, function (rawComment) {
         return formatCommentForREST(rawComment);
     });
     return node;
