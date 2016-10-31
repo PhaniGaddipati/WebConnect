@@ -125,7 +125,7 @@ RestAPI.addRoute("chart/:id", {
                 response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
                 response[RESPONSE_MESSAGE] = "The user cannot delete the given chart.";
                 return {
-                    statusCode: 404,
+                    statusCode: 401,
                     body: response
                 };
             }

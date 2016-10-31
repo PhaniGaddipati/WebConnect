@@ -3,6 +3,7 @@
  */
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Users from "/imports/api/users/users.js";
+import {updateUserProfile} from "/imports/api/users/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
 import {CountryCodes} from "meteor/3stack:country-codes";
 
@@ -90,7 +91,8 @@ RestAPI.addRoute("user/:id", {
      * @apiError (404) UserNotFound The id of the User was not found.
      */
     get: function () {
-        let id   = this.urlParams.id;
+        let id = this.urlParams.id;
+        console.log("GET user/" + id);
         let user = Users.Users.findOne({_id: id});
 
         if (user) {
@@ -109,6 +111,72 @@ RestAPI.addRoute("user/:id", {
                 statusCode: 404,
                 body: response
             };
+        }
+    },
+    /**
+     * @api {post} /user/:id Update a User
+     * @apiName UpdateUser
+     * @apiGroup Users
+     *
+     * @apiHeader {String} X-Auth-Token The auth token for the user.
+     * @apiHeader {String} X-User-Id The ID of the user updating the profile.
+     *
+     * @apiParam {String} id User unique ID.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.user User that was updated.
+     * @apiError (401) PermissionDenied The logged in user could not edit the user of the given id.
+     * @apiError (404) UserNotFound The id of the User was not found.
+     */
+    post: {
+        authRequired: true,
+        action: function () {
+            let id = this.urlParams.id;
+            console.log("POST user/" + id);
+            let user    = Users.Users.findOne({_id: id});
+            let newUser = this.bodyParams.user;
+
+            if (user) {
+                if (user[Users.USER_ID] != this.userId) {
+                    // Some pesky person is trying to change someone else's profile
+                    let response               = {};
+                    response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                    response[RESPONSE_MESSAGE] = "You don't have permission to do this.";
+                    return {
+                        statusCode: 401,
+                        body: response
+                    };
+                } else {
+                    // I'll allow it
+                    try {
+                        updateUserProfile.call({user: newUser});
+                        let response              = {};
+                        response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+                        response[RESPONSE_DATA]   = {
+                            user: RESTUtils.formatUserForREST(Users.Users.findOne({_id: id}))
+                        };
+                        return response;
+                    } catch (err) {
+                        console.log(err);
+                        let response               = {};
+                        response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                        response[RESPONSE_MESSAGE] = "The user could not be updated.";
+                        return {
+                            statusCode: 404,
+                            body: response
+                        };
+                    }
+                }
+            }
+            else {
+                let response               = {};
+                response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                response[RESPONSE_MESSAGE] = "The given user id wasn't found.";
+                return {
+                    statusCode: 404,
+                    body: response
+                };
+            }
         }
     }
 });
