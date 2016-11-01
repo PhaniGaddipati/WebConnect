@@ -245,12 +245,7 @@ export const getAllChartUsers = new ValidatedMethod({
             // Add all comments of nodes
             cmnts = cmnts.concat(node[Graphs.NODE_COMMENTS]);
         });
-        _.each(cmnts, function (cmnt) {
-            // Add the comment's users
-            if (cmnt[Comments.ATTACHMENT] != null) {
-                userList.push(cmnt[Comments.OWNER]);
-            }
-        });
+        userList = _.pluck(cmnts, Comments.OWNER);
         userList.push(chart[Charts.OWNER]);
         return _.without(_.uniq(userList), null);
     }
