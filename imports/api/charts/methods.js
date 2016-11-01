@@ -222,6 +222,41 @@ export const getAllChartResources = new ValidatedMethod({
 });
 
 /**
+ * Returns an array of all the user Ids found in the given chart by ID,
+ * or null if the chart wasn't found. This includes all users from
+ * every graph node and comment.
+ */
+export const getAllChartUsers = new ValidatedMethod({
+    name: "charts.getAllChartUsers",
+    validate: function (id) {
+        //Nothing to validate
+    },
+    run(id){
+        let chart = Charts.Charts.findOne({_id: id});
+        if (!chart) {
+            return null;
+        }
+        let userList = [];
+        let graph    = getGraph.call(chart[Charts.GRAPH_ID]);
+        let cmnts    = [];
+
+        cmnts = cmnts.concat(chart[Charts.COMMENTS]);
+        _.each(graph[Graphs.NODES], function (node) {
+            // Add all comments of nodes
+            cmnts = cmnts.concat(node[Graphs.NODE_COMMENTS]);
+        });
+        _.each(cmnts, function (cmnt) {
+            // Add the comment's users
+            if (cmnt[Comments.ATTACHMENT] != null) {
+                userList.push(cmnt[Comments.OWNER]);
+            }
+        });
+        userList.push(chart[Charts.OWNER]);
+        return _.without(_.uniq(userList), null);
+    }
+});
+
+/**
  * Updates a user's feedback on a chart as an upvote or a downvote.
  * If feedback is true, then any downvote is removed and an upvote is marked.
  *
