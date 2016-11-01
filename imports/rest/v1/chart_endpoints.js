@@ -34,9 +34,12 @@ RestAPI.addRoute("catalog", {
         console.log("GET v1/catalog");
         let rawChartsInCatalog = getChartsInCatalog.call();
 
-        // For each chart in the array, convert to REST format and omit the graph field
+        // For each chart in the array, convert to REST format and omit the graph and aggregate fields
         let charts = _.map(rawChartsInCatalog, function (chart) {
-            return _.omit(RESTUtils.formatChartForREST(chart), RESTUtils.FLOWCHART_GRAPH);
+            return _.omit(RESTUtils.formatChartForREST(chart),
+                RESTUtils.FLOWCHART_GRAPH,
+                RESTUtils.FLOWCHART_ALL_USR_ID,
+                RESTUtils.FLOWCHART_ALL_RES);
         });
 
         let response              = {};
