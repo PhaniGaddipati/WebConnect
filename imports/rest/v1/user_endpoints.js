@@ -3,7 +3,7 @@
  */
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Users from "/imports/api/users/users.js";
-import {updateUserProfile} from "/imports/api/users/methods.js";
+import {updateUserProfile, searchUsers} from "/imports/api/users/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
 import {CountryCodes} from "meteor/3stack:country-codes";
 
@@ -76,7 +76,6 @@ RestAPI.addRoute("register", {
         }
     }
 });
-
 
 RestAPI.addRoute("user/:id", {
     /**
@@ -177,6 +176,45 @@ RestAPI.addRoute("user/:id", {
                     body: response
                 };
             }
+        }
+    }
+});
+
+RestAPI.addRoute("users/search", {
+    /**
+     * @api {post} /users/search Search for Users
+     * @apiName SearchUsers
+     * @apiGroup Users
+     *
+     * @apiParam {String} query The search query.
+     * @apiParam {Number} limit The number of results to limit to, optional. Defaults to 50.
+     *
+     * @apiSuccess (200) {Object} status
+     * @apiSuccess (200) {Object} data.results Array of users in ranked order
+     */
+    post: function () {
+        let query = this.bodyParams.query;
+        let limit = parseInt(this.bodyParams.limit);
+
+        try {
+            let users          = searchUsers.call({query, limit});
+            let formattedUsers = _.map(users, RESTUtils.formatUserForREST);
+
+            let response              = {};
+            response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+            response[RESPONSE_DATA]   = {
+                results: formattedUsers
+            };
+            return response;
+        } catch (err) {
+            console.log(err);
+            let response               = {};
+            response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+            response[RESPONSE_MESSAGE] = "The search could not be completed";
+            return {
+                statusCode: 500,
+                body: response
+            };
         }
     }
 });

@@ -19,6 +19,14 @@ export const PROFILE_EXPERTISES   = "expertises";
 export const COUNTRY_CODE         = "code";
 export const COUNTRY_NAME         = "name";
 
+// Set up index for contact search
+if (Meteor.isServer) {
+    Users._ensureIndex({
+        "profile.name": "text",
+        "profile.expertises": "text"
+    });
+}
+
 // Disallow client side updates of the profile field (default is allowed)
 Users.deny({
     update() {

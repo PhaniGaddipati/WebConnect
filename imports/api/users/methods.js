@@ -7,9 +7,35 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {CountryCodes} from "meteor/3stack:country-codes";
 import {Users} from "./users.js";
 
+const DEFAULT_SEARCH_LIMIT = 50;
+
 export const currentUser = function () {
     return Users.findOne({_id: Meteor.userId()});
 };
+
+export const searchUsers = new ValidatedMethod({
+    name: "users.searchUsers",
+    validate: function ({query, limit}) {
+        //check(query, Match.OneOf(String, null, undefined));
+    },
+    run({query, limit}){
+        if (!limit) {
+            limit = DEFAULT_SEARCH_LIMIT;
+        }
+
+        let sel = {};
+        if (query) {
+            sel = {$text: {$search: query}}
+        }
+        let proj = {
+            fields: {score: {$meta: "textScore"}},
+            sort: {score: {$meta: "textScore"}},
+            limit: limit
+        };
+
+        return Users.find(sel, proj).fetch();
+    }
+});
 
 export const updateUserProfile = new ValidatedMethod({
     name: "users.updateUserProfile",
