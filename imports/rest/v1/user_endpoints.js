@@ -135,6 +135,9 @@ RestAPI.addRoute("user/:id", {
             let user    = Users.Users.findOne({_id: id});
             let newUser = this.bodyParams.user;
 
+            // Make sure ids match and id is in obj
+            newUser[Users.USER_ID] = id;
+
             if (user) {
                 if (user[Users.USER_ID] != this.userId) {
                     // Some pesky person is trying to change someone else's profile
