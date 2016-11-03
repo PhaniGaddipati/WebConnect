@@ -135,6 +135,16 @@ RestAPI.addRoute("user/:id", {
             let user    = Users.Users.findOne({_id: id});
             let newUser = this.bodyParams.user;
 
+            if (!newUser) {
+                let response               = {};
+                response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                response[RESPONSE_MESSAGE] = "Field \"user\" is required.";
+                return {
+                    statusCode: 400,
+                    body: response
+                };
+            }
+
             // Make sure ids match and id is in obj
             newUser[Users.USER_ID] = id;
 
