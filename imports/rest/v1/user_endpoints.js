@@ -138,7 +138,7 @@ RestAPI.addRoute("user/:id", {
             if (!newUser) {
                 let response               = {};
                 response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
-                response[RESPONSE_MESSAGE] = "Field \"user\" is required.";
+                response[RESPONSE_MESSAGE] = "Field 'user' is required.";
                 return {
                     statusCode: 400,
                     body: response
