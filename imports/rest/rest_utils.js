@@ -23,6 +23,7 @@ export const USER_COUNTRY_CODE = "countryCode";
 export const USER_COUNTRY      = "country";
 export const USER_ORGANIZATION = "organization";
 export const USER_EXPERTISES   = "expertises";
+export const USER_PIC          = "pic";
 
 /**
  * Names of the flowchart REST json fields.
@@ -80,6 +81,7 @@ export const formatUserForREST = function (rawUser) {
     user[USER_COUNTRY]      = rawUser[Users.PROFILE][Users.PROFILE_COUNTRY][Users.COUNTRY_NAME];
     user[USER_ORGANIZATION] = rawUser[Users.PROFILE][Users.PROFILE_ORGANIZATION];
     user[USER_EXPERTISES]   = rawUser[Users.PROFILE][Users.PROFILE_EXPERTISES];
+    user[USER_PIC]          = rawUser[Users.PROFILE][Users.PROFILE_PIC];
     return user;
 };
 
@@ -94,15 +96,15 @@ export const formatChartForREST = function (rawChart) {
     chart[FLOWCHART_NAME]         = rawChart[Charts.NAME];
     chart[FLOWCHART_DESCRIPTION]  = rawChart[Charts.DESCRIPTION];
     chart[FLOWCHART_UPDATED_DATE] = rawChart[Charts.UPDATED_DATE];
-    chart[FLOWCHART_VERSION]    = rawChart[Charts.VERSION];
-    chart[FLOWCHART_OWNER]      = rawChart[Charts.OWNER];
-    chart[FLOWCHART_RESOURCES]  = rawChart[Charts.RESOURCES];
-    chart[FLOWCHART_TYPE]       = rawChart[Charts.TYPE];
-    chart[FLOWCHART_IMAGE]      = rawChart[Charts.IMAGE];
-    chart[FLOWCHART_SCORE]      = computeScore(rawChart);
-    chart[FLOWCHART_GRAPH]      = formatGraphForREST(getGraph.call(rawChart[Charts.GRAPH_ID]));
-    chart[FLOWCHART_ALL_RES]    = getAllChartResources.call(rawChart[Charts.CHART_ID]);
-    chart[FLOWCHART_ALL_USR_ID] = getAllChartUsers.call(rawChart[Charts.CHART_ID]);
+    chart[FLOWCHART_VERSION]      = rawChart[Charts.VERSION];
+    chart[FLOWCHART_OWNER]        = rawChart[Charts.OWNER];
+    chart[FLOWCHART_RESOURCES]    = rawChart[Charts.RESOURCES];
+    chart[FLOWCHART_TYPE]         = rawChart[Charts.TYPE];
+    chart[FLOWCHART_IMAGE]        = rawChart[Charts.IMAGE];
+    chart[FLOWCHART_SCORE]        = computeScore(rawChart);
+    chart[FLOWCHART_GRAPH]        = formatGraphForREST(getGraph.call(rawChart[Charts.GRAPH_ID]));
+    chart[FLOWCHART_ALL_RES]      = getAllChartResources.call(rawChart[Charts.CHART_ID]);
+    chart[FLOWCHART_ALL_USR_ID]   = getAllChartUsers.call(rawChart[Charts.CHART_ID]);
 
     let sortedComments        = _.sortBy(rawChart[Charts.COMMENTS], function (cmnt) {
         return new Date(cmnt[Comments.CREATED_DATE]).getTime();

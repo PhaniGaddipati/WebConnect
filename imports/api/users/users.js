@@ -16,6 +16,7 @@ export const PROFILE_ORGANIZATION = "organization";
 export const PROFILE_NAME         = "name";
 export const PROFILE_COUNTRY      = "country";
 export const PROFILE_EXPERTISES   = "expertises";
+export const PROFILE_PIC          = "pic";
 export const COUNTRY_CODE         = "code";
 export const COUNTRY_NAME         = "name";
 
@@ -64,6 +65,10 @@ Users.schema.userProfile = new SimpleSchema({
     expertises: {
         type: [String],
         defaultValue: []
+    },
+    pic: {
+        type: String,
+        optional: true
     }
 });
 
