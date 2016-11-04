@@ -28,6 +28,14 @@ export const TYPE_PROBLEM = "problem";
 
 export const Charts = new Mongo.Collection("charts");
 
+// Set up index for chart search
+if (Meteor.isServer) {
+    Charts._ensureIndex({
+        "name": "text",
+        "description": "text"
+    });
+}
+
 // Deny all client updates, everything going to be done through methods
 Charts.deny({
     insert(){
