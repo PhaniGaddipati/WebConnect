@@ -7,7 +7,7 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {CountryCodes} from "meteor/3stack:country-codes";
 import {Users} from "./users.js";
 
-const DEFAULT_SEARCH_LIMIT = 50;
+const DEFAULT_SEARCH_LIMIT = 10;
 
 export const currentUser = function () {
     return Users.findOne({_id: Meteor.userId()});
