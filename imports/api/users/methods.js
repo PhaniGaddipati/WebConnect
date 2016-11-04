@@ -15,12 +15,14 @@ export const currentUser = function () {
 
 export const searchUsers = new ValidatedMethod({
     name: "users.searchUsers",
-    validate: function ({query, limit}) {
-        //check(query, Match.OneOf(String, null, undefined));
+    validate: function ({query, limit, skip}) {
     },
-    run({query, limit}){
+    run({query, limit, skip}){
         if (!limit) {
             limit = DEFAULT_SEARCH_LIMIT;
+        }
+        if (!skip) {
+            skip = 0;
         }
 
         let sel = {};
@@ -30,7 +32,8 @@ export const searchUsers = new ValidatedMethod({
         let proj = {
             fields: {score: {$meta: "textScore"}},
             sort: {score: {$meta: "textScore"}},
-            limit: limit
+            limit: limit,
+            skip: skip
         };
 
         return Users.find(sel, proj).fetch();

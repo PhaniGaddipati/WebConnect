@@ -39,6 +39,8 @@ RestAPI.addRoute("register", {
         let password    = this.bodyParams.password;
         let countryCode = this.bodyParams.countryCode;
 
+        console.log("POST /register" + email);
+
         let profile                                        = {};
         profile[Users.PROFILE_ORGANIZATION]                = this.bodyParams.organization;
         profile[Users.PROFILE_NAME]                        = this.bodyParams.name;
@@ -208,9 +210,12 @@ RestAPI.addRoute("users/search", {
     post: function () {
         let query = this.bodyParams.query;
         let limit = parseInt(this.bodyParams.limit);
+        let skip  = parseInt(this.bodyParams.skip);
+
+        console.log("POST users/search/" + query);
 
         try {
-            let users          = searchUsers.call({query, limit});
+            let users          = searchUsers.call({query, limit, skip});
             let formattedUsers = _.map(users, RESTUtils.formatUserForREST);
 
             let response              = {};
