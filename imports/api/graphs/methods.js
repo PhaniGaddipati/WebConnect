@@ -56,18 +56,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         }
 
         // Make map of node to incoming and outgoing edges
-        let nodeMap = {};
-        _.each(graph[Graphs.NODES], function (node) {
-            nodeMap[node[Graphs.NODE_ID]] = {
-                incomingEdges: [],
-                outgoingEdges: []
-            }
-        });
-        _.each(graph[Graphs.EDGES], function (edge) {
-            nodeMap[edge[Graphs.EDGE_SOURCE]].outgoingEdges.push(edge);
-            nodeMap[edge[Graphs.EDGE_TARGET]].incomingEdges.push(edge);
-        });
-
+        let nodeMap = makeNodeMap(graph);
 
         // Go through the graph and find any virtual nodes,
         // which is indicated by a node with a graphId field
@@ -78,7 +67,6 @@ export const getGraphWithoutLinks = new ValidatedMethod({
 
         let newNodes = [];
         let newEdges = [];
-
         _.each(graph[Graphs.NODES], function (node) {
             if (node[Graphs.NODE_GRAPH_ID]) {
                 // Virtual node found
@@ -89,9 +77,10 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         "Bypassing this virtual node.");
                     bypass = true;
                 } else {
-                    let virtualNodeOutgoingTarget = nodeMap[node[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
-                    let subGraphId                = node[Graphs.NODE_GRAPH_ID];
-                    let subGraph                  = getGraphWithoutLinks.call(subGraphId);
+                    let vNodeOutTarget = nodeMap[node[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
+                    let subGraphId     = node[Graphs.NODE_GRAPH_ID];
+                    let subGraph       = getGraphWithoutLinks.call(subGraphId);
+
                     if (!subGraph) {
                         // Couldn't find subgraph. Ignore it by skipping the virtual node
                         console.warn("Couldn't find virtual node " + node[Graphs.NODE_ID] + " graph " + subGraphId + ". " +
@@ -99,10 +88,11 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         bypass = true;
                     } else {
                         // Find all terminations of subGraph and set it to vNode's target
+                        let sgNodeMap = makeNodeMap(subGraph);
                         _.each(subGraph[Graphs.EDGES], function (sgEdge) {
-                            if (sgEdge[Graphs.EDGE_TARGET] == subGraph[Graphs.LAST_NODE]) {
+                            if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]].outgoingEdges.length == 0) {
                                 // Terminating edge, link back to parent graph
-                                sgEdge[Graphs.EDGE_TARGET] = virtualNodeOutgoingTarget;
+                                sgEdge[Graphs.EDGE_TARGET] = vNodeOutTarget;
                             }
                         });
                         // vNode's incoming edges points to firstNode of subgraph
@@ -127,8 +117,14 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                 }
             } else {
                 newNodes.push(node);
-                newEdges = newEdges.concat(nodeMap[node[Graphs.NODE_ID]].incomingEdges);
-                newEdges = newEdges.concat(nodeMap[node[Graphs.NODE_ID]].outgoingEdges);
+
+                // Add the edges that don't point/start from a virtual node
+                newEdges = newEdges.concat(_.filter(nodeMap[node[Graphs.NODE_ID]].incomingEdges, function (edge) {
+                    return nodeMap[edge[Graphs.EDGE_SOURCE]].isVirtual;
+                }));
+                newEdges = newEdges.concat(_.filter(nodeMap[node[Graphs.NODE_ID]].outgoingEdges, function (edge) {
+                    return nodeMap[edge[Graphs.EDGE_TARGET]].isVirtual;
+                }));
             }
         });
 
@@ -143,6 +139,30 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         return graph;
     }
 });
+
+function makeNodeMap(graph) {
+    let nodeMap = {};
+    _.each(graph[Graphs.NODES], function (node) {
+        nodeMap[node[Graphs.NODE_ID]] = {
+            incomingEdges: [],
+            outgoingEdges: [],
+            isVirtual: !node[Graphs.NODE_GRAPH_ID]
+        }
+    });
+    _.each(graph[Graphs.EDGES], function (edge) {
+        if (nodeMap[edge[Graphs.EDGE_SOURCE]]) {
+            nodeMap[edge[Graphs.EDGE_SOURCE]].outgoingEdges.push(edge);
+        } else {
+            console.warn("Couldn't find source node " + edge[Graphs.EDGE_SOURCE] + " for graph " + graph[Graphs.GRAPH_ID]);
+        }
+        if (nodeMap[edge[Graphs.EDGE_TARGET]]) {
+            nodeMap[edge[Graphs.EDGE_TARGET]].incomingEdges.push(edge);
+        } else {
+            console.warn("Couldn't find target node " + edge[Graphs.EDGE_TARGET] + " for graph " + graph[Graphs.GRAPH_ID]);
+        }
+    });
+    return nodeMap;
+}
 
 /**
  * Attempts to upsert a graph. If the graph doesn't exist in the DB,
