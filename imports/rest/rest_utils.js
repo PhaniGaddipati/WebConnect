@@ -10,7 +10,7 @@ import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
 import * as Users from "/imports/api/users/users.js";
-import {getGraph} from "/imports/api/graphs/methods.js";
+import {getGraphWithoutLinks} from "/imports/api/graphs/methods.js";
 import {getAllChartResources, getAllChartUsers} from "/imports/api/charts/methods";
 
 /**
@@ -102,7 +102,7 @@ export const formatChartForREST = function (rawChart) {
     chart[FLOWCHART_TYPE]         = rawChart[Charts.TYPE];
     chart[FLOWCHART_IMAGE]        = rawChart[Charts.IMAGE];
     chart[FLOWCHART_SCORE]        = computeScore(rawChart);
-    chart[FLOWCHART_GRAPH]        = formatGraphForREST(getGraph.call(rawChart[Charts.GRAPH_ID]));
+    chart[FLOWCHART_GRAPH]        = formatGraphForREST(getGraphWithoutLinks.call(rawChart[Charts.GRAPH_ID]));
     chart[FLOWCHART_ALL_RES]      = getAllChartResources.call(rawChart[Charts.CHART_ID]);
     chart[FLOWCHART_ALL_USR_ID]   = getAllChartUsers.call(rawChart[Charts.CHART_ID]);
 
@@ -176,8 +176,13 @@ function formatEdgeForREST(rawEdge) {
     edge[GRAPH_EDGE_ID]      = rawEdge[Graphs.EDGE_ID];
     edge[GRAPH_EDGE_NAME]    = rawEdge[Graphs.EDGE_NAME];
     edge[GRAPH_EDGE_SOURCE]  = rawEdge[Graphs.EDGE_SOURCE];
-    edge[GRAPH_EDGE_TARGET]  = rawEdge[Graphs.EDGE_TARGET];
     edge[GRAPH_EDGE_DETAILS] = rawEdge[Graphs.EDGE_DETAILS];
+
+    if (rawEdge[Graphs.EDGE_TARGET]) {
+        edge[GRAPH_EDGE_TARGET] = rawEdge[Graphs.EDGE_TARGET];
+    } else {
+        edge[GRAPH_EDGE_TARGET] = null;
+    }
     return edge;
 }
 

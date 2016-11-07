@@ -12,7 +12,9 @@ export const NODES          = "nodes";
 export const EDGES          = "edges";
 export const OWNER          = "owner";
 export const FIRST_NODE     = "firstNode";
+export const LAST_NODE      = "lastNode";
 export const NODE_ID        = "_id";
+export const NODE_GRAPH_ID  = "graphId";
 export const NODE_NAME      = "name";
 export const NODE_DETAILS   = "details";
 export const NODE_RESOURCES = "resources";
@@ -41,8 +43,8 @@ Graphs.deny({
     }
 });
 
-Graphs.schema             = {};
-Graphs.schema.nodeSchema  = new SimpleSchema({
+Graphs.schema            = {};
+Graphs.schema.nodeSchema = new SimpleSchema({
     _id: {
         type: String,
         regEx: SimpleSchema.RegEx.Id,
@@ -52,6 +54,11 @@ Graphs.schema.nodeSchema  = new SimpleSchema({
                 return Random.id();
             }
         }
+    },
+    graphId: {
+        type: String,
+        regEx: SimpleSchema.RegEx.Id,
+        optional: true,
     },
     name: {
         type: String,
@@ -79,7 +86,7 @@ Graphs.schema.nodeSchema  = new SimpleSchema({
         defaultValue: []
     }
 });
-Graphs.schema.edgeSchema  = new SimpleSchema({
+Graphs.schema.edgeSchema = new SimpleSchema({
     _id: {
         type: String,
         regEx: SimpleSchema.RegEx.Id,
@@ -110,6 +117,7 @@ Graphs.schema.edgeSchema  = new SimpleSchema({
         optional: false
     }
 });
+
 Graphs.schema.graphSchema = new SimpleSchema({
     owner: {
         type: String,
@@ -128,6 +136,10 @@ Graphs.schema.graphSchema = new SimpleSchema({
         defaultValue: []
     },
     firstNode: {
+        type: SimpleSchema.RegEx.Id,
+        optional: false
+    },
+    lastNode: {
         type: SimpleSchema.RegEx.Id,
         optional: false
     }

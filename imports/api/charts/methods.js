@@ -6,7 +6,7 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Charts from "./charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
-import {insertGraph, getGraph} from "../graphs/methods.js";
+import {insertGraph, getGraphWithoutLinks} from "../graphs/methods.js";
 
 /**
  * Inserts a new chart into the database, given the name and description.
@@ -197,7 +197,7 @@ export const getAllChartResources = new ValidatedMethod({
             return null;
         }
         let resList = [];
-        let graph   = getGraph.call(chart[Charts.GRAPH_ID]);
+        let graph   = getGraphWithoutLinks.call(chart[Charts.GRAPH_ID]);
         let cmnts   = [];
 
         cmnts = cmnts.concat(chart[Charts.COMMENTS]);
@@ -237,7 +237,7 @@ export const getAllChartUsers = new ValidatedMethod({
             return null;
         }
         let userList = [];
-        let graph    = getGraph.call(chart[Charts.GRAPH_ID]);
+        let graph    = getGraphWithoutLinks.call(chart[Charts.GRAPH_ID]);
         let cmnts    = [];
 
         cmnts = cmnts.concat(chart[Charts.COMMENTS]);
