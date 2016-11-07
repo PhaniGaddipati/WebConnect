@@ -65,25 +65,26 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         // SG.lastNode points to where the virtual node's
         // outgoing edge points. There should only be 1 outgoing edge
 
-        let newNodes = [];
-        let newEdges = [];
-        _.each(graph[Graphs.NODES], function (node) {
-            if (node[Graphs.NODE_GRAPH_ID]) {
+        let nodesToDelete = {};
+        let newNodes      = [];
+        let newEdges      = [];
+        _.each(graph[Graphs.NODES], function (vNode) {
+            if (vNode[Graphs.NODE_GRAPH_ID]) {
                 // Virtual node found
                 let bypass = false;
-                if (nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length != 1) {
-                    console.warn("Virtual node " + node[Graphs.NODE_ID] + " of graph " + graph[Graphs.GRAPH_ID] +
-                        "contains " + nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length + " outgoing edges. Expected 1. " +
+                if (nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length != 1) {
+                    console.warn("Virtual node " + vNode[Graphs.NODE_ID] + " of graph " + graph[Graphs.GRAPH_ID] +
+                        "contains " + nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length + " outgoing edges. Expected 1. " +
                         "Bypassing this virtual node.");
                     bypass = true;
                 } else {
-                    let vNodeOutTarget = nodeMap[node[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
-                    let subGraphId     = node[Graphs.NODE_GRAPH_ID];
+                    let vNodeOutTarget = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
+                    let subGraphId     = vNode[Graphs.NODE_GRAPH_ID];
                     let subGraph       = getGraphWithoutLinks.call(subGraphId);
 
                     if (!subGraph) {
                         // Couldn't find subgraph. Ignore it by skipping the virtual node
-                        console.warn("Couldn't find virtual node " + node[Graphs.NODE_ID] + " graph " + subGraphId + ". " +
+                        console.warn("Couldn't find virtual node " + vNode[Graphs.NODE_ID] + " graph " + subGraphId + ". " +
                             "Bypassing this virtual node.");
                         bypass = true;
                     } else {
@@ -91,38 +92,43 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         let sgNodeMap = makeNodeMap(subGraph);
                         _.each(subGraph[Graphs.EDGES], function (sgEdge) {
                             if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]].outgoingEdges.length == 0) {
+                                // This terminating node is no longer needed
+                                nodesToDelete[sgEdge[Graphs.EDGE_TARGET]] = true;
                                 // Terminating edge, link back to parent graph
-                                sgEdge[Graphs.EDGE_TARGET] = vNodeOutTarget;
+                                sgEdge[Graphs.EDGE_TARGET]                = vNodeOutTarget;
                             }
+                            newEdges.push(sgEdge);
                         });
                         // vNode's incoming edges points to firstNode of subgraph
-                        _.each(nodeMap[node[Graphs.NODE_ID]].incomingEdges, function (edge) {
+                        _.each(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
                             edge[Graphs.EDGE_TARGET] = subGraph[Graphs.FIRST_NODE];
+                            newEdges.push(edge);
                         });
 
-                        // Queue up nodes and edge to add to the main graph
-                        newNodes = newNodes.concat(subGraph[Graphs.NODES]);
-                        newEdges = newEdges.concat(subGraph[Graphs.EDGES]);
+                        // Add subgraph nodes and edges
+                        let nodesToAdd = _.reject(subGraph[Graphs.NODES], function (node) {
+                            return nodesToDelete[node[Graphs.NODE_ID]];
+                        });
+                        newNodes       = newNodes.concat(nodesToAdd);
                     }
                 }
                 if (bypass) {
                     // Set virtual node's incoming edges to point to it's outgoing edge, if it has one.
                     // If it has more than 1, point to the first.
-                    if (nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length > 0) {
-                        let outgoingEdgeTarget = nodeMap[node[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
-                        _.each(nodeMap[node[Graphs.NODE_ID]].incomingEdges, function (edge) {
+                    if (nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length > 0) {
+                        let outgoingEdgeTarget = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
+                        _.each(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
                             edge[Graphs.EDGE_TARGET] = outgoingEdgeTarget;
                         });
                     }
                 }
             } else {
-                newNodes.push(node);
-
+                newNodes.push(vNode);
                 // Add the edges that don't point/start from a virtual node
-                newEdges = newEdges.concat(_.filter(nodeMap[node[Graphs.NODE_ID]].incomingEdges, function (edge) {
+                newEdges = newEdges.concat(_.reject(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
                     return nodeMap[edge[Graphs.EDGE_SOURCE]].isVirtual;
                 }));
-                newEdges = newEdges.concat(_.filter(nodeMap[node[Graphs.NODE_ID]].outgoingEdges, function (edge) {
+                newEdges = newEdges.concat(_.reject(nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges, function (edge) {
                     return nodeMap[edge[Graphs.EDGE_TARGET]].isVirtual;
                 }));
             }
@@ -146,7 +152,7 @@ function makeNodeMap(graph) {
         nodeMap[node[Graphs.NODE_ID]] = {
             incomingEdges: [],
             outgoingEdges: [],
-            isVirtual: !node[Graphs.NODE_GRAPH_ID]
+            isVirtual: node[Graphs.NODE_GRAPH_ID] != null
         }
     });
     _.each(graph[Graphs.EDGES], function (edge) {
