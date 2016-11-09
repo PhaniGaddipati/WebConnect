@@ -78,9 +78,9 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         "Bypassing this virtual node.");
                     bypass = true;
                 } else {
-                    let vNodeOutTarget = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges[0][Graphs.EDGE_TARGET];
-                    let subGraphId     = vNode[Graphs.NODE_GRAPH_ID];
-                    let subGraph       = getGraphWithoutLinks.call(subGraphId);
+                    let vNodeOutEdges = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges;
+                    let subGraphId    = vNode[Graphs.NODE_GRAPH_ID];
+                    let subGraph      = getGraphWithoutLinks.call(subGraphId);
 
                     if (!subGraph) {
                         // Couldn't find subgraph. Ignore it by skipping the virtual node
@@ -88,21 +88,28 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                             "Bypassing this virtual node.");
                         bypass = true;
                     } else {
-                        // Find all terminations of subGraph and set it to vNode's target
-                        let sgNodeMap = makeNodeMap(subGraph);
-                        _.each(subGraph[Graphs.EDGES], function (sgEdge) {
-                            if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]].outgoingEdges.length == 0) {
-                                // This terminating node is no longer needed
-                                nodesToDelete[sgEdge[Graphs.EDGE_TARGET]] = true;
-                                // Terminating edge, link back to parent graph
-                                sgEdge[Graphs.EDGE_TARGET]                = vNodeOutTarget;
-                            }
-                            newEdges.push(sgEdge);
-                        });
                         // vNode's incoming edges points to firstNode of subgraph
                         _.each(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
                             edge[Graphs.EDGE_TARGET] = subGraph[Graphs.FIRST_NODE];
                             newEdges.push(edge);
+                        });
+
+                        // Find all terminations of subGraph and set it to vNode's target
+                        let sgNodeMap = makeNodeMap(subGraph);
+                        _.each(subGraph[Graphs.EDGES], function (sgEdge) {
+                            if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]].outgoingEdges.length == 0) {
+                                // This leaf node is no longer needed
+                                nodesToDelete[sgEdge[Graphs.EDGE_TARGET]] = true;
+                                // Terminating edge, link to outgoing edges of the virtual node
+                                _.each(vNodeOutEdges, function (outEdge) {
+                                    // Make a new edge incase there's more than 1 terminating node
+                                    let edge                 = outEdge;
+                                    edge[Graphs.EDGE_SOURCE] = sgEdge[Graphs.EDGE_SOURCE];
+                                    newEdges.push(edge);
+                                });
+                            } else {
+                                newEdges.push(sgEdge);
+                            }
                         });
 
                         // Add subgraph nodes and edges
