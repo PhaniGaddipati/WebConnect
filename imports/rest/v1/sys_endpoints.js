@@ -7,12 +7,36 @@ import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
+import {postFeedback} from "/imports/api/sys/methods.js";
 
 const RESPONSE_STATUS         = "status";
 const RESPONSE_MESSAGE        = "message";
 const RESPONSE_DATA           = "data";
 const RESPONSE_STATUS_SUCCESS = "success";
 const RESPONSE_STATUS_ERROR   = "error";
+
+RestAPI.addRoute("sys/feedback", {
+    post: function () {
+        let response = {};
+        let userId   = this.bodyParams.userId;
+        let text     = this.bodyParams.text;
+        console.log("POST sys/feedback \"" + text + "\"");
+        try {
+            postFeedback.call({userId, text});
+            response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+            response[RESPONSE_DATA]   = {};
+            return response;
+        } catch (err) {
+            console.log(err);
+            response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+            response[RESPONSE_MESSAGE] = "Failed to post feedback";
+            return {
+                statusCode: 400,
+                body: response
+            }
+        }
+    }
+});
 
 RestAPI.addRoute("sys/chart", {authRequired: true}, {
     post: function () {

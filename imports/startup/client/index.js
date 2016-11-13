@@ -6,3 +6,4 @@ import "/imports/ui/styles/bootstrap.css";
 import "/imports/utils/jsplumb/stylesheets/jsPlumbToolkit-defaults.css";
 import "/imports/utils/jsplumb/stylesheets/jsPlumbToolkit-demo.css";
 import "/imports/utils/jsplumb/stylesheets/chart-view.css";
+import "/imports/utils/jsplumb/dummy_render.html";

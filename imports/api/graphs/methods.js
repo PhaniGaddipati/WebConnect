@@ -56,7 +56,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         }
 
         // Make map of node to incoming and outgoing edges
-        let nodeMap = makeNodeMap(graph);
+        let nodeMap = getNodeEdgeMap(graph);
 
         // Go through the graph and find any virtual nodes,
         // which is indicated by a node with a graphId field
@@ -72,7 +72,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
             if (vNode[Graphs.NODE_GRAPH_ID]) {
                 // Virtual node found
                 let bypass = false;
-                if (nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length != 1) {
+                if (nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length < 1) {
                     console.warn("Virtual node " + vNode[Graphs.NODE_ID] + " of graph " + graph[Graphs.GRAPH_ID] +
                         "contains " + nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length + " outgoing edges. Expected 1. " +
                         "Bypassing this virtual node.");
@@ -95,7 +95,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         });
 
                         // Find all terminations of subGraph and set it to vNode's target
-                        let sgNodeMap = makeNodeMap(subGraph);
+                        let sgNodeMap = getNodeEdgeMap(subGraph);
                         _.each(subGraph[Graphs.EDGES], function (sgEdge) {
                             if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]].outgoingEdges.length == 0) {
                                 // This leaf node is no longer needed
@@ -153,7 +153,14 @@ export const getGraphWithoutLinks = new ValidatedMethod({
     }
 });
 
-function makeNodeMap(graph) {
+/**
+ * Creates a map mapping node id to arrays of
+ * incomingEdges, outgoingEdges. isVirtual marks
+ * if the node is a virtual node.
+ * @param graph
+ * @returns {{}}
+ */
+export const getNodeEdgeMap = function (graph) {
     let nodeMap = {};
     _.each(graph[Graphs.NODES], function (node) {
         nodeMap[node[Graphs.NODE_ID]] = {
@@ -175,7 +182,7 @@ function makeNodeMap(graph) {
         }
     });
     return nodeMap;
-}
+};
 
 /**
  * Attempts to upsert a graph. If the graph doesn't exist in the DB,
