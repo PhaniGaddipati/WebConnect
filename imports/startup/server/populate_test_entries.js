@@ -2154,7 +2154,7 @@ try {
             ]
         });
 
-    if (!Charts.Charts.findOne({_id: "77D4EC29C5836CB59"}))
+    if (!Charts.Charts.findOne({name: "Suction Machine"}))
         Charts.Charts.insert({
             "_id": "77D4EC29C5836CB59",
             "name": "Suction Machine",
@@ -2170,7 +2170,7 @@ try {
             "comments": [],
             "graph": "HGE9F8GEH453C9F5B"
         });
-    if (!Charts.Charts.findOne({_id: "8592A4G4E6D388BFJ"}))
+    if (!Charts.Charts.findOne({name: "Autoclave"}))
         Charts.Charts.insert({
             "_id": "8592A4G4E6D388BFJ",
             "name": "Autoclave",
