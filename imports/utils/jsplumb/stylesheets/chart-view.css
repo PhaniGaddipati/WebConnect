@@ -1,31 +1,95 @@
-.jtk-node {
-    background-color: #3E7E9C;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
+/* ------------------------ dialogs ----------------------------*/
+
+/* ----------------------- drag/drop interactions -------------- */
+.drop-hover {
+    background-color: #FCCCCC !important;
+}
+
+/* ----------------------- node styles ------------------------- */
+
+.flowchart-object {
     position: absolute;
-    z-index: 11;
-    overflow: auto;
-    min-width: 230px;
-    min-height: 30px;
-    width: auto;
-}
-
-.jtk-node .name {
-    background-color: #3E7E9C;
-    color: #f7ebca;
-    cursor: move;
-    font-size: 12px;
-    line-height: 13px;
-    padding: 6px;
     text-align: center;
+    opacity: 0.8;
+    z-index: 10;
+    background: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    min-width: 0;
+    min-height: 0;
+    stroke: none;
+    fill: #f7ebca;
+    font-family: "Open Sans", sans-serif !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    padding-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 15px;
 }
 
-.jtk-node .name span {
+.flowchart-object .title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.node-action {
+    background-color: #234b5e;
+    color: white;
+}
+
+.node-virtual {
+    background-color: #E65100;
+    color: white;
+}
+
+.node-terminator {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 30px;
+}
+
+.flowchart-object .drag-start {
     cursor: pointer;
 }
 
-.endpoint {
-    color: transparent;
-    background-color: transparent;
+.flowchart-object .node-action:hover {
+    color: #ff8000;
+}
+
+.flowchart-object .node-edit {
+    left: 50%;
+    margin-left: -20px;
+}
+
+.flowchart-object .node-delete {
+    left: 50%;
+    margin-left: 10px;
+}
+
+.flowchart-object.jtk-surface-selected-element .node-action {
+    display: block;
+}
+
+.outer {
+    fill: gray;
+    opacity: 0.3;
+    cursor: pointer;
+}
+
+.flowchart-object:hover .outer {
+    opacity: 0.7;
+}
+
+.inner {
+    cursor: move !important;
+}
+
+.connection-drop svg {
+    fill: #CCC;
+}
+
+.connection-drop text {
+    fill: black;
 }

@@ -6,13 +6,14 @@ import "./chart_view.html";
 import "/imports/ui/components/app_loading/app_loading.js";
 import "/imports/utils/jsplumb/jsPlumb-2.1.5.js";
 import "/imports/utils/jsplumb/jsPlumbToolkit-1.0.26-min.js";
-import "/imports/utils/jsplumb/templates/tmplNode.html";
+import "/imports/utils/jsplumb/templates/processNode.html";
+import "/imports/utils/jsplumb/templates/virtualNode.html";
+import "/imports/utils/jsplumb/templates/terminatorNode.html";
 import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getGraph} from "/imports/api/graphs/methods.js";
-
-const dagre = require("dagre");
+import {layoutGraph} from "/imports/utils/jsplumb/jsplumb_utils.js";
 
 Template.chart_view.onCreated(function () {
     var self     = Template.instance();
@@ -48,32 +49,11 @@ Template.chart_view.helpers({
 function loadFlowchart() {
     let graph = Template.instance().graph.get();
     if (graph) {
-        let nodes      = graph[Graphs.NODES];
-        let edges      = graph[Graphs.EDGES];
-        var dagreGraph = new dagre.graphlib.Graph();
-        dagreGraph.setGraph({});
-        dagreGraph.setDefaultEdgeLabel(function () {
-            return {};
-        });
-        _.each(nodes, function (node) {
-            node.width  = 230;
-            node.height = 50;
-            dagreGraph.setNode(node[Graphs.NODE_ID], node);
-        });
-        _.each(edges, function (edge) {
-            dagreGraph.setEdge(edge[Graphs.EDGE_SOURCE], edge[Graphs.EDGE_TARGET]);
-        });
-        dagre.layout(dagreGraph, {ranker: "tight-tree"});
-        nodes = _.map(dagreGraph.nodes(), function (nodeId) {
-            let node  = dagreGraph.node(nodeId);
-            node.left = node.x;
-            node.top  = node.y;
-            return _.omit(node, "x", "y");
-        });
+        graph = layoutGraph(graph);
         Template.instance().jsplumb.load({
             data: {
-                "nodes": nodes,
-                "edges": edges
+                "nodes": graph[Graphs.NODES],
+                "edges": graph[Graphs.EDGES]
             }
         });
         Template.instance().jsplumbRenderer = Template.instance().jsplumb.render({
@@ -85,26 +65,50 @@ function loadFlowchart() {
             view: {
                 nodes: {
                     "default": {
-                        template: "tmplNode"
+                        template: "processNode"
+                    },
+                    "virtual": {
+                        template: "virtualNode"
+                    },
+                    "terminator": {
+                        template: "terminatorNode"
                     }
                 },
                 edges: {
                     "default": {
-                        paintStyle: {lineWidth: 2, strokeStyle: '#89bcde'},
-                        hoverPaintStyle: {strokeStyle: "orange"},
+                        anchor: "AutoDefault",
+                        endpoint: "Blank",
+                        connector: ["Flowchart", {cornerRadius: 5}],
+                        paintStyle: {
+                            lineWidth: 2,
+                            strokeStyle: "#f76258",
+                            outlineWidth: 3,
+                            outlineStroke: "transparent"
+                        },	//	paint style for this edge type.
+                        hoverPaintStyle: {strokeWidth: 2, stroke: "rgb(67,67,67)"}, // hover paint style for this edge type.
                         overlays: [
-                            ["Arrow", {fillStyle: "#89bcde", width: 10, length: 10, location: 1}]
+                            ["Arrow", {location: 1, width: 10, length: 10}],
+                            ["Arrow", {location: 0.3, width: 10, length: 10}],
+                            ["Label", {label: "${name}", location: .25, labelStyle: {color: "black"}}]
                         ]
                     }
+                },
+                ports: {
+                    "start": {
+                        edgeType: "default"
+                    },
+                    "source": {
+                        maxConnections: -1,
+                        edgeType: "connection"
+                    },
+                    "target": {
+                        maxConnections: -1,
+                        isTarget: true,
+                        dropOptions: {
+                            hoverClass: "connection-drop"
+                        }
+                    }
                 }
-            },
-            jsPlumb: {
-                Endpoint: ["Dot", {cssClass: "endpoint", radius: 7}],
-                EndpointStyle: {fillStyle: '#89bcde'},
-                EndpointHoverStyle: {fillStyle: "orange"},
-                Anchor: ["Perimeter", {shape: "Rectangle"}],
-                Connector: ["Flowchart", {gap: 5, stub: 25, cornerRadius: 5}],
-                ConnectionsDetachable: false
             }
         });
     }

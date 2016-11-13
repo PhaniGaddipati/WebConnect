@@ -9,11 +9,31 @@
 /* --------------------------------------------------------------------------------------------- */
 
 /*
-    Assigned to every node managed by an instance of the Toolkit. They are required to be positioned absolute, to
+    Assigned to every Node managed by an instance of the Toolkit. They are required to be positioned absolute, to
     enable dragging to work properly.
 */
 .jtk-node {
     position: absolute;
+}
+
+/*
+    Assigned to every Group managed by an instance of the Toolkit. They are required to be positioned absolute, to
+    enable dragging to work properly. We set overflow:visible on Group elements too, as a drag outside of the bounds
+    is automatically reverted anyway, and without overflow:visible you cannot drag a node to some other element. You can
+    also drag a node out of the element's viewport and if you drop it you can never get it back.
+*/
+.jtk-group {
+    position: absolute;
+    overflow: visible;
+}
+
+/*
+
+    This is the attribute used to mark which part of a Group DOM element should contain the child Nodes. We mark it
+    as having `position:relative` so that the absolute positioned Nodes are drawn correctly.
+*/
+[jtk-group-content] {
+    position: relative;
 }
 
 /*
@@ -24,7 +44,7 @@
     the issue has been fixed in more recent versions of Chrome, but the style is left here in case you come across
     the problem.
 */
-.jtk-node.jsplumb-drag {
+.jtk-node.jtk-drag {
     /*-webkit-backface-visibility: hidden;*/
 }
 
@@ -66,7 +86,7 @@
 
 /*
     Assigned to the surface when it is being panned. The default is to change the cursor (in browsers that support
-    a `grabbing` cursor), and to disable tex selection.
+    a `grabbing` cursor), and to disable text selection.
 */
 .jtk-surface-panning {
     cursor: -moz-grabbing;
@@ -209,6 +229,7 @@ Assigned to tile images in a tiled background
     line-height: 40;
 }
 
+
 /*
     Assigned to a pan button when the user is pressing it.
 */
@@ -264,6 +285,14 @@ Assigned to tile images in a tiled background
 .jtk-miniview-element {
     background-color: rgb(96, 122, 134);
     position: absolute;
+}
+
+/*
+    Added to Group elements displayed in a miniview
+*/
+.jtk-miniview-group-element {
+    background: transparent;
+    border: 2px solid rgb(96, 122, 134);
 }
 
 /*
@@ -563,7 +592,7 @@ Assigned to tile images in a tiled background
     user-select: none;
 }
 
-.jsplumb-bezier-handle {
+.jtk-bezier-handle {
     width: 15px;
     height: 15px;
     border-radius: 50%;
@@ -572,24 +601,24 @@ Assigned to tile images in a tiled background
     z-index: 10;
 }
 
-.jsplumb-bezier-handle-secondary {
+.jtk-bezier-handle-secondary {
     cursor: default;
     background-color: lightgreen;
 }
 
-.jsplumb-bezier-handle-secondary-source {
+.jtk-bezier-handle-secondary-source {
     background-color: lavenderblush;
 }
 
-.jsplumb-bezier-guideline {
+.jtk-bezier-guideline {
     position: absolute;
 }
 
-.jsplumb-bezier-guideline path {
+.jtk-bezier-guideline path {
     stroke: darkcyan;
     stroke-linewidth: 3;
 }
 
-.jsplumb-connection-edit path {
+.jtk-connection-edit path {
     stroke-dasharray: 2 2;
 }
