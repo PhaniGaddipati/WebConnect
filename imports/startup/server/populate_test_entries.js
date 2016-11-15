@@ -1,7 +1,6 @@
 /**
  * Created by Phani on 9/15/2016.
  */
-
 import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {Random} from "meteor/random";
@@ -1129,7 +1128,7 @@ try {
                 },
                 {
                     "_id": "7FJ56H6H46J29788H",
-                    "graphId": "BC57D8B3259BD27FA",
+                    "graphId": "F994G52C9H22CGAAD",
                     "name": "Something"
                 },
                 {
@@ -1694,7 +1693,7 @@ try {
                 },
                 {
                     "_id": "A2G6JF4J4A3423JFA",
-                    "graphId": "BC57D8B3259BD27FA",
+                    "graphId": "F994G52C9H22CGAAD",
                     "name": "Something"
                 },
                 {
