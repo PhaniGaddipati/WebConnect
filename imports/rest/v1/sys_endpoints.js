@@ -1,7 +1,6 @@
 /**
  * Created by Phani on 9/28/2016.
  */
-
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
@@ -40,6 +39,7 @@ RestAPI.addRoute("sys/feedback", {
 
 RestAPI.addRoute("sys/chart", {authRequired: true}, {
     post: function () {
+        console.log("POST sys/chart");
         let chart    = this.bodyParams.flowchart;
         let response = {};
         if (chart && this.userId) {
@@ -48,9 +48,6 @@ RestAPI.addRoute("sys/chart", {authRequired: true}, {
             let graph           = chart[Charts.GRAPH_ID];
             chart[Charts.OWNER] = this.userId;
             graph[Graphs.OWNER] = this.userId;
-
-            graph._id = null;
-            chart._id = null;
 
             let graphId = Graphs.Graphs.insert(graph);
             if (graphId) {

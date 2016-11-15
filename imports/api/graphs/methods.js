@@ -133,10 +133,10 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                 newNodes.push(vNode);
                 // Add the edges that don't point/start from a virtual node
                 newEdges = newEdges.concat(_.reject(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
-                    return nodeMap[edge[Graphs.EDGE_SOURCE]].isVirtual;
+                    return nodeMap[edge[Graphs.EDGE_SOURCE]] && nodeMap[edge[Graphs.EDGE_SOURCE]].isVirtual;
                 }));
                 newEdges = newEdges.concat(_.reject(nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges, function (edge) {
-                    return nodeMap[edge[Graphs.EDGE_TARGET]].isVirtual;
+                    return nodeMap[edge[Graphs.EDGE_TARGET]] && nodeMap[edge[Graphs.EDGE_TARGET]].isVirtual;
                 }));
             }
         });
