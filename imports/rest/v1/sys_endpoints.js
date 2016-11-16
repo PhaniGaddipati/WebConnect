@@ -4,7 +4,7 @@
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {validateGraph} from "/imports/api/graphs/methods.js";
+import {validateGraph, getGraphWithoutLinks} from "/imports/api/graphs/methods.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
 import {postFeedback} from "/imports/api/sys/methods.js";
@@ -14,6 +14,29 @@ const RESPONSE_MESSAGE        = "message";
 const RESPONSE_DATA           = "data";
 const RESPONSE_STATUS_SUCCESS = "success";
 const RESPONSE_STATUS_ERROR   = "error";
+
+RestAPI.addRoute("sys/graph/:id", {
+    get: function () {
+        let id = this.urlParams.id;
+        console.log("GET sys/graph/" + id);
+        let graph    = getGraphWithoutLinks.call(id);
+        let response = {};
+        if (!graph) {
+            response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+            response[RESPONSE_MESSAGE] = "Graph not found: " + id;
+            return {
+                statusCode: 404,
+                body: response
+            }
+        } else {
+            response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+            response[RESPONSE_DATA]   = {
+                graph: graph
+            };
+            return response;
+        }
+    }
+});
 
 RestAPI.addRoute("sys/graph/validate", {
     post: function () {
