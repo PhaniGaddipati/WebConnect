@@ -6,6 +6,101 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
 
 /**
+ * Checks that a graph is well formed. This includes:
+ *    1) subgraphs exist
+ *    2) edges point to existing nodes
+ *    3) objects match schema
+ *
+ * Returns null on successful validation, or error messages on failure
+ */
+export const validateGraph = new ValidatedMethod({
+    name: "graphs.validateGraph",
+    validate: function (g) {
+    },
+    run(g){
+        let valid     = true;
+        let errorMsgs = "";
+        try {
+            let gId = g[Graphs.GRAPH_ID];
+            if (!gId) {
+                gId       = "<no id>";
+                errorMsgs = errorMsgs.concat("\nGraph Validation: missing _id field");
+                valid     = false;
+            }
+            if (!g[Graphs.NODES]) {
+                errorMsgs = errorMsgs.concat("\nGraph Validation: missing nodes field");
+                valid     = false;
+            } else {
+                _.each(g[Graphs.NODES], function (node) {
+                    if (!Graphs.Graphs.schema.nodeSchema.newContext().validate(
+                            Graphs.Graphs.schema.nodeSchema.clean(node))) {
+                        errorMsgs = errorMsgs.concat("\nGraph Validation: invalid node "
+                        + (!!node[Graphs.NODE_GRAPH_ID]) ? node[Graphs.NODE_GRAPH_ID] : "");
+                        valid     = false;
+                    }
+                });
+            }
+            if (!g[Graphs.EDGES]) {
+                console.concat("\nGraph Validation: missing edges field");
+                valid = false;
+            } else {
+                _.each(g[Graphs.EDGES], function (edge) {
+                    if (!Graphs.Graphs.schema.edgeSchema.newContext().validate(
+                            Graphs.Graphs.schema.edgeSchema.clean(edge))) {
+                        errorMsgs = errorMsgs.concat("\nGraph Validation: invalid edge "
+                        + edge[Graphs.EDGE_ID] ? edge[Graphs.EDGE_ID] : "");
+                        valid     = false;
+                    }
+                });
+            }
+            if (!g[Graphs.FIRST_NODE]) {
+                errorMsgs = errorMsgs.concat("\nGraph Validation: missing firstNode field");
+                valid     = false;
+            }
+
+            if (valid) {
+                // Check edges only if the rest is good
+                let nodeMap      = {};
+                let virtualNodes = [];
+                _.each(g[Graphs.NODES], function (node) {
+                    nodeMap[node[Graphs.NODE_ID]] = true;
+                    if (node[Graphs.NODE_GRAPH_ID]) {
+                        virtualNodes.push(node);
+                    }
+                });
+                _.each(g[Graphs.EDGES], function (edge) {
+                    if (!nodeMap[edge[Graphs.EDGE_SOURCE]]) {
+                        errorMsgs = errorMsgs.concat("\nGraph Validation: edge " + edge[Graphs.EDGE_ID]
+                            + " source " + edge[Graphs.EDGE_SOURCE] + " doesn't exist");
+                        valid     = false;
+                    }
+                    if (!nodeMap[edge[Graphs.EDGE_TARGET]]) {
+                        errorMsgs = errorMsgs.concat("\nGraph Validation: edge " + edge[Graphs.EDGE_ID]
+                            + " target " + edge[Graphs.EDGE_TARGET] + " doesn't exist");
+                        valid     = false;
+                    }
+                });
+                _.each(virtualNodes, function (vNode) {
+                    if (!Graphs.Graphs.findOne({_id: vNode[Graphs.NODE_GRAPH_ID]})) {
+                        errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
+                            + " refers to nonexistant graph " + vNode[Graphs.NODE_GRAPH_ID]);
+                        valid     = false;
+                    }
+                });
+            }
+        } catch (err) {
+            errorMsgs = errorMsgs.log("\nGraph Validation: unexpected error");
+            errorMsgs = errorMsgs.log(err);
+            valid     = false;
+        }
+        if (valid) {
+            return null;
+        }
+        return errorMsgs;
+    }
+});
+
+/**
  * Inserts a new graph into the database, given the owner id
  *
  * The unique _id of the graph is returned, or null on failure.

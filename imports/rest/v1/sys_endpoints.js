@@ -4,6 +4,7 @@
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
+import {validateGraph} from "/imports/api/graphs/methods.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
 import {postFeedback} from "/imports/api/sys/methods.js";
@@ -48,6 +49,29 @@ RestAPI.addRoute("sys/chart", {authRequired: true}, {
             let graph           = chart[Charts.GRAPH_ID];
             chart[Charts.OWNER] = this.userId;
             graph[Graphs.OWNER] = this.userId;
+
+            if (graph[Graphs.GRAPH_ID]) {
+                // ID given, check if it exists
+                if (Graphs.Graphs.findOne({_id: graph[Graphs.GRAPH_ID]})) {
+                    response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                    response[RESPONSE_MESSAGE] = "Graph with ID " + graph[Graphs.GRAPH_ID] + " already exists";
+                    return {
+                        statusCode: 400,
+                        body: response
+                    }
+                }
+            }
+
+            let error = validateGraph.call(graph);
+            if (error) {
+                //Failed :(
+                response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+                response[RESPONSE_MESSAGE] = error;
+                return {
+                    statusCode: 400,
+                    body: response
+                }
+            }
 
             let graphId = Graphs.Graphs.insert(graph);
             if (graphId) {
