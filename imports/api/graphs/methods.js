@@ -35,7 +35,7 @@ export const validateGraph = new ValidatedMethod({
                     if (!Graphs.Graphs.schema.nodeSchema.newContext().validate(
                             Graphs.Graphs.schema.nodeSchema.clean(node))) {
                         errorMsgs = errorMsgs.concat("\ninvalid node "
-                        + (!!node[Graphs.NODE_GRAPH_ID]) ? node[Graphs.NODE_GRAPH_ID] : "");
+                            + ((!!node[Graphs.NODE_GRAPH_ID]) ? node[Graphs.NODE_GRAPH_ID] : ""));
                         valid     = false;
                     }
                 });
@@ -48,7 +48,7 @@ export const validateGraph = new ValidatedMethod({
                     if (!Graphs.Graphs.schema.edgeSchema.newContext().validate(
                             Graphs.Graphs.schema.edgeSchema.clean(edge))) {
                         errorMsgs = errorMsgs.concat("\ninvalid edge "
-                        + edge[Graphs.EDGE_ID] ? edge[Graphs.EDGE_ID] : "");
+                            + (edge[Graphs.EDGE_ID] ? edge[Graphs.EDGE_ID] : ""));
                         valid     = false;
                     }
                 });

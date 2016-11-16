@@ -15,6 +15,38 @@ const RESPONSE_DATA           = "data";
 const RESPONSE_STATUS_SUCCESS = "success";
 const RESPONSE_STATUS_ERROR   = "error";
 
+RestAPI.addRoute("sys/graph/validate", {
+    post: function () {
+        let flowchart = this.bodyParams.flowchart;
+        let graph     = this.bodyParams.graph;
+        let response  = {};
+        if ((!flowchart || flowchart[Charts.GRAPH_ID]) && !graph) {
+            response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
+            response[RESPONSE_MESSAGE] = "Graph not provided";
+            return {
+                statusCode: 404,
+                body: response
+            }
+        }
+        if (!graph) {
+            graph = flowchart[Charts.GRAPH_ID];
+        }
+        let error = validateGraph.call(graph);
+        let valid = false;
+        if (!error) {
+            valid = true;
+            error = "";
+        }
+
+        response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+        response[RESPONSE_DATA]   = {
+            valid: valid,
+            errors: error
+        };
+        return response;
+    }
+});
+
 RestAPI.addRoute("sys/feedback", {
     post: function () {
         let response = {};
