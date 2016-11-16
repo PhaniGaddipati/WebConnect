@@ -108,8 +108,9 @@ export const getChartsInCatalog = new ValidatedMethod({
         // No arguments to validate
     },
     run(){
-        // For now, all charts are in the catalog
-        return Charts.Charts.find({}).fetch();
+        let sel                = {};
+        sel[Charts.IN_CATALOG] = true;
+        return Charts.Charts.find(sel).fetch();
     }
 });
 

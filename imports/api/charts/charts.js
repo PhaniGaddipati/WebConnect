@@ -20,6 +20,7 @@ export const GRAPH_ID      = "graph";
 export const COMMENTS      = "comments";
 export const RESOURCES     = "resources";
 export const IMAGE         = "image";
+export const IN_CATALOG = "inCatalog";
 
 export const TYPE         = "type";
 export const TYPE_MISC    = "misc";
@@ -134,6 +135,11 @@ Charts.schema = new SimpleSchema({
         type: [String],
         optional: false,
         defaultValue: []
+    },
+    inCatalog: {
+        type: Boolean,
+        optional: false,
+        defaultValue: false
     }
 });
 
