@@ -24,37 +24,37 @@ export const validateGraph = new ValidatedMethod({
             let gId = g[Graphs.GRAPH_ID];
             if (!gId) {
                 gId       = "<no id>";
-                errorMsgs = errorMsgs.concat("\nGraph Validation: missing _id field");
+                errorMsgs = errorMsgs.concat("\nmissing _id field");
                 valid     = false;
             }
             if (!g[Graphs.NODES]) {
-                errorMsgs = errorMsgs.concat("\nGraph Validation: missing nodes field");
+                errorMsgs = errorMsgs.concat("\nmissing nodes field");
                 valid     = false;
             } else {
                 _.each(g[Graphs.NODES], function (node) {
                     if (!Graphs.Graphs.schema.nodeSchema.newContext().validate(
                             Graphs.Graphs.schema.nodeSchema.clean(node))) {
-                        errorMsgs = errorMsgs.concat("\nGraph Validation: invalid node "
+                        errorMsgs = errorMsgs.concat("\ninvalid node "
                         + (!!node[Graphs.NODE_GRAPH_ID]) ? node[Graphs.NODE_GRAPH_ID] : "");
                         valid     = false;
                     }
                 });
             }
             if (!g[Graphs.EDGES]) {
-                console.concat("\nGraph Validation: missing edges field");
+                console.concat("\nmissing edges field");
                 valid = false;
             } else {
                 _.each(g[Graphs.EDGES], function (edge) {
                     if (!Graphs.Graphs.schema.edgeSchema.newContext().validate(
                             Graphs.Graphs.schema.edgeSchema.clean(edge))) {
-                        errorMsgs = errorMsgs.concat("\nGraph Validation: invalid edge "
+                        errorMsgs = errorMsgs.concat("\ninvalid edge "
                         + edge[Graphs.EDGE_ID] ? edge[Graphs.EDGE_ID] : "");
                         valid     = false;
                     }
                 });
             }
             if (!g[Graphs.FIRST_NODE]) {
-                errorMsgs = errorMsgs.concat("\nGraph Validation: missing firstNode field");
+                errorMsgs = errorMsgs.concat("\nmissing firstNode field");
                 valid     = false;
             }
 
@@ -68,14 +68,18 @@ export const validateGraph = new ValidatedMethod({
                         virtualNodes.push(node);
                     }
                 });
+                if (!nodeMap[g[Graphs.FIRST_NODE]]) {
+                    errorMsgs = errorMsgs.concat("\nfirstNode " + g[Graphs.FIRST_NODE] + " doesn't exist");
+                    valid     = false;
+                }
                 _.each(g[Graphs.EDGES], function (edge) {
                     if (!nodeMap[edge[Graphs.EDGE_SOURCE]]) {
-                        errorMsgs = errorMsgs.concat("\nGraph Validation: edge " + edge[Graphs.EDGE_ID]
+                        errorMsgs = errorMsgs.concat("\nedge " + edge[Graphs.EDGE_ID]
                             + " source " + edge[Graphs.EDGE_SOURCE] + " doesn't exist");
                         valid     = false;
                     }
                     if (!nodeMap[edge[Graphs.EDGE_TARGET]]) {
-                        errorMsgs = errorMsgs.concat("\nGraph Validation: edge " + edge[Graphs.EDGE_ID]
+                        errorMsgs = errorMsgs.concat("\nedge " + edge[Graphs.EDGE_ID]
                             + " target " + edge[Graphs.EDGE_TARGET] + " doesn't exist");
                         valid     = false;
                     }
@@ -89,7 +93,7 @@ export const validateGraph = new ValidatedMethod({
                 });
             }
         } catch (err) {
-            errorMsgs = errorMsgs.log("\nGraph Validation: unexpected error");
+            errorMsgs = errorMsgs.log("\nunexpected error");
             errorMsgs = errorMsgs.log(err);
             valid     = false;
         }
