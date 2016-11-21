@@ -40,7 +40,7 @@ Template.signin_register.helpers({
 Template.signin_register.events({
     "click #signin_btn": function (evt, template) {
         evt.preventDefault();
-        let email    = template.find("#signin_email").value;
+        let email    = template.find("#signin_email").value.trim();
         let password = template.find("#signin_password").value;
         Meteor.loginWithPassword(email, password, function (err) {
             if (err) {
@@ -52,10 +52,10 @@ Template.signin_register.events({
     },
     "click #register_btn": function (evt, template) {
         evt.preventDefault();
-        let name        = template.find("#register_name").value;
-        let org         = template.find("#register_organization").value;
-        let countryCode = template.find("#register_country").value;
-        let email       = template.find("#register_email").value;
+        let name        = template.find("#register_name").value.trim();
+        let org         = template.find("#register_organization").value.trim();
+        let countryCode = template.find("#register_country").value.trim();
+        let email       = template.find("#register_email").value.trim();
         let password    = template.find("#register_password").value;
         let cpassword   = template.find("#register_c_password").value;
 
