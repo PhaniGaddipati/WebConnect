@@ -2,7 +2,7 @@ import "./top_downloaded_charts.html";
 import "/imports/ui/components/app_loading/app_loading.js";
 import * as Charts from "/imports/api/charts/charts.js";
 
-const NUM_TOP_CHARTS = 10;
+const NUM_TOP_CHARTS = 5;
 const MAX_DESC_LEN = 100;
 
 Template.top_downloaded_charts.onCreated(function () {
