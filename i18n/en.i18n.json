@@ -35,5 +35,6 @@
   "last_updated": "Last Updated",
   "author": "Author",
   "not_found": "Not Found",
-  "skills_csv": "Skills (Comma Separated)"
+  "skills_csv": "Skills (Comma Separated)",
+  "skills": "Skills"
 }

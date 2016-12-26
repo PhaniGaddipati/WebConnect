@@ -1,6 +1,3 @@
-/**
- * Created by Phani on 7/23/2016.
- */
 import "./account.html";
 import "./signin_register.js";
 import "/imports/ui/components/user_charts/user_charts.js";
@@ -40,6 +37,17 @@ Template.account.helpers({
     "currentUserEmail": function () {
         if (currentUser())
             return currentUser()[User.EMAILS][0][User.EMAIL_ADDRESS];
+        return "";
+    },
+    "currentUserHasSkills": function () {
+        if (currentUser() && currentUser()[User.PROFILE][User.PROFILE_EXPERTISES].length > 0) {
+            return true;
+        }
+        return false;
+    },
+    "currentUserSkills": function () {
+        if (currentUser())
+            return currentUser()[User.PROFILE][User.PROFILE_EXPERTISES];
         return "";
     },
     "hasCharts": function () {

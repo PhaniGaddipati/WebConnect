@@ -25,6 +25,15 @@
                             <strong class="list-group-item-heading">{{_ "country"}}</strong>
                             <p class="list-group-item-text">{{currentUserCountry}}</p>
                         </div>
+                        {{#if currentUserHasSkills}}
+                            <div class="list-group-item">
+                                <strong class="list-group-item-heading">{{_ "skills"}}</strong>
+                                &nbsp;
+                                {{#each currentUserSkills}}
+                                    <span class="label label-primary" style="font-size: 10pt;">{{this}}</span>
+                                {{/each}}
+                            </div>
+                        {{/if}}
                     </div>
                 </div>
             </div>
