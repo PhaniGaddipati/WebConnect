@@ -31,5 +31,8 @@
   "home_intro": "Search for a device or problem, or select an example",
   "home_title": "Welcome to TechConnect",
   "search_hint": "e.g Pulse Oximeter",
-  "description": "Description"
+  "description": "Description",
+  "last_updated": "Last Updated",
+  "author": "Author",
+  "not_found": "Not Found"
 }

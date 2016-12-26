@@ -10,13 +10,14 @@ import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getGraph} from "/imports/api/graphs/methods.js";
+import {getUserName} from "/imports/api/users/methods.js";
 import {layoutGraph} from "/imports/utils/jsplumb/jsplumb_utils.js";
 
 Template.chart_view.onCreated(function () {
-    var self     = Template.instance();
+    var self = Template.instance();
     self.chartId = Template.instance().data.chartId;
-    self.chart   = new ReactiveVar(null);
-    self.graph   = new ReactiveVar(null);
+    self.chart = new ReactiveVar(null);
+    self.graph = new ReactiveVar(null);
     self.jsplumb = jsPlumbToolkit.newInstance({
         idFunction: function (data) {
             return data["_id"];
@@ -43,6 +44,14 @@ Template.chart_view.helpers({
     },
     chartDescription: function () {
         return Template.instance().chart.get()[Charts.DESCRIPTION];
+    },
+    chartLastUpdated: function () {
+        return moment(Template.instance().chart.get()[Charts.UPDATED_DATE])
+            .locale(TAPi18n.getLanguage()).format("MMMM DD, YYYY");
+    },
+    chartAuthor: function () {
+        let owner = Template.instance().chart.get()[Charts.OWNER];
+        return getUserName.run({userId: owner});
     }
 });
 

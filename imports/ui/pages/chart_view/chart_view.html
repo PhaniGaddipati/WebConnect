@@ -3,9 +3,13 @@
         {{> app_loading}}
     {{else}}
         <h1>{{chartName}}</h1>
-
         <div class="well">
-            <p><strong>{{_ "description"}}</strong> - {{chartDescription}}</p>
+            <p><strong>{{_ "description"}}:</strong> {{chartDescription}}</p>
+            {{#if chartAuthor}}
+                <strong>{{_ "author"}}: </strong>{{chartAuthor}}
+                <br>
+            {{/if}}
+            <strong>{{_ "last_updated"}}:</strong> {{chartLastUpdated}}
         </div>
         <div id="jsplumbContainer" style="height:100%;min-height: 500px;"></div>
     {{/if}}

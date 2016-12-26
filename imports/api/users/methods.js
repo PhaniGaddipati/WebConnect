@@ -5,13 +5,30 @@ import {Meteor} from "meteor/meteor";
 import {ValidatedMethod} from "meteor/mdg:validated-method";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {CountryCodes} from "meteor/3stack:country-codes";
-import {Users} from "./users.js";
+import {Users, PROFILE, PROFILE_NAME} from "./users.js";
 
 const DEFAULT_SEARCH_LIMIT = 10;
 
 export const currentUser = function () {
     return Users.findOne({_id: Meteor.userId()});
 };
+
+export const getUserName = new ValidatedMethod({
+    name: "users.getUserName",
+    validate: new SimpleSchema({
+        userId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        }
+    }).validator(),
+    run({userId:userId}){
+        let user = Users.findOne({_id: userId});
+        if (user) {
+            return user[PROFILE][PROFILE_NAME];
+        }
+        return null;
+    }
+});
 
 export const searchUsers = new ValidatedMethod({
     name: "users.searchUsers",
