@@ -1,6 +1,3 @@
-/**
- * Created by Phani on 10/18/2016.
- */
 import "meteor/reactive-var";
 import "./chart_view.html";
 import "/imports/ui/components/app_loading/app_loading.js";
@@ -43,6 +40,9 @@ Template.chart_view.helpers({
     },
     chartName: function () {
         return Template.instance().chart.get()[Charts.NAME];
+    },
+    chartDescription: function () {
+        return Template.instance().chart.get()[Charts.DESCRIPTION];
     }
 });
 

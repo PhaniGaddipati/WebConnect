@@ -30,5 +30,6 @@
   "signin_to_see_your_charts": "Please sign in to see your charts",
   "home_intro": "Search for a device or problem, or select an example",
   "home_title": "Welcome to TechConnect",
-  "search_hint": "e.g Pulse Oximeter"
+  "search_hint": "e.g Pulse Oximeter",
+  "description": "Description"
 }
