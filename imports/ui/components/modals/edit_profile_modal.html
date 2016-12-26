@@ -1,0 +1,15 @@
+<template name="edit_profile_modal">
+    <div class="modal fade" id="edit_profile_modal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    {{> user_profile_fields}}
+                    <div class="form-group">
+                        <button class="btn btn-default" id="cancelBtn">{{_ "cancel"}}</button>
+                        <button class="btn btn-primary pull-right" id="saveProfileBtn">{{_ "save_changes"}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -51,7 +51,7 @@ Template.chart_view.helpers({
     },
     chartAuthor: function () {
         let owner = Template.instance().chart.get()[Charts.OWNER];
-        return getUserName.run({userId: owner});
+        return getUserName.call({userId: owner});
     }
 });
 

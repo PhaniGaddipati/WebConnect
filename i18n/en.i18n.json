@@ -36,5 +36,8 @@
   "author": "Author",
   "not_found": "Not Found",
   "skills_csv": "Skills (Comma Separated)",
-  "skills": "Skills"
+  "skills": "Skills",
+  "edit": "Edit",
+  "save_changes": "Save Changes",
+  "cancel": "Cancel"
 }

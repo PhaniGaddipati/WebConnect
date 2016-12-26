@@ -1,6 +1,7 @@
 import "./account.html";
 import "./signin_register.js";
 import "/imports/ui/components/user_charts/user_charts.js";
+import "/imports/ui/components/modals/edit_profile_modal.js";
 import * as User from "/imports/api/users/users.js";
 import {currentUser} from "/imports/api/users/methods.js";
 import {getCurrentUserCharts} from "/imports/api/charts/methods.js";
@@ -52,5 +53,12 @@ Template.account.helpers({
     },
     "hasCharts": function () {
         return getCurrentUserCharts.call().length < 0;
+    }
+});
+
+Template.account.events({
+    "click #editProfile": function (evt) {
+        evt.preventDefault();
+        Modal.show("edit_profile_modal");
     }
 });

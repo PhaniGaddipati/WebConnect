@@ -4,16 +4,16 @@
         <input class="form-control" id="user_name" type="text">
     </div>
     <div class="form-group">
+        <label class="control-label" for="user_email">{{_ "email"}}</label>
+        <input class="form-control" id="user_email" type="email">
+    </div>
+    <div class="form-group">
         <label class="control-label" for="user_organization">{{_ "organization"}}</label>
         <input class="form-control" id="user_organization" type="text">
     </div>
     <div class="form-group">
         <label class="control-label" for="user_country">{{_ "country"}}</label>
         {{> countryCodeSelect selected=selectedCode props=countrySelectProps}}
-    </div>
-    <div class="form-group">
-        <label class="control-label" for="user_email">{{_ "email"}}</label>
-        <input class="form-control" id="user_email" type="email">
     </div>
     <div class="form-group">
         <label class="control-label" for="user_skills">{{_ "skills_csv"}}</label>
