@@ -5,6 +5,11 @@ import {Meteor} from "meteor/meteor";
 import {Accounts} from "meteor/accounts-base";
 import {CountryCodes} from "meteor/3stack:country-codes";
 import "./signin_register.html";
+import "/imports/ui/components/user_profile_fields/user_profile_fields.js";
+import {
+    getProfileFromFields,
+    getEmailFromFields
+} from "/imports/ui/components/user_profile_fields/user_profile_fields.js";
 import * as User from "/imports/api/users/users.js";
 
 const ENTER_KEY = 13;
@@ -27,15 +32,6 @@ Template.signin_register.helpers({
     },
     "signingin": function () {
         return Meteor.loggingIn();
-    },
-    "countries": function () {
-        return _.values(CountryCodes.getList());
-    },
-    "countrySelectProps": function () {
-        return {
-            class: "form-control",
-            id: "register_country"
-        };
     }
 });
 
@@ -75,10 +71,8 @@ function onSignin(tmpl) {
 }
 
 function onRegister(tmpl) {
-    let name = tmpl.find("#register_name").value.trim();
-    let org = tmpl.find("#register_organization").value.trim();
-    let countryCode = tmpl.find("#register_country").value.trim();
-    let email = tmpl.find("#register_email").value.trim();
+    let profile = getProfileFromFields(tmpl);
+    let email = getEmailFromFields(tmpl);
     let password = tmpl.find("#register_password").value;
     let cpassword = tmpl.find("#register_c_password").value;
 
@@ -88,20 +82,15 @@ function onRegister(tmpl) {
         registerError.set(true);
         registerMsg.set(TAPi18n.__("mismatch_passwords"));
     }
-    if (_.isEmpty(name) || _.isEmpty(org) || _.isEmpty(countryCode) || _.isEmpty(password) || _.isEmpty(email)) {
+    if (_.isEmpty(profile[User.PROFILE_NAME]) || _.isEmpty(profile[User.PROFILE_ORGANIZATION]) ||
+        _.isEmpty(profile[User.PROFILE_COUNTRY][User.COUNTRY_CODE]) || _.isEmpty(password) ||
+        _.isEmpty(email)) {
         valid = false;
         registerError.set(true);
         registerMsg.set(TAPi18n.__("empty_fields"));
     }
 
     if (valid) {
-        let profile = {};
-        profile[User.PROFILE_ORGANIZATION] = org;
-        profile[User.PROFILE_NAME] = name;
-        profile[User.PROFILE_COUNTRY] = {};
-        profile[User.PROFILE_COUNTRY][User.COUNTRY_NAME] = CountryCodes.countryName(countryCode);
-        profile[User.PROFILE_COUNTRY][User.COUNTRY_CODE] = countryCode;
-
         Accounts.createUser({
             username: email,
             email: email,
