@@ -1,0 +1,130 @@
+/* ------------------------ dialogs ----------------------------*/
+
+/* ----------------------- drag/drop interactions -------------- */
+.drop-hover {
+    background-color: #FCCCCC !important;
+}
+
+/* ----------------------- node styles ------------------------- */
+
+.flowchart-object {
+    border: 1px solid #346789;
+    box-shadow: 2px 2px 19px #aaa;
+    -o-box-shadow: 2px 2px 19px #aaa;
+    -webkit-box-shadow: 2px 2px 19px #aaa;
+    -moz-box-shadow: 2px 2px 19px #aaa;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    opacity: 0.8;
+    min-width: 0;
+    min-height: 0;
+    padding: 15px 10px;
+    cursor: pointer;
+    text-align: center;
+    z-index: 10;
+    position: absolute;
+    background-color: #eeeeef;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+}
+
+.terminator-node {
+    background-color: #ef7a7c !important;
+    border: 1px solid #a15354 !important;
+}
+
+.first-node {
+    background-color: #7def8d !important;
+    border: 1px solid #3e7a47 !important;
+}
+
+.virtual-node {
+    background-color: #efdb8d !important;
+    border: 1px solid #685f3d !important;
+}
+
+.flowchart-object:hover {
+    box-shadow: 2px 2px 19px #444;
+    -o-box-shadow: 2px 2px 19px #444;
+    -webkit-box-shadow: 2px 2px 19px #444;
+    -moz-box-shadow: 2px 2px 19px #444;
+    opacity: 0.6;
+}
+
+.flowchart-object .processTitle {
+    font-size: 16px;
+    font-weight: bold;
+    height: 60px;
+}
+
+.flowchart-object .terminatorTitle {
+    font-size: 16px;
+    font-weight: bold;
+    height: 60px;
+}
+
+.flowchart-object.jtk-surface-selected-element .node-action {
+    display: block;
+}
+
+.flowchart-object .edgeLabel.jsplumb-hover {
+    background-color: #5C96BC;
+    color: white;
+    border: 1px solid white;
+}
+
+.outer {
+    fill: gray;
+    opacity: 0.3;
+    cursor: pointer;
+}
+
+.flowchart-object:hover .outer {
+    opacity: 0.7;
+}
+
+.inner {
+    cursor: move !important;
+}
+
+.connection-drop svg {
+    fill: #CCC;
+}
+
+.connection-drop text {
+    fill: black;
+}
+
+.jsplumb-drag {
+    box-shadow: 2px 2px 19px #15988A !important;
+}
+
+.dummyRender {
+    visibility: hidden;
+}
+
+.table-column {
+    list-style-type: none;
+    padding: 4px 6px;
+}
+
+.jsplumb-endpoint {
+    z-index: 20;
+}
+
+.jsplumb-connector {
+    z-index: 5;
+}
+
+.jtk-miniview {
+    position: relative;
+    left: 25px;
+    top: 25px;
+    display: block;
+    z-index: 10000;
+}
