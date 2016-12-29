@@ -79,6 +79,14 @@ Template.chart_view.events({
         evt.preventDefault();
         Template.instance().jsplumbRenderer.zoomToFit();
     },
+    "click #zoomOutBtn": function (evt) {
+        evt.preventDefault();
+        Template.instance().jsplumbRenderer.nudgeZoom(-.10);
+    },
+    "click #zoomInBtn": function (evt) {
+        evt.preventDefault();
+        Template.instance().jsplumbRenderer.nudgeZoom(+.10);
+    },
     "click #relayoutBtn": function (evt) {
         evt.preventDefault();
         Template.instance().jsplumbRenderer.magnetize();
