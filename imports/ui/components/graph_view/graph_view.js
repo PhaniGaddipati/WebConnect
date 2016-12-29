@@ -13,9 +13,9 @@ const NODE_FILL = 0.20;
 Template.graph_view.onCreated(function () {
     var self = Template.instance();
     self.graphId = Template.instance().data.graphId;
-    console.log(self.graphId);
     self.graph = new ReactiveVar(null);
     self.selection = new ReactiveVar(null);
+    self.errorLoadingGraph = new ReactiveVar(false);
 
     self.jsPlumbToolkit = jsPlumbToolkit.newInstance({
         idFunction: function (data) {
@@ -23,7 +23,11 @@ Template.graph_view.onCreated(function () {
         }
     });
     getGraph.call(self.graphId, function (err, graph) {
-        self.graph.set(graph);
+        if (err || !graph) {
+            self.errorLoadingGraph.set(true);
+        } else {
+            self.graph.set(graph);
+        }
     });
 });
 
@@ -38,6 +42,9 @@ Template.graph_view.helpers({
             return false;
         }
         return sel.getNodes().length > 0;
+    },
+    errorLoadingGraph: function () {
+        return Template.instance().errorLoadingGraph.get();
     }
 });
 

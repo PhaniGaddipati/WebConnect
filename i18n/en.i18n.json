@@ -40,5 +40,6 @@
   "edit": "Edit",
   "save_changes": "Save Changes",
   "cancel": "Cancel",
-  "selected": "selected"
+  "selected": "selected",
+  "failed_load_graph": "Failed to load the graph! Check the URL and try again"
 }
