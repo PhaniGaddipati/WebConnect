@@ -75,18 +75,18 @@
     padding-bottom: 15px;
 }
 
-.first-node {
-    background-color: #8BC34A;
-    border: 1px solid #3e7a47;
-}
-
 .virtual-node {
     background-color: #efdb8d;
     border: 1px solid #685f3d;
 }
 
 .flowchart-object:not(.jsplumb-connected) {
-    background-color: #ffcdc8 !important;
+    background-color: #ffcdc8;
+}
+
+.first-node {
+    background-color: #8BC34A !important;
+    border: 1px solid #3e7a47;
 }
 
 .outer {
