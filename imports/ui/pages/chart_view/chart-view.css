@@ -142,7 +142,7 @@
 .jtk-miniview {
     position: absolute;
     float: right;
-    right: 25px;
+    right: 75px;
     top: 25px;
     display: block;
     z-index: 10000;
@@ -150,7 +150,7 @@
 
 #jsplumbToolbar {
     position: absolute;
-    left: 25px;
+    left: 75px;
     top: 25px;
     display: block;
     z-index: 100000;
@@ -166,4 +166,12 @@
     border: 1px solid rgba(52, 103, 137, 0.28);
     background: #ffcdc8;
     font-weight: bold;
+}
+
+#jsplumbContainer {
+    height: 100%;
+    min-height: 500px;
+    position: relative;
+    margin-left: 50px;
+    margin-right: 50px;
 }
