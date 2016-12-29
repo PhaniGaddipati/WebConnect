@@ -113,6 +113,7 @@ function loadFlowchart() {
         });
         Template.instance().jsplumbRenderer =
             Template.instance().jsPlumbToolkit.render(getJSPlumbOptions());
+        Template.instance().jsplumbRenderer.magnetize();
         Template.instance().jsplumbRenderer.zoomToFit();
     }
     Template.instance().chartLoading.set(false);
