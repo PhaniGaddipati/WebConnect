@@ -10,6 +10,7 @@ import "../../ui/pages/about/about.js";
 import "../../ui/pages/account/account.js";
 import "../../ui/pages/account/logout.js";
 import "/imports/ui/pages/chart/chart.js";
+import "/imports/ui/components/graph_view/graph_view.js";
 import {incrementChartDownload} from "/imports/api/charts/methods.js";
 
 //Routes
@@ -49,6 +50,18 @@ FlowRouter.route("/chart/:chartId", {
             {
                 main: "chart",
                 dataContext: {chartId: params.chartId}
+            }
+        );
+    },
+});
+
+FlowRouter.route("/graph/:graphId", {
+    name: "App.chart",
+    action(params) {
+        BlazeLayout.render("app_body_fluid",
+            {
+                main: "graph_view",
+                dataContext: {graphId: params.graphId}
             }
         );
     },

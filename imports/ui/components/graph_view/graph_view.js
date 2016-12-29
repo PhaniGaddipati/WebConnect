@@ -13,6 +13,7 @@ const NODE_FILL = 0.20;
 Template.graph_view.onCreated(function () {
     var self = Template.instance();
     self.graphId = Template.instance().data.graphId;
+    console.log(self.graphId);
     self.graph = new ReactiveVar(null);
     self.selection = new ReactiveVar(null);
 
