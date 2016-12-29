@@ -3,9 +3,11 @@
  */
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getNodeEdgeMap} from "/imports/api/graphs/methods.js";
+import "/imports/ui/pages/chart_view/templates/process_dummy_node.html";
+import "/imports/ui/pages/chart_view/templates/terminator_dummy_node.html";
 
 const dagre = require("dagre");
-const NODE_WIDTH = 250;
+const NODE_WIDTH = 250; // Make sure to also change in dummy nodes
 
 export const OPTIONS = "options";
 export const TYPE = "type";
@@ -84,5 +86,19 @@ export const layoutGraph = function (graph) {
 };
 
 function computeHeight(node) {
-    return node.options.length * 60 + 75;
+
+
+    if (node[TYPE] == NODE_TYPE_TERMINATOR) {
+        // No options for this kind of node
+        document.getElementById("dummyTerminatorTitle").innerHTML = node[Graphs.NODE_NAME];
+        return document.getElementById("terminatorDummyNode").offsetHeight;
+    } else {
+        document.getElementById("dummyProcessTitle").innerHTML = node[Graphs.NODE_NAME];
+        let element = document.getElementById("dummyOptionList");
+        element.innerHTML = "";
+        _.each(node[OPTIONS], function (opt) {
+            element.innerHTML = element.innerHTML + "<li class=\"list-group-item\">" + opt.name + "</li>";
+        });
+        return document.getElementById("processDummyNode").offsetHeight;
+    }
 }
