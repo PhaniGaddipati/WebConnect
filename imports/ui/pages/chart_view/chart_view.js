@@ -117,16 +117,12 @@ function getJSPlumbOptions() {
                     endpoint: ["Dot", {radius: 6}],
                     connector: ["StateMachine", {cornerRadius: 5, stub: [10, 50], midpoint: 0.1}],
                     paintStyle: {
-                        lineWidth: 2,
-                        strokeStyle: "#0878CB",
-                        outlineWidth: 3,
-                        outlineStroke: "white"
+                        lineWidth: 3,
+                        strokeStyle: "#0878CB"
                     },	//	paint style for this edge type.
                     hoverPaintStyle: {
-                        strokeWidth: 3,
-                        stroke: "#05518a",
-                        outlineWidth: 5,
-                        outlineStroke: "white",
+                        lineWidth: 6,
+                        strokeStyle: "#05518a"
                     }, // hover paint style for this edge type.
                     overlays: [["Arrow", {location: 1, width: 15, length: 20}]]
                 }
