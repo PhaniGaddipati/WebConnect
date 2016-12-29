@@ -43,6 +43,7 @@ export const labelNodesAndEdges = function (graph) {
 };
 
 export const extendEdgeSources = function (graph) {
+    // Extends the source id to id.edge_name to reference the port inside the node
     _.each(graph[Graphs.EDGES], function (edge) {
         edge[Graphs.EDGE_SOURCE] = edge[Graphs.EDGE_SOURCE] + "." + edge[Graphs.EDGE_NAME];
     });

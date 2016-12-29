@@ -17,6 +17,7 @@ import {layoutGraph, labelNodesAndEdges, extendEdgeSources} from "/imports/ui/pa
 Template.chart_view.onCreated(function () {
     var self = Template.instance();
     self.chartId = Template.instance().data.chartId;
+    self.chartLoading = new ReactiveVar(true);
     self.chart = new ReactiveVar(null);
     self.graph = new ReactiveVar(null);
     self.jsplumb = jsPlumbToolkit.newInstance({
@@ -38,7 +39,8 @@ Template.chart_view.onRendered(function () {
 
 Template.chart_view.helpers({
     chartLoading: function () {
-        return Template.instance().chart.get() == null;
+        return !Template.instance().chart.get()
+            || Template.instance().chartLoading.get();
     },
     chartName: function () {
         return Template.instance().chart.get()[Charts.NAME];
@@ -57,6 +59,7 @@ Template.chart_view.helpers({
 });
 
 function loadFlowchart() {
+    Template.instance().chartLoading.set(true);
     let graph = Template.instance().graph.get();
     if (graph) {
         graph = labelNodesAndEdges(graph);
@@ -72,6 +75,7 @@ function loadFlowchart() {
             Template.instance().jsplumb.render(getJSPlumbOptions());
         Template.instance().jsplumbRenderer.zoomToFit();
     }
+    Template.instance().chartLoading.set(false);
 }
 
 function makeNodeMap(nodes) {

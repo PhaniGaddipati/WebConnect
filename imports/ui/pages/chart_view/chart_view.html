@@ -11,11 +11,9 @@
             {{/if}}
             <strong>{{_ "last_updated"}}:</strong> {{chartLastUpdated}}
         </div>
-        <div style="position: relative">
-            <div id="jsplumbContainer" style="height:100%;min-height: 500px;">
-                <div id="jsplumbMiniviewContainer"></div>
-            </div>
+        <div style="position: relative;display: block">
+            <div id="jsplumbMiniviewContainer"></div>
+            <div id="jsplumbContainer" style="height:100%;min-height: 500px;position: relative"></div>
         </div>
-
     {{/if}}
 </template>
