@@ -126,6 +126,7 @@
 
 .jsplumb-endpoint {
     z-index: 20;
+    opacity: .5;
 }
 
 .jsplumb-connector {
