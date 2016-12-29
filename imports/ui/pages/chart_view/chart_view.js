@@ -62,13 +62,6 @@ Template.chart_view.helpers({
             return false;
         }
         return sel.getNodes().length > 0;
-    },
-    numSelection: function () {
-        let sel = Template.instance().selection.get();
-        if (!sel) {
-            return 0;
-        }
-        return sel.getNodes().length;
     }
 });
 
@@ -96,10 +89,10 @@ Template.chart_view.events({
     },
     "click #zoomToSelectionBtn": function (evt) {
         evt.preventDefault();
-        Template.instance().jsplumbRenderer.zoomToSelection({
-            fill: 0.5,
-            selection: Template.instance().selection.get()
-        });
+        let selection = Template.instance().selection.get();
+        if (selection && selection.getNodes().length > 0) {
+            Template.instance().jsplumbRenderer.centerOnAndZoom(selection.getNodes()[0], .20);
+        }
     }
 });
 
@@ -131,7 +124,8 @@ function getJSPlumbOptions() {
     var selectEvent = {
         tap: function (params) {
             if (params.e.button == 0) {
-                toolkit.toggleSelection(params.node);
+                toolkit.clearSelection();
+                toolkit.addToSelection(params.node);
                 selection.set(toolkit.getSelection());
             }
         }
