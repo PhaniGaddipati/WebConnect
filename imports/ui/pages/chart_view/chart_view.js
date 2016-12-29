@@ -140,6 +140,7 @@ function getJSPlumbOptions() {
         miniview: {
             container: "jsplumbMiniviewContainer"
         },
+        enablePanButtons: false,
         layout: {
             type: "Absolute",
             parameters: {}

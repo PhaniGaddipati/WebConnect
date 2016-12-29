@@ -23,7 +23,7 @@
     text-align: center;
     z-index: 10;
     position: absolute;
-    background-color: #eeeeef;
+    background-color: #ebebec;
     color: black;
     font-family: helvetica, sans-serif;
     font-size: 0.9em;
@@ -170,8 +170,9 @@
 
 #jsplumbContainer {
     height: 100%;
-    min-height: 500px;
+    min-height: 90vh;
     position: relative;
     margin-left: 50px;
     margin-right: 50px;
+    background-color: #f6f6f6;
 }
