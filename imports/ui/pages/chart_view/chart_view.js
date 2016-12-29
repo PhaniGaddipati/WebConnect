@@ -12,6 +12,8 @@ import {getGraph} from "/imports/api/graphs/methods.js";
 import {getUserName} from "/imports/api/users/methods.js";
 import {layoutGraph, labelNodesAndEdges, extendEdgeSources} from "/imports/ui/pages/chart_view/jsplumb_utils.js";
 
+const NODE_FILL = 0.20;
+
 Template.chart_view.onCreated(function () {
     var self = Template.instance();
     self.chartId = Template.instance().data.chartId;
@@ -91,7 +93,7 @@ Template.chart_view.events({
         evt.preventDefault();
         let selection = Template.instance().selection.get();
         if (selection && selection.getNodes().length > 0) {
-            Template.instance().jsplumbRenderer.centerOnAndZoom(selection.getNodes()[0], .20);
+            Template.instance().jsplumbRenderer.centerOnAndZoom(selection.getNodes()[0], NODE_FILL);
         }
     }
 });
@@ -119,15 +121,19 @@ function loadFlowchart() {
 }
 
 function getJSPlumbOptions() {
-    let toolkit = Template.instance().jsPlumbToolkit;
-    let selection = Template.instance().selection;
-    var selectEvent = {
+    let tmpl = Template.instance();
+    let toolkit = tmpl.jsPlumbToolkit;
+    let selection = tmpl.selection;
+    var events = {
         tap: function (params) {
             if (params.e.button == 0) {
                 toolkit.clearSelection();
                 toolkit.addToSelection(params.node);
                 selection.set(toolkit.getSelection());
             }
+        },
+        dblclick: function (params) {
+            tmpl.jsplumbRenderer.centerOnAndZoom(params.node, NODE_FILL);
         }
     };
     return {
@@ -144,7 +150,7 @@ function getJSPlumbOptions() {
             nodes: {
                 "default": {
                     template: "processNode",
-                    events: selectEvent
+                    events: events
                 },
                 "terminator": {
                     template: "terminatorNode"
