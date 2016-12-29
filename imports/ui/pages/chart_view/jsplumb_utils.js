@@ -20,6 +20,9 @@ export const NODE_TYPE_FIRST = "first";
 /**
  * Adds "type" field for node types: process, decision, terminator, virtual
  * Adds "options" array field for outgoing edges
+ * the options field has the following fields:
+ *      name: the outgoing edge name
+ *      id: nodeId.edgeId
  * @param graph
  */
 export const labelNodesAndEdges = function (graph) {
@@ -38,7 +41,10 @@ export const labelNodesAndEdges = function (graph) {
         }
         node[OPTIONS] = [];
         _.each(nodeMap[node[Graphs.NODE_ID]].outgoingEdges, function (edge) {
-            node[OPTIONS].push({name: edge[Graphs.EDGE_NAME]});
+            node[OPTIONS].push({
+                name: edge[Graphs.EDGE_NAME],
+                id: node[Graphs.NODE_ID] + "." + edge[Graphs.EDGE_ID]
+            });
         });
     });
     return graph;
@@ -86,8 +92,6 @@ export const layoutGraph = function (graph) {
 };
 
 function computeHeight(node) {
-
-
     if (node[TYPE] == NODE_TYPE_TERMINATOR) {
         // No options for this kind of node
         document.getElementById("dummyTerminatorTitle").innerHTML = node[Graphs.NODE_NAME];

@@ -1,6 +1,6 @@
 <body>
 <script type="jtk" id="firstNode">
-    <div style="left:${left}px;top:${top}px;width:${width}px;height:${height}px;" class="flowchart-object first-node">
+    <div style="left:${left}px;top:${top}px;width:${width}px;height:${height}px;" class="flowchart-object first-node" id="${_id}">
         <jtk-target port-id="${name}" port-type="default" scope="${datatype}"></jtk-target>
 
         <div class="processTitle">
@@ -10,7 +10,7 @@
         <div class="processOptions">
             <ul class="list-group">
                 <r-each in="options">
-                    <li class="list-group-item">
+                    <li class="list-group-item node-option" id="${id}">
                         ${name}
                         <jtk-source port-id="${name}" port-type="option" scope="${datatype}"></jtk-source>
                     </li>

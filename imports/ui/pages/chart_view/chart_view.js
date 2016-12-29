@@ -20,10 +20,9 @@ Template.chart_view.onCreated(function () {
     self.chartLoading = new ReactiveVar(true);
     self.chart = new ReactiveVar(null);
     self.graph = new ReactiveVar(null);
-    self.jsplumb = jsPlumbToolkit.newInstance({
-        idFunction: function (data) {
-            return data["_id"];
-        }
+
+    jsPlumb.ready(function () {
+        onJSPlumbReady(self);
     });
     getChart.call(this.chartId, function (err, chart) {
         self.chart.set(chart);
@@ -32,6 +31,14 @@ Template.chart_view.onCreated(function () {
         });
     });
 });
+
+function onJSPlumbReady(tmpl) {
+    tmpl.jsPlumbToolkit = jsPlumbToolkit.newInstance({
+        idFunction: function (data) {
+            return data["_id"];
+        }
+    });
+}
 
 Template.chart_view.onRendered(function () {
     this.autorun(loadFlowchart);
@@ -65,25 +72,18 @@ function loadFlowchart() {
         graph = labelNodesAndEdges(graph);
         graph = layoutGraph(graph);
         graph = extendEdgeSources(graph);
-        Template.instance().jsplumb.load({
+
+        Template.instance().jsPlumbToolkit.load({
             data: {
                 "nodes": graph[Graphs.NODES],
                 "edges": graph[Graphs.EDGES]
             }
         });
         Template.instance().jsplumbRenderer =
-            Template.instance().jsplumb.render(getJSPlumbOptions());
+            Template.instance().jsPlumbToolkit.render(getJSPlumbOptions());
         Template.instance().jsplumbRenderer.zoomToFit();
     }
     Template.instance().chartLoading.set(false);
-}
-
-function makeNodeMap(nodes) {
-    let nodeMap = {};
-    _.each(nodes, function (node) {
-        nodeMap[node[Graphs.NODE_ID]] = node;
-    });
-    return nodeMap;
 }
 
 function getJSPlumbOptions() {
@@ -113,8 +113,8 @@ function getJSPlumbOptions() {
             },
             edges: {
                 "default": {
-                    anchors: [["Right", "Left"], ["Perimeter", {shape: "Rectangle"}]],
-                    endpoint: ["Dot", {radius: 6}],
+                    anchors: [["Right", "Left"], ["Perimeter", {shape: "Rectangle", anchorCount: 10}]],
+                    endpoint: ["Dot", {radius: 8}],
                     connector: ["StateMachine", {cornerRadius: 5, stub: [10, 50], midpoint: 0.1}],
                     paintStyle: {
                         lineWidth: 3,
@@ -124,7 +124,21 @@ function getJSPlumbOptions() {
                         lineWidth: 6,
                         strokeStyle: "#05518a"
                     }, // hover paint style for this edge type.
-                    overlays: [["Arrow", {location: 1, width: 15, length: 20}]]
+                    overlays: [["Arrow", {location: 1, width: 15, length: 20}]],
+                    beforeDrop: function (p) {
+                        // Nodes have ID nodeId
+                        // Options have ID nodeId.edgeId
+                        // Check that the nodeIds are different
+                        let sourceId = p.sourceId;
+                        let targetId = p.targetId;
+                        if (sourceId.indexOf(".") > -1) {
+                            sourceId = sourceId.substring(0, sourceId.indexOf("."));
+                        }
+                        if (targetId.indexOf(".") > -1) {
+                            targetId = targetId.substring(0, targetId.indexOf("."));
+                        }
+                        return sourceId !== targetId;
+                    }
                 }
             },
             ports: {
@@ -134,7 +148,9 @@ function getJSPlumbOptions() {
                     allowNodeLoopback: false
                 },
                 "option": {
-                    maxConnections: 1
+                    maxConnections: 1,
+                    allowLoopback: false,
+                    allowNodeLoopback: false
                 }
             }
         }
