@@ -22,8 +22,10 @@ Template.chart_view.onCreated(function () {
     self.graph = new ReactiveVar(null);
     self.selection = new ReactiveVar(null);
 
-    jsPlumb.ready(function () {
-        onJSPlumbReady(self);
+    self.jsPlumbToolkit = jsPlumbToolkit.newInstance({
+        idFunction: function (data) {
+            return data["_id"];
+        }
     });
     getChart.call(this.chartId, function (err, chart) {
         self.chart.set(chart);
@@ -32,14 +34,6 @@ Template.chart_view.onCreated(function () {
         });
     });
 });
-
-function onJSPlumbReady(tmpl) {
-    tmpl.jsPlumbToolkit = jsPlumbToolkit.newInstance({
-        idFunction: function (data) {
-            return data["_id"];
-        }
-    });
-}
 
 Template.chart_view.onRendered(function () {
     this.autorun(loadFlowchart);
