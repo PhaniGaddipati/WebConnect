@@ -87,6 +87,14 @@ function loadFlowchart() {
 }
 
 function getJSPlumbOptions() {
+    let toolkit = Template.instance().jsPlumbToolkit;
+    var selectEvent = {
+        tap: function (params) {
+            if (params.e.button == 0) {
+                toolkit.toggleSelection(params.node);
+            }
+        }
+    };
     return {
         container: Template.instance().find("#jsplumbContainer"),
         miniview: {
@@ -99,16 +107,19 @@ function getJSPlumbOptions() {
         view: {
             nodes: {
                 "default": {
-                    template: "processNode"
+                    template: "processNode",
+                    events: selectEvent
                 },
                 "terminator": {
                     template: "terminatorNode"
                 },
                 "first": {
-                    template: "firstNode"
+                    template: "firstNode",
+                    parent: "default"
                 },
                 "virtual": {
-                    template: "virtualNode"
+                    template: "virtualNode",
+                    parent: "default"
                 }
             },
             edges: {
@@ -121,7 +132,7 @@ function getJSPlumbOptions() {
                         strokeStyle: "#0878CB"
                     },	//	paint style for this edge type.
                     hoverPaintStyle: {
-                        lineWidth: 6,
+                        lineWidth: 8,
                         strokeStyle: "#05518a"
                     }, // hover paint style for this edge type.
                     overlays: [["Arrow", {location: 1, width: 15, length: 20}]],
@@ -153,6 +164,13 @@ function getJSPlumbOptions() {
                     allowNodeLoopback: false
                 }
             }
-        }
+        },
+        events: {
+            canvasClick: function (e) {
+                console.log("Canvas click");
+                toolkit.clearSelection();
+            }
+        },
+        consumeRightClick: false
     }
 }

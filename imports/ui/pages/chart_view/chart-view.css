@@ -15,7 +15,7 @@
     -moz-box-shadow: 2px 2px 19px #aaa;
     -moz-border-radius: 0.5em;
     border-radius: 0.5em;
-    opacity: .95;
+    opacity: .90;
     min-width: 0;
     min-height: 0;
     padding: 15px 10px 5px 10px;
@@ -63,6 +63,13 @@
     background-color: #5C96BC;
     color: white;
     border: 1px solid white;
+}
+
+.flowchart-object.jtk-surface-selected-element {
+    border: 1px solid #346789 !important;
+    box-shadow: 2px 2px 15px 5px #52aae0;
+    z-index: 25;
+    opacity: 1.0;
 }
 
 .terminator-node {
@@ -123,6 +130,15 @@
 .jsplumb-connector {
     z-index: 5;
 }
+
+.jsplumb-connector.jsplumb-hover {
+    z-index: 25;
+}
+
+.jsplumb-connector.jsplumb-dragging {
+    z-index: 25;
+}
+
 
 .jtk-miniview {
     position: absolute;
