@@ -43,6 +43,7 @@ export const labelNodesAndEdges = function (graph) {
         _.each(nodeMap[node[Graphs.NODE_ID]].outgoingEdges, function (edge) {
             node[OPTIONS].push({
                 name: edge[Graphs.EDGE_NAME],
+                edgeId: edge[Graphs.EDGE_ID],
                 id: node[Graphs.NODE_ID] + "." + edge[Graphs.EDGE_ID]
             });
         });
@@ -53,7 +54,7 @@ export const labelNodesAndEdges = function (graph) {
 export const extendEdgeSources = function (graph) {
     // Extends the source id to id.edge_name to reference the port inside the node
     _.each(graph[Graphs.EDGES], function (edge) {
-        edge[Graphs.EDGE_SOURCE] = edge[Graphs.EDGE_SOURCE] + "." + edge[Graphs.EDGE_NAME];
+        edge[Graphs.EDGE_SOURCE] = edge[Graphs.EDGE_SOURCE] + "." + edge[Graphs.EDGE_ID];
     });
     return graph;
 };
