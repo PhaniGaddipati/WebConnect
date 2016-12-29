@@ -9,7 +9,7 @@ import "../../ui/pages/home.js";
 import "../../ui/pages/about/about.js";
 import "../../ui/pages/account/account.js";
 import "../../ui/pages/account/logout.js";
-import "/imports/ui/pages/chart_view/chart_view.js";
+import "/imports/ui/pages/chart/chart.js";
 import {incrementChartDownload} from "/imports/api/charts/methods.js";
 
 //Routes
@@ -47,7 +47,7 @@ FlowRouter.route("/chart/:chartId", {
         incrementChartDownload.call(params.chartId);
         BlazeLayout.render("app_body_fluid",
             {
-                main: "chart_view",
+                main: "chart",
                 dataContext: {chartId: params.chartId}
             }
         );

@@ -1,11 +1,11 @@
 import "meteor/reactive-var";
-import "./chart_view.html";
+import "./chart.html";
 import {getUserName} from "/imports/api/users/methods.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import "/imports/ui/components/graph_view/graph_view.js";
 
-Template.chart_view.onCreated(function () {
+Template.chart.onCreated(function () {
     var self = Template.instance();
     self.chartId = Template.instance().data.chartId;
     self.chartLoading = new ReactiveVar(true);
@@ -16,7 +16,7 @@ Template.chart_view.onCreated(function () {
     });
 });
 
-Template.chart_view.helpers({
+Template.chart.helpers({
     chartLoading: function () {
         return !Template.instance().chart.get()
             || Template.instance().chartLoading.get();
