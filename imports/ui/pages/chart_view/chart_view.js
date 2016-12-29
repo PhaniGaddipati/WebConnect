@@ -203,8 +203,8 @@ function getJSPlumbOptions() {
         },
         events: {
             canvasClick: function (e) {
-                // toolkit.clearSelection();
-                // selection.set(null);
+                toolkit.clearSelection();
+                selection.set(null);
             }
         },
         consumeRightClick: false
