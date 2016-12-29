@@ -15,7 +15,7 @@
     -moz-box-shadow: 2px 2px 19px #aaa;
     -moz-border-radius: 0.5em;
     border-radius: 0.5em;
-    opacity: 0.8;
+    opacity: .95;
     min-width: 0;
     min-height: 0;
     padding: 15px 10px 5px 10px;
@@ -35,22 +35,6 @@
 
 .flowchart-object:not(.jsplumb-connected) {
     background: #ffcdc8;
-}
-
-.terminator-node {
-    background-color: #ef6464 !important;
-    border: 1px solid #a15354 !important;
-    padding-bottom: 15px !important;
-}
-
-.first-node {
-    background-color: #7def8d !important;
-    border: 1px solid #3e7a47 !important;
-}
-
-.virtual-node {
-    background-color: #efdb8d !important;
-    border: 1px solid #685f3d !important;
 }
 
 .flowchart-object:hover {
@@ -79,6 +63,22 @@
     background-color: #5C96BC;
     color: white;
     border: 1px solid white;
+}
+
+.terminator-node {
+    background-color: #ef6464 !important;
+    border: 1px solid #a15354 !important;
+    padding-bottom: 15px !important;
+}
+
+.first-node {
+    background-color: #7def8d !important;
+    border: 1px solid #3e7a47 !important;
+}
+
+.virtual-node {
+    background-color: #efdb8d !important;
+    border: 1px solid #685f3d !important;
 }
 
 .outer {
