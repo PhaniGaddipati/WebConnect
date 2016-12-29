@@ -3,8 +3,8 @@
  */
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getNodeEdgeMap} from "/imports/api/graphs/methods.js";
-import "/imports/ui/pages/chart_view/templates/process_dummy_node.html";
-import "/imports/ui/pages/chart_view/templates/terminator_dummy_node.html";
+import "/imports/ui/components/graph_view/templates/process_dummy_node.html";
+import "/imports/ui/components/graph_view/templates/terminator_dummy_node.html";
 
 const dagre = require("dagre");
 const NODE_WIDTH = 250; // Make sure to also change in dummy nodes
