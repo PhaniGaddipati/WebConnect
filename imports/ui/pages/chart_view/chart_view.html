@@ -11,8 +11,23 @@
             {{/if}}
             <strong>{{_ "last_updated"}}:</strong> {{chartLastUpdated}}
         </div>
+
         <div style="position: relative;display: block">
             <div id="jsplumbMiniviewContainer"></div>
+            <div>
+                <div class="btn-toolbar" id="jsplumbToolbar">
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-default" id="zoomToFitBtn"><i class="fa fa-eye"></i></a>
+                        <a href="#" class="btn btn-default" id="relayoutBtn"><i class="fa fa-magic"></i> </a>
+                    </div>
+                    {{#if nodesSelection}}
+                        <div class="btn-group">
+                            <a class="btn btn-info" id="zoomToSelectionBtn">{{numSelection}}</a>
+                            <a href="#" class="btn btn-info" id="clearSelectionBtn"><i class="fa fa-close"></i> </a>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
             <div id="jsplumbContainer" style="height:100%;min-height: 500px;position: relative"></div>
         </div>
     {{/if}}

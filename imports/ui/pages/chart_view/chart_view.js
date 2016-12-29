@@ -20,6 +20,7 @@ Template.chart_view.onCreated(function () {
     self.chartLoading = new ReactiveVar(true);
     self.chart = new ReactiveVar(null);
     self.graph = new ReactiveVar(null);
+    self.selection = new ReactiveVar(null);
 
     jsPlumb.ready(function () {
         onJSPlumbReady(self);
@@ -62,6 +63,43 @@ Template.chart_view.helpers({
     chartAuthor: function () {
         let owner = Template.instance().chart.get()[Charts.OWNER];
         return getUserName.call({userId: owner});
+    },
+    nodesSelection: function () {
+        let sel = Template.instance().selection.get();
+        if (!sel) {
+            return false;
+        }
+        return sel.getNodes().length > 0;
+    },
+    numSelection: function () {
+        let sel = Template.instance().selection.get();
+        if (!sel) {
+            return 0;
+        }
+        return sel.getNodes().length;
+    }
+});
+
+Template.chart_view.events({
+    "click #zoomToFitBtn": function (evt) {
+        evt.preventDefault();
+        Template.instance().jsplumbRenderer.zoomToFit();
+    },
+    "click #relayoutBtn": function (evt) {
+        evt.preventDefault();
+        Template.instance().jsplumbRenderer.magnetize();
+    },
+    "click #clearSelectionBtn": function (evt) {
+        evt.preventDefault();
+        Template.instance().jsPlumbToolkit.clearSelection();
+        Template.instance().selection.set(null);
+    },
+    "click #zoomToSelectionBtn": function (evt) {
+        evt.preventDefault();
+        Template.instance().jsplumbRenderer.zoomToSelection({
+            fill: 0.5,
+            selection: Template.instance().selection.get()
+        });
     }
 });
 
@@ -88,10 +126,12 @@ function loadFlowchart() {
 
 function getJSPlumbOptions() {
     let toolkit = Template.instance().jsPlumbToolkit;
+    let selection = Template.instance().selection;
     var selectEvent = {
         tap: function (params) {
             if (params.e.button == 0) {
                 toolkit.toggleSelection(params.node);
+                selection.set(toolkit.getSelection());
             }
         }
     };
@@ -167,8 +207,8 @@ function getJSPlumbOptions() {
         },
         events: {
             canvasClick: function (e) {
-                console.log("Canvas click");
-                toolkit.clearSelection();
+                // toolkit.clearSelection();
+                // selection.set(null);
             }
         },
         consumeRightClick: false
