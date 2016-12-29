@@ -5,8 +5,6 @@ import "/imports/utils/jsplumb/jsPlumb-2.1.5.js";
 import "/imports/utils/jsplumb/jsPlumbToolkit-1.0.26-min.js";
 import "/imports/ui/pages/chart_view/templates/process_node.html";
 import "/imports/ui/pages/chart_view/templates/terminator_node.html";
-import "/imports/ui/pages/chart_view/templates/first_node.html";
-import "/imports/ui/pages/chart_view/templates/virtual_node.html";
 import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
@@ -158,12 +156,16 @@ function getJSPlumbOptions() {
                     template: "terminatorNode"
                 },
                 "first": {
-                    template: "firstNode",
-                    parent: "default"
+                    parent: "default",
+                    parameters: {
+                        node_class: "first-node"
+                    }
                 },
                 "virtual": {
-                    template: "virtualNode",
-                    parent: "default"
+                    parent: "default",
+                    parameters: {
+                        node_class: "virtual-node"
+                    }
                 }
             },
             edges: {
