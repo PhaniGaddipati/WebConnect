@@ -57,8 +57,11 @@ Template.guide_view.helpers({
     haveResources: function () {
         return Template.instance().currentNode.get()[Graphs.NODE_RESOURCES].length > 0;
     },
-    plusOne: function (n) {
-        return n + 1;
+    formatResource: function (res) {
+        if (res) {
+            return res.substring(res.lastIndexOf("/") + 1, res.length);
+        }
+        return "";
     }
 });
 

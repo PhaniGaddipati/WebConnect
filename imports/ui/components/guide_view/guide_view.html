@@ -34,8 +34,8 @@
                     <br>
                     <ul class="list-group">
                         {{#each resources}}
-                            <li class="list-group-item"><a href="{{this}}" target="_blank">Resource {{plusOne
-                                    @index}}</a></li>
+                            <li class="list-group-item"><a href="{{this}}" target="_blank">
+                                <i class="fa fa-file-pdf-o"></i> - {{formatResource this}}</a></li>
                         {{/each}}
                     </ul>
                 {{/if}}
