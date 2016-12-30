@@ -10,10 +10,9 @@
         <div class="processOptions">
             <ul class="list-group">
                 <r-each in="options">
-                <!-- The li element has id of nodeId.edgeId. The port has id edgeId -->
-                    <li class="list-group-item node-option" id="${id}">
+                    <li class="list-group-item node-option" id="${_id}" data-parent-node="${parentNode}">
                         ${name}
-                        <jtk-source port-id="${edgeId}" port-type="option" scope="${datatype}" port-name="${name}" port-details="${details}"></jtk-source>
+                        <jtk-source port-id="${_id}" port-type="option" scope="${datatype}" port-name="${name}" port-details="${details}"></jtk-source>
                     </li>
                 </r-each>
             </ul>

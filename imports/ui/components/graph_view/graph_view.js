@@ -5,31 +5,18 @@ import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {
-    getGraph,
-    getNodeEdgeMap,
-    NODE_MAP_NODE,
-    NODE_MAP_OUTGOING_EDGES,
-    NODE_MAP_INCOMING_EDGES
-} from "/imports/api/graphs/methods.js";
-import {
-    layoutGraph,
-    labelNodesAndEdges,
-    extendEdgeSources,
-    TYPE,
-    NODE_TYPE_VIRTUAL
-} from "/imports/ui/components/graph_view/jsplumb_utils.js";
-import {SELECTED_OPTION_TARGET_ID} from "/imports/ui/components/guide_view/guide_view.js";
+import {layoutGraph} from "/imports/ui/components/graph_view/jsplumb_utils.js";
+import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
+import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
-export const SELECTION_NODE_MAP_ENTRY = "graph_selection_nodeid";
+export const SELECTION_NODE_DATA = "graph_selection_nodeid";
 const NODE_FILL = 0.3;
 
-Session.set(SELECTION_NODE_MAP_ENTRY, null);
-
 Template.graph_view.onCreated(function () {
-    var self = Template.instance();
-    self.graphId = Template.instance().data.graphId;
+    let self = Template.instance();
+    self.graphId = self.data.graphId;
     self.graph = new ReactiveVar(null);
+    self.loadingGraph = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
 
     self.jsPlumbToolkit = jsPlumbToolkit.newInstance({
@@ -37,51 +24,59 @@ Template.graph_view.onCreated(function () {
             return data["_id"];
         }
     });
-    getGraph.call(self.graphId, function (err, graph) {
+    GraphUtils.getGraphAsJSPlumb.call(self.graphId, function (err, graph) {
         if (err || !graph) {
+            console.log(err);
             self.errorLoadingGraph.set(true);
         } else {
             self.graph.set(graph);
-            self.nodeMap = getNodeEdgeMap(graph);
         }
+        self.loadingGraph.set(false);
     });
 });
 
 Template.graph_view.onRendered(function () {
+    Session.set(SELECTION_NODE_DATA, null);
     this.autorun(loadFlowchart);
     this.autorun(updateSelectionFromGuide);
 });
 
 function updateSelectionFromGuide() {
-    let tmpl = Template.instance();
-    let nodeId = Session.get(SELECTED_OPTION_TARGET_ID);
-    if (nodeId) {
-        let node = tmpl.jsPlumbToolkit.getNode(nodeId);
-        setSelection(Template.instance(), node);
-        tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getSelection().getNodes()[0], NODE_FILL);
+    let self = Template.instance();
+
+    let optionId = Session.get(SELECTED_OPTION_ID);
+    let node = self.jsPlumbToolkit.getSelection().getNodes()[0];
+    if (optionId && node) {
+        let port = node.getPort(optionId);
+        if (port && port.getEdges().length > 0) {
+            let nextNode = port.getEdges()[0].target;
+            self.jsplumbRenderer.centerOnAndZoom(nextNode, NODE_FILL);
+            setSelection(Template.instance(), nextNode);
+        }
     }
 }
 
 Template.graph_view.helpers({
+    loadingGraph: function () {
+        return Template.instance().loadingGraph.get();
+    },
     nodesSelection: function () {
-        return Session.get(SELECTION_NODE_MAP_ENTRY) != null;
+        return Session.get(SELECTION_NODE_DATA) != null;
     },
     errorLoadingGraph: function () {
         return Template.instance().errorLoadingGraph.get();
     },
     selectedVirtual: function () {
-        let sel = Session.get(SELECTION_NODE_MAP_ENTRY);
-        if (!sel) {
+        let node = Session.get(SELECTION_NODE_DATA);
+        if (!node) {
             return false;
         }
-        return sel[NODE_MAP_NODE][TYPE] === NODE_TYPE_VIRTUAL;
+        return node[Graphs.NODE_GRAPH_ID] != null;
     },
     selectedVirtualGraphId: function () {
-        let sel = Session.get(SELECTION_NODE_MAP_ENTRY);
-        if (sel) {
-            if (sel[NODE_MAP_NODE][TYPE] === NODE_TYPE_VIRTUAL) {
-                return sel[NODE_MAP_NODE][Graphs.NODE_GRAPH_ID];
-            }
+        let node = Session.get(SELECTION_NODE_DATA);
+        if (node) {
+            return node[Graphs.NODE_GRAPH_ID];
         }
         return "#";
     }
@@ -111,59 +106,47 @@ Template.graph_view.events({
     },
     "click #zoomToSelectionBtn": function (evt) {
         evt.preventDefault();
-        let tmpl = Template.instance();
-        let sel = Session.get(SELECTION_NODE_MAP_ENTRY);
-        if (sel) {
-            let id = sel[NODE_MAP_NODE][Graphs.NODE_ID];
-            tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getNode(id), NODE_FILL);
+        let self = Template.instance();
+        let node = Session.get(SELECTION_NODE_DATA);
+        if (node) {
+            let id = node[Graphs.NODE_ID];
+            self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getNode(id), NODE_FILL);
         }
     }
 });
 
 function loadFlowchart() {
-    let tmpl = Template.instance();
-    let graph = tmpl.graph.get();
+    let self = Template.instance();
+    let graph = self.graph.get();
     if (graph) {
-        graph = labelNodesAndEdges(graph);
         graph = layoutGraph(graph);
-        graph = extendEdgeSources(graph);
-
-        let edgeObjs = _.map(graph[Graphs.EDGES], function (edge) {
-            return {
-                source: edge[Graphs.EDGE_SOURCE],
-                target: edge[Graphs.EDGE_TARGET],
-                data: _.omit(edge, Graphs.EDGE_SOURCE, Graphs.EDGE_TARGET)
-            }
-        });
-
-        tmpl.jsPlumbToolkit.load({
+        self.jsPlumbToolkit.load({
             data: {
                 "nodes": graph[Graphs.NODES],
-                "edges": edgeObjs
+                "edges": graph[Graphs.EDGES]
             }
         });
-        tmpl.jsplumbRenderer =
-            tmpl.jsPlumbToolkit.render(getJSPlumbOptions());
-        tmpl.jsplumbRenderer.magnetize();
-        let node = tmpl.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
+        self.jsplumbRenderer =
+            self.jsPlumbToolkit.render(getJSPlumbOptions());
+        self.jsplumbRenderer.magnetize();
+        let node = self.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
         if (node) {
-            setSelection(tmpl, node);
-            tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getSelection().getNodes()[0], .25);
+            setSelection(self, node);
+            self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getSelection().getNodes()[0], .25);
         }
-        //tmpl.jsplumbRenderer.zoomToFit();
     }
 }
 
 function getJSPlumbOptions() {
-    let tmpl = Template.instance();
+    let self = Template.instance();
     var events = {
         tap: function (params) {
             if (params.e.button == 0) {
-                setSelection(tmpl, params.node);
+                setSelection(self, params.node);
             }
         },
         dblclick: function (params) {
-            tmpl.jsplumbRenderer.centerOnAndZoom(params.node, NODE_FILL);
+            self.jsplumbRenderer.centerOnAndZoom(params.node, NODE_FILL);
         }
     };
     return {
@@ -213,21 +196,12 @@ function getJSPlumbOptions() {
                     }, // hover paint style for this edge type.
                     overlays: [["Arrow", {location: 1, width: 15, length: 20}]],
                     beforeDrop: function (p) {
-                        // Nodes have ID nodeId
-                        // Options have ID nodeId.edgeId
-                        // Check that the nodeIds are different
-                        let sourceId = p.sourceId;
-                        let targetId = p.targetId;
-                        if (sourceId.indexOf(".") > -1) {
-                            sourceId = sourceId.substring(0, sourceId.indexOf("."));
+                        let con = p.connection;
+                        if (p.sourceId == p.targetId) {
+                            // This should never really happen...
+                            return false;
                         }
-                        if (targetId.indexOf(".") > -1) {
-                            targetId = targetId.substring(0, targetId.indexOf("."));
-                        }
-                        if (sourceId != targetId) {
-                            setSelection(tmpl, tmpl.jsPlumbToolkit.getNode(targetId));
-                        }
-                        return sourceId !== targetId;
+                        return con.source.getAttribute("data-parent-node") != p.targetId;
                     }
                 }
             },
@@ -246,51 +220,20 @@ function getJSPlumbOptions() {
         },
         events: {
             canvasClick: function (e) {
-                clearSelection(tmpl);
+                clearSelection(self);
             }
         },
         consumeRightClick: false
     }
 }
 
-function setSelection(tmpl, jsNode) {
-    clearSelection(tmpl);
-    tmpl.jsPlumbToolkit.addToSelection(jsNode);
-    // update edges to reflect any changes in the chart
-    let nodeMapEntry = tmpl.nodeMap[jsNode.data[Graphs.NODE_ID]];
-    nodeMapEntry[NODE_MAP_OUTGOING_EDGES] = getOutgoingEdges(jsNode);
-    nodeMapEntry[NODE_MAP_INCOMING_EDGES] = getIncomingEdges(jsNode);
-    Session.set(SELECTION_NODE_MAP_ENTRY, nodeMapEntry);
+function setSelection(self, jsNode) {
+    clearSelection(self);
+    self.jsPlumbToolkit.addToSelection(jsNode);
+    Session.set(SELECTION_NODE_DATA, jsNode.data);
 }
 
-function getOutgoingEdges(jsNode) {
-    let jsEdges = jsNode.getAllEdges();
-    jsEdges = _.filter(jsEdges, function (jsEdge) {
-        return jsEdge.source.getNode().id == jsNode.id;
-    });
-    _.each(jsEdges, function (jsEdge) {
-        jsEdge.data[Graphs.EDGE_SOURCE] = jsEdge.source.id;
-        jsEdge.data[Graphs.EDGE_TARGET] = jsEdge.target.id;
-        let sel = $("#" + jsNode.id).find("[port-id=" + jsEdge.source.id + "]");
-        jsEdge.data[Graphs.EDGE_NAME] = sel.attr("port-name");
-        jsEdge.data[Graphs.EDGE_DETAILS] = sel.attr("port-details");
-    });
-    return _.pluck(jsEdges, "data");
-}
-
-function getIncomingEdges(jsNode) {
-    let jsEdges = jsNode.getAllEdges();
-    jsEdges = _.filter(jsEdges, function (jsEdge) {
-        return jsEdge.source.getNode().id != jsNode.id;
-    });
-    _.each(jsEdges, function (jsEdge) {
-        jsEdge.data[Graphs.EDGE_SOURCE] = jsEdge.source.id;
-        jsEdge.data[Graphs.EDGE_TARGET] = jsEdge.target.id;
-    });
-    return _.pluck(jsEdges, "data");
-}
-
-function clearSelection(tmpl) {
-    tmpl.jsPlumbToolkit.clearSelection();
-    Session.set(SELECTION_NODE_MAP_ENTRY, null);
+function clearSelection(self) {
+    self.jsPlumbToolkit.clearSelection();
+    Session.set(SELECTION_NODE_DATA, null);
 }

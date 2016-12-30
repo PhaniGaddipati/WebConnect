@@ -8,8 +8,11 @@
             </div>
         </div>
     {{else}}
+        {{#if loadingGraph}}
+            {{> app_loading}}
+        {{/if}}
         <div class="container-fluid">
-            <div style="position: relative;display: block">
+            <div style="position: relative;display: block;{{#if loadingGraph}}visibility:hidden;{{/if}}">
                 <div id="jsplumbMiniviewContainer"></div>
                 <div>
                     <div class="btn-toolbar" id="jsplumbToolbar">

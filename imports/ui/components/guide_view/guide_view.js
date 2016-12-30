@@ -2,13 +2,11 @@
  * Created by phani on 12/29/16.
  */
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {NODE_MAP_NODE, NODE_MAP_OUTGOING_EDGES} from "/imports/api/graphs/methods.js";
 import "./guide_view.html";
-import {SELECTION_NODE_MAP_ENTRY} from "/imports/ui/components/graph_view/graph_view.js";
+import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
+import {SELECTION_NODE_DATA} from "/imports/ui/components/graph_view/graph_view.js";
 
-export const SELECTED_OPTION_TARGET_ID = "selected_option_target_id";
-
-Session.set(SELECTED_OPTION_TARGET_ID, null);
+export const SELECTED_OPTION_ID = "selected_option_target_id";
 
 Template.guide_view.onCreated(function () {
     let self = Template.instance();
@@ -25,7 +23,7 @@ Template.guide_view.onCreated(function () {
 });
 
 function updateCurrentNode(tmpl) {
-    let node = Session.get(SELECTION_NODE_MAP_ENTRY);
+    let node = Session.get(SELECTION_NODE_DATA);
     if (node) {
         tmpl.currentNode.set(node);
     } else {
@@ -35,18 +33,18 @@ function updateCurrentNode(tmpl) {
 
 Template.guide_view.helpers({
     nodeSelected: function () {
-        return Session.get(SELECTION_NODE_MAP_ENTRY) != null
+        return Session.get(SELECTION_NODE_DATA) != null
     },
     currentNode: function () {
-        return Template.instance().currentNode.get()[NODE_MAP_NODE];
+        return Template.instance().currentNode.get();
     },
     options: function () {
         let self = Template.instance();
-        return self.currentNode.get()[NODE_MAP_OUTGOING_EDGES];
+        return self.currentNode.get()[GraphUtils.OPTIONS];
     },
     haveResources: function () {
         let self = Template.instance();
-        return self.currentNode.get()[NODE_MAP_NODE][Graphs.NODE_RESOURCES].length > 0;
+        return self.currentNode.get()[Graphs.NODE_RESOURCES].length > 0;
     },
     formatResource: function (res) {
         if (res) {
@@ -59,6 +57,6 @@ Template.guide_view.helpers({
 Template.guide_view.events({
     "click .guide-option-button": function (evt) {
         evt.preventDefault();
-        Session.set(SELECTED_OPTION_TARGET_ID, evt.target.getAttribute("value"));
+        Session.set(SELECTED_OPTION_ID, evt.target.getAttribute("value"));
     }
 });
