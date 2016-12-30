@@ -1,9 +1,11 @@
 import "meteor/reactive-var";
+import "meteor/session";
 import "./chart.html";
 import {getUserName} from "/imports/api/users/methods.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import "/imports/ui/components/graph_view/graph_view.js";
+import "/imports/ui/components/guide_view/guide_view.js";
 
 Template.chart.onCreated(function () {
     var self = Template.instance();
@@ -36,6 +38,11 @@ Template.chart.helpers({
         return getUserName.call({userId: owner});
     },
     graphViewParams: function () {
+        return {
+            graphId: Template.instance().chart.get()[Charts.GRAPH_ID]
+        };
+    },
+    guideViewParams: function () {
         return {
             graphId: Template.instance().chart.get()[Charts.GRAPH_ID]
         };

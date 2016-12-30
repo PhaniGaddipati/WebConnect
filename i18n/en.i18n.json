@@ -42,5 +42,9 @@
   "cancel": "Cancel",
   "selected": "selected",
   "failed_load_graph": "Failed to load the graph! Check the URL and try again",
-  "open_subguide": "open sub-guide"
+  "open_subguide": "Open Sub-guide",
+  "options": "Options",
+  "select_node_view": "Select a node to view it",
+  "resources": "Resources",
+  "no_resources": "No Resources"
 }

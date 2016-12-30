@@ -5,6 +5,11 @@ import {ValidatedMethod} from "meteor/mdg:validated-method";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
 
+export const NODE_MAP_NODE = "node";
+export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
+export const NODE_MAP_OUTGOING_EDGES = "outgoingEdges";
+export const NODE_MAP_IS_VIRTUAL = "isVirtual";
+
 /**
  * Checks that a graph is well formed. This includes:
  *    1) subgraphs exist
@@ -18,25 +23,25 @@ export const validateGraph = new ValidatedMethod({
     validate: function (g) {
     },
     run(g){
-        let valid     = true;
+        let valid = true;
         let errorMsgs = "";
         try {
             let gId = g[Graphs.GRAPH_ID];
             if (!gId) {
-                gId       = "<no id>";
+                gId = "<no id>";
                 errorMsgs = errorMsgs.concat("\nmissing _id field");
-                valid     = false;
+                valid = false;
             }
             if (!g[Graphs.NODES]) {
                 errorMsgs = errorMsgs.concat("\nmissing nodes field");
-                valid     = false;
+                valid = false;
             } else {
                 _.each(g[Graphs.NODES], function (node) {
                     if (!Graphs.Graphs.schema.nodeSchema.newContext().validate(
                             Graphs.Graphs.schema.nodeSchema.clean(node))) {
                         errorMsgs = errorMsgs.concat("\ninvalid node "
                             + ((!!node[Graphs.NODE_GRAPH_ID]) ? node[Graphs.NODE_GRAPH_ID] : ""));
-                        valid     = false;
+                        valid = false;
                     }
                 });
             }
@@ -49,18 +54,18 @@ export const validateGraph = new ValidatedMethod({
                             Graphs.Graphs.schema.edgeSchema.clean(edge))) {
                         errorMsgs = errorMsgs.concat("\ninvalid edge "
                             + (edge[Graphs.EDGE_ID] ? edge[Graphs.EDGE_ID] : ""));
-                        valid     = false;
+                        valid = false;
                     }
                 });
             }
             if (!g[Graphs.FIRST_NODE]) {
                 errorMsgs = errorMsgs.concat("\nmissing firstNode field");
-                valid     = false;
+                valid = false;
             }
 
             if (valid) {
                 // Check edges only if the rest is good
-                let nodeMap      = {};
+                let nodeMap = {};
                 let virtualNodes = [];
                 _.each(g[Graphs.NODES], function (node) {
                     nodeMap[node[Graphs.NODE_ID]] = true;
@@ -70,32 +75,32 @@ export const validateGraph = new ValidatedMethod({
                 });
                 if (!nodeMap[g[Graphs.FIRST_NODE]]) {
                     errorMsgs = errorMsgs.concat("\nfirstNode " + g[Graphs.FIRST_NODE] + " doesn't exist");
-                    valid     = false;
+                    valid = false;
                 }
                 _.each(g[Graphs.EDGES], function (edge) {
                     if (!nodeMap[edge[Graphs.EDGE_SOURCE]]) {
                         errorMsgs = errorMsgs.concat("\nedge " + edge[Graphs.EDGE_ID]
                             + " source " + edge[Graphs.EDGE_SOURCE] + " doesn't exist");
-                        valid     = false;
+                        valid = false;
                     }
                     if (!nodeMap[edge[Graphs.EDGE_TARGET]]) {
                         errorMsgs = errorMsgs.concat("\nedge " + edge[Graphs.EDGE_ID]
                             + " target " + edge[Graphs.EDGE_TARGET] + " doesn't exist");
-                        valid     = false;
+                        valid = false;
                     }
                 });
                 _.each(virtualNodes, function (vNode) {
                     if (!Graphs.Graphs.findOne({_id: vNode[Graphs.NODE_GRAPH_ID]})) {
                         errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
                             + " refers to nonexistant graph " + vNode[Graphs.NODE_GRAPH_ID]);
-                        valid     = false;
+                        valid = false;
                     }
                 });
             }
         } catch (err) {
             errorMsgs = errorMsgs.log("\nunexpected error");
             errorMsgs = errorMsgs.log(err);
-            valid     = false;
+            valid = false;
         }
         if (valid) {
             return null;
@@ -120,7 +125,7 @@ export const insertGraph = new ValidatedMethod({
             throw new Meteor.Error("graphs.insert.accessDenied",
                 "A user must be logged in to insert a new Graph");
         }
-        let graph           = {};
+        let graph = {};
         graph[Graphs.OWNER] = ownerId;
         return Graphs.Graphs.insert(graph);
     }
@@ -165,8 +170,8 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         // outgoing edge points. There should only be 1 outgoing edge
 
         let nodesToDelete = {};
-        let newNodes      = [];
-        let newEdges      = [];
+        let newNodes = [];
+        let newEdges = [];
         _.each(graph[Graphs.NODES], function (vNode) {
             if (vNode[Graphs.NODE_GRAPH_ID]) {
                 // Virtual node found
@@ -178,8 +183,8 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                     bypass = true;
                 } else {
                     let vNodeOutEdges = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges;
-                    let subGraphId    = vNode[Graphs.NODE_GRAPH_ID];
-                    let subGraph      = getGraphWithoutLinks.call(subGraphId);
+                    let subGraphId = vNode[Graphs.NODE_GRAPH_ID];
+                    let subGraph = getGraphWithoutLinks.call(subGraphId);
 
                     if (!subGraph) {
                         // Couldn't find subgraph. Ignore it by skipping the virtual node
@@ -188,7 +193,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         bypass = true;
                     } else {
                         // vNode's incoming edges points to firstNode of subgraph
-                        _.each(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
+                        _.each(nodeMap[vNode[Graphs.NODE_ID]][NODE_MAP_INCOMING_EDGES], function (edge) {
                             edge[Graphs.EDGE_TARGET] = subGraph[Graphs.FIRST_NODE];
                             newEdges.push(edge);
                         });
@@ -196,13 +201,13 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         // Find all terminations of subGraph and set it to vNode's target
                         let sgNodeMap = getNodeEdgeMap(subGraph);
                         _.each(subGraph[Graphs.EDGES], function (sgEdge) {
-                            if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]].outgoingEdges.length == 0) {
+                            if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]][NODE_MAP_OUTGOING_EDGES].length == 0) {
                                 // This leaf node is no longer needed
                                 nodesToDelete[sgEdge[Graphs.EDGE_TARGET]] = true;
                                 // Terminating edge, link to outgoing edges of the virtual node
                                 _.each(vNodeOutEdges, function (outEdge) {
                                     // Make a new edge incase there's more than 1 terminating node
-                                    let edge                 = outEdge;
+                                    let edge = outEdge;
                                     edge[Graphs.EDGE_SOURCE] = sgEdge[Graphs.EDGE_SOURCE];
                                     newEdges.push(edge);
                                 });
@@ -215,7 +220,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         let nodesToAdd = _.reject(subGraph[Graphs.NODES], function (node) {
                             return nodesToDelete[node[Graphs.NODE_ID]];
                         });
-                        newNodes       = newNodes.concat(nodesToAdd);
+                        newNodes = newNodes.concat(nodesToAdd);
                     }
                 }
                 if (bypass) {
@@ -232,10 +237,10 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                 newNodes.push(vNode);
                 // Add the edges that don't point/start from a virtual node
                 newEdges = newEdges.concat(_.reject(nodeMap[vNode[Graphs.NODE_ID]].incomingEdges, function (edge) {
-                    return nodeMap[edge[Graphs.EDGE_SOURCE]] && nodeMap[edge[Graphs.EDGE_SOURCE]].isVirtual;
+                    return nodeMap[edge[Graphs.EDGE_SOURCE]] && nodeMap[edge[Graphs.EDGE_SOURCE]][NODE_MAP_IS_VIRTUAL];
                 }));
                 newEdges = newEdges.concat(_.reject(nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges, function (edge) {
-                    return nodeMap[edge[Graphs.EDGE_TARGET]] && nodeMap[edge[Graphs.EDGE_TARGET]].isVirtual;
+                    return nodeMap[edge[Graphs.EDGE_TARGET]] && nodeMap[edge[Graphs.EDGE_TARGET]][NODE_MAP_IS_VIRTUAL];
                 }));
             }
         });
@@ -254,7 +259,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
 
 /**
  * Creates a map mapping node id to arrays of
- * incomingEdges, outgoingEdges. isVirtual marks
+ * incomingEdges, outgoingEdges, and the node. isVirtual marks
  * if the node is a virtual node.
  * @param graph
  * @returns {{}}
@@ -265,17 +270,18 @@ export const getNodeEdgeMap = function (graph) {
         nodeMap[node[Graphs.NODE_ID]] = {
             incomingEdges: [],
             outgoingEdges: [],
-            isVirtual: node[Graphs.NODE_GRAPH_ID] != null
+            isVirtual: node[Graphs.NODE_GRAPH_ID] != null,
+            node: node
         }
     });
     _.each(graph[Graphs.EDGES], function (edge) {
         if (nodeMap[edge[Graphs.EDGE_SOURCE]]) {
-            nodeMap[edge[Graphs.EDGE_SOURCE]].outgoingEdges.push(edge);
+            nodeMap[edge[Graphs.EDGE_SOURCE]][NODE_MAP_OUTGOING_EDGES].push(edge);
         } else {
             console.warn("Couldn't find source node " + edge[Graphs.EDGE_SOURCE] + " for graph " + graph[Graphs.GRAPH_ID]);
         }
         if (nodeMap[edge[Graphs.EDGE_TARGET]]) {
-            nodeMap[edge[Graphs.EDGE_TARGET]].incomingEdges.push(edge);
+            nodeMap[edge[Graphs.EDGE_TARGET]][NODE_MAP_INCOMING_EDGES].push(edge);
         } else {
             console.warn("Couldn't find target node " + edge[Graphs.EDGE_TARGET] + " for graph " + graph[Graphs.GRAPH_ID]);
         }

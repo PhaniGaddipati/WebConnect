@@ -1,0 +1,48 @@
+<template name="guide_view">
+    {{#if errorLoadingGraph}}
+        <div class="text-center">
+            <div class="alert alert-danger">
+                {{_ "failed_load_graph"}}
+            </div>
+        </div>
+    {{else}}
+        {{#if nodeSelected}}
+            {{#with currentNode}}
+                <div class="text-center">
+                    <p class="lead">{{name}}</p>
+                    <br>
+                    <p>{{details}}</p>
+                </div>
+
+                {{#if graphId}}
+                    <a href="/graph/{{graphId}}" target="_blank" id="openLinkedGraph"
+                       class="btn btn-warning center-block">{{_
+                            "open_subguide"}}</a>
+                {{/if}}
+
+                <div class="row">
+                    {{#each images}}
+                        <a href="{{this}}" target="_blank"><img class="img-thumbnail col-xs-6" src="{{this}}"></a>
+                    {{/each}}
+                </div>
+                <br>
+                {{#each options}}
+                    <a class="btn btn-primary center-block guide-option-button" value="{{target}}"
+                       style="width:100%;margin-bottom: 2px">{{name}}</a>
+                {{/each}}
+                {{#if haveResources}}
+                    <br>
+                    <ul class="list-group">
+                        {{#each resources}}
+                            <li class="list-group-item"><a href="{{this}}" target="_blank">Resource {{plusOne
+                                    @index}}</a></li>
+                        {{/each}}
+                    </ul>
+                {{/if}}
+
+            {{/with}}
+        {{else}}
+            <p class="text-muted text-center">{{_ "select_node_view"}}</p>
+        {{/if}}
+    {{/if}}
+</template>

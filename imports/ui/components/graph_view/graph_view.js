@@ -13,8 +13,12 @@ import {
     TYPE,
     NODE_TYPE_VIRTUAL
 } from "/imports/ui/components/graph_view/jsplumb_utils.js";
+import {SELECTED_OPTION_TARGET_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
-const NODE_FILL = 0.20;
+export const GRPAH_SELECTION_NODE_ID = "graph_selection_nodeid";
+const NODE_FILL = 0.25;
+
+Session.set(GRPAH_SELECTION_NODE_ID, null);
 
 Template.graph_view.onCreated(function () {
     var self = Template.instance();
@@ -39,7 +43,18 @@ Template.graph_view.onCreated(function () {
 
 Template.graph_view.onRendered(function () {
     this.autorun(loadFlowchart);
+    this.autorun(updateSelectionFromGuide);
 });
+
+function updateSelectionFromGuide() {
+    let tmpl = Template.instance();
+    let nodeId = Session.get(SELECTED_OPTION_TARGET_ID);
+    if (nodeId) {
+        let node = tmpl.jsPlumbToolkit.getNode(nodeId);
+        setSelection(Template.instance(), node);
+        tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getSelection().getNodes()[0], NODE_FILL);
+    }
+}
 
 Template.graph_view.helpers({
     nodesSelection: function () {
@@ -90,8 +105,7 @@ Template.graph_view.events({
     },
     "click #clearSelectionBtn": function (evt) {
         evt.preventDefault();
-        Template.instance().jsPlumbToolkit.clearSelection();
-        Template.instance().selection.set(null);
+        clearSelection(Template.instance());
     },
     "click #zoomToSelectionBtn": function (evt) {
         evt.preventDefault();
@@ -103,35 +117,37 @@ Template.graph_view.events({
 });
 
 function loadFlowchart() {
-    let graph = Template.instance().graph.get();
+    let tmpl = Template.instance();
+    let graph = tmpl.graph.get();
     if (graph) {
         graph = labelNodesAndEdges(graph);
         graph = layoutGraph(graph);
         graph = extendEdgeSources(graph);
 
-        Template.instance().jsPlumbToolkit.load({
+        tmpl.jsPlumbToolkit.load({
             data: {
                 "nodes": graph[Graphs.NODES],
                 "edges": graph[Graphs.EDGES]
             }
         });
-        Template.instance().jsplumbRenderer =
-            Template.instance().jsPlumbToolkit.render(getJSPlumbOptions());
-        Template.instance().jsplumbRenderer.magnetize();
-        Template.instance().jsplumbRenderer.zoomToFit();
+        tmpl.jsplumbRenderer =
+            tmpl.jsPlumbToolkit.render(getJSPlumbOptions());
+        tmpl.jsplumbRenderer.magnetize();
+        let node = tmpl.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
+        if (node) {
+            setSelection(tmpl, node);
+            //tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getSelection().getNodes()[0], NODE_FILL);
+        }
+        tmpl.jsplumbRenderer.zoomToFit();
     }
 }
 
 function getJSPlumbOptions() {
     let tmpl = Template.instance();
-    let toolkit = tmpl.jsPlumbToolkit;
-    let selection = tmpl.selection;
     var events = {
         tap: function (params) {
             if (params.e.button == 0) {
-                toolkit.clearSelection();
-                toolkit.addToSelection(params.node);
-                selection.set(toolkit.getSelection());
+                setSelection(tmpl, params.node);
             }
         },
         dblclick: function (params) {
@@ -215,10 +231,22 @@ function getJSPlumbOptions() {
         },
         events: {
             canvasClick: function (e) {
-                toolkit.clearSelection();
-                selection.set(null);
+                clearSelection(tmpl);
             }
         },
         consumeRightClick: false
     }
+}
+
+function setSelection(tmpl, node) {
+    clearSelection(tmpl);
+    tmpl.jsPlumbToolkit.addToSelection(node);
+    tmpl.selection.set(tmpl.jsPlumbToolkit.getSelection());
+    Session.set(GRPAH_SELECTION_NODE_ID, node.data[Graphs.NODE_ID]);
+}
+
+function clearSelection(tmpl) {
+    tmpl.jsPlumbToolkit.clearSelection();
+    tmpl.selection.set(null);
+    Session.set(GRPAH_SELECTION_NODE_ID, null);
 }
