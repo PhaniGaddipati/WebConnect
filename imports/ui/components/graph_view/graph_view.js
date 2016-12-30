@@ -111,9 +111,11 @@ Template.graph_view.events({
     },
     "click #zoomToSelectionBtn": function (evt) {
         evt.preventDefault();
+        let tmpl = Template.instance();
         let sel = Session.get(SELECTION_NODE_MAP_ENTRY);
         if (sel) {
-            Template.instance().jsplumbRenderer.centerOnAndZoom(sel, NODE_FILL);
+            let id = sel[NODE_MAP_NODE][Graphs.NODE_ID];
+            tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getNode(id), NODE_FILL);
         }
     }
 });
