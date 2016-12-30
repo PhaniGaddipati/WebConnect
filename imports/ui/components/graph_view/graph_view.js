@@ -10,7 +10,7 @@ import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
-const NODE_FILL = 0.3;
+const NODE_FILL = 0.2;
 
 Template.graph_view.onCreated(function () {
     let self = Template.instance();
@@ -33,6 +33,8 @@ Template.graph_view.onCreated(function () {
         }
         self.loadingGraph.set(false);
     });
+
+
 });
 
 Template.graph_view.onRendered(function () {
