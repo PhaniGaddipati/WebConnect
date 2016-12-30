@@ -73,8 +73,8 @@ Template.graph_view.helpers({
     selectedVirtualGraphId: function () {
         let sel = Session.get(SELECTION_NODE_MAP_ENTRY);
         if (sel) {
-            if (sel.data[TYPE] === NODE_TYPE_VIRTUAL) {
-                return sel.data[Graphs.NODE_GRAPH_ID];
+            if (sel[NODE_MAP_NODE][TYPE] === NODE_TYPE_VIRTUAL) {
+                return sel[NODE_MAP_NODE][Graphs.NODE_GRAPH_ID];
             }
         }
         return "#";
