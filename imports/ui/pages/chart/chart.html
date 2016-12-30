@@ -13,10 +13,12 @@
                     <br>
                 {{/if}}
                 <strong>{{_ "last_updated"}}:</strong> {{chartLastUpdated}}
+                <br><br>
+                <a class="btn btn-default btn-sm" href="#views">View Guide</a>
             </div>
         </div>
-
+        <hr>
+        <a id="views"></a>
         {{> Template.dynamic template="graph_guide" data=graphParams}}
     {{/if}}
-    <br/><br/><br/>
 </template>
