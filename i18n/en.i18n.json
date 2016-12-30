@@ -41,5 +41,6 @@
   "save_changes": "Save Changes",
   "cancel": "Cancel",
   "selected": "selected",
-  "failed_load_graph": "Failed to load the graph! Check the URL and try again"
+  "failed_load_graph": "Failed to load the graph! Check the URL and try again",
+  "open_subguide": "open sub-guide"
 }

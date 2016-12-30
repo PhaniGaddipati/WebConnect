@@ -6,7 +6,13 @@ import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getGraph} from "/imports/api/graphs/methods.js";
-import {layoutGraph, labelNodesAndEdges, extendEdgeSources} from "/imports/ui/components/graph_view/jsplumb_utils.js";
+import {
+    layoutGraph,
+    labelNodesAndEdges,
+    extendEdgeSources,
+    TYPE,
+    NODE_TYPE_VIRTUAL
+} from "/imports/ui/components/graph_view/jsplumb_utils.js";
 
 const NODE_FILL = 0.20;
 
@@ -45,6 +51,22 @@ Template.graph_view.helpers({
     },
     errorLoadingGraph: function () {
         return Template.instance().errorLoadingGraph.get();
+    },
+    selectedVirtual: function () {
+        let sel = Template.instance().selection.get();
+        if (!sel || sel.getNodes().length == 0) {
+            return false;
+        }
+        return sel.getNodes()[0].data[TYPE] === NODE_TYPE_VIRTUAL;
+    },
+    selectedVirtualGraphId: function () {
+        let sel = Template.instance().selection.get();
+        if (sel && sel.getNodes().length > 0) {
+            if (sel.getNodes()[0].data[TYPE] === NODE_TYPE_VIRTUAL) {
+                return sel.getNodes()[0].data[Graphs.NODE_GRAPH_ID];
+            }
+        }
+        return "#";
     }
 });
 
