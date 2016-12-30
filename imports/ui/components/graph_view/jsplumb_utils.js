@@ -11,6 +11,7 @@ const NODE_WIDTH = 250; // Make sure to also change in dummy nodes
 
 export const OPTIONS = "options";
 export const TYPE = "type";
+export const HAS_ATTACHMENT = "hasAttachment";
 export const NODE_TYPE_PROCESS = "process";
 export const NODE_TYPE_DECISION = "decision";
 export const NODE_TYPE_TERMINATOR = "terminator";
@@ -39,6 +40,8 @@ export const labelNodesAndEdges = function (graph) {
         } else {
             node[TYPE] = NODE_TYPE_TERMINATOR;
         }
+        node[HAS_ATTACHMENT] = node[Graphs.NODE_RESOURCES].length > 0 ||
+            node[Graphs.NODE_IMAGES].length > 0;
         node[OPTIONS] = [];
         _.each(nodeMap[node[Graphs.NODE_ID]].outgoingEdges, function (edge) {
             node[OPTIONS].push({
