@@ -16,7 +16,7 @@ import {
 import {SELECTED_OPTION_TARGET_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const GRPAH_SELECTION_NODE_ID = "graph_selection_nodeid";
-const NODE_FILL = 0.25;
+const NODE_FILL = 0.3;
 
 Session.set(GRPAH_SELECTION_NODE_ID, null);
 
@@ -136,9 +136,9 @@ function loadFlowchart() {
         let node = tmpl.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
         if (node) {
             setSelection(tmpl, node);
-            //tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getSelection().getNodes()[0], NODE_FILL);
+            tmpl.jsplumbRenderer.centerOnAndZoom(tmpl.jsPlumbToolkit.getSelection().getNodes()[0], .25);
         }
-        tmpl.jsplumbRenderer.zoomToFit();
+        //tmpl.jsplumbRenderer.zoomToFit();
     }
 }
 
