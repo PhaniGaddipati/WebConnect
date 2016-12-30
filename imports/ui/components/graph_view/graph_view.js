@@ -5,7 +5,13 @@ import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {getGraph, getNodeEdgeMap, NODE_MAP_NODE} from "/imports/api/graphs/methods.js";
+import {
+    getGraph,
+    getNodeEdgeMap,
+    NODE_MAP_NODE,
+    NODE_MAP_OUTGOING_EDGES,
+    NODE_MAP_INCOMING_EDGES
+} from "/imports/api/graphs/methods.js";
 import {
     layoutGraph,
     labelNodesAndEdges,
@@ -120,10 +126,18 @@ function loadFlowchart() {
         graph = layoutGraph(graph);
         graph = extendEdgeSources(graph);
 
+        let edgeObjs = _.map(graph[Graphs.EDGES], function (edge) {
+            return {
+                source: edge[Graphs.EDGE_SOURCE],
+                target: edge[Graphs.EDGE_TARGET],
+                data: _.omit(edge, Graphs.EDGE_SOURCE, Graphs.EDGE_TARGET)
+            }
+        });
+
         tmpl.jsPlumbToolkit.load({
             data: {
                 "nodes": graph[Graphs.NODES],
-                "edges": graph[Graphs.EDGES]
+                "edges": edgeObjs
             }
         });
         tmpl.jsplumbRenderer =
@@ -234,10 +248,38 @@ function getJSPlumbOptions() {
     }
 }
 
-function setSelection(tmpl, node) {
+function setSelection(tmpl, jsNode) {
     clearSelection(tmpl);
-    tmpl.jsPlumbToolkit.addToSelection(node);
-    Session.set(SELECTION_NODE_MAP_ENTRY, tmpl.nodeMap[node.data[Graphs.NODE_ID]]);
+    tmpl.jsPlumbToolkit.addToSelection(jsNode);
+    // update edges to reflect any changes in the chart
+    let nodeMapEntry = tmpl.nodeMap[jsNode.data[Graphs.NODE_ID]];
+    nodeMapEntry[NODE_MAP_OUTGOING_EDGES] = getOutgoingEdges(jsNode);
+    nodeMapEntry[NODE_MAP_INCOMING_EDGES] = getIncomingEdges(jsNode);
+    Session.set(SELECTION_NODE_MAP_ENTRY, nodeMapEntry);
+}
+
+function getOutgoingEdges(jsNode) {
+    let jsEdges = jsNode.getAllEdges();
+    jsEdges = _.filter(jsEdges, function (jsEdge) {
+        return jsEdge.source.getNode().id == jsNode.id;
+    });
+    _.each(jsEdges, function (jsEdge) {
+        jsEdge.data[Graphs.EDGE_SOURCE] = jsEdge.source.id;
+        jsEdge.data[Graphs.EDGE_TARGET] = jsEdge.target.id;
+    });
+    return _.pluck(jsEdges, "data");
+}
+
+function getIncomingEdges(jsNode) {
+    let jsEdges = jsNode.getAllEdges();
+    jsEdges = _.filter(jsEdges, function (jsEdge) {
+        return jsEdge.source.getNode().id != jsNode.id;
+    });
+    _.each(jsEdges, function (jsEdge) {
+        jsEdge.data[Graphs.EDGE_SOURCE] = jsEdge.source.id;
+        jsEdge.data[Graphs.EDGE_TARGET] = jsEdge.target.id;
+    });
+    return _.pluck(jsEdges, "data");
 }
 
 function clearSelection(tmpl) {
