@@ -224,6 +224,9 @@ function getJSPlumbOptions() {
                         if (targetId.indexOf(".") > -1) {
                             targetId = targetId.substring(0, targetId.indexOf("."));
                         }
+                        if (sourceId != targetId) {
+                            setSelection(tmpl, tmpl.jsPlumbToolkit.getNode(targetId));
+                        }
                         return sourceId !== targetId;
                     }
                 }
@@ -268,6 +271,9 @@ function getOutgoingEdges(jsNode) {
     _.each(jsEdges, function (jsEdge) {
         jsEdge.data[Graphs.EDGE_SOURCE] = jsEdge.source.id;
         jsEdge.data[Graphs.EDGE_TARGET] = jsEdge.target.id;
+        let sel = $("#" + jsNode.id).find("[port-id=" + jsEdge.source.id + "]");
+        jsEdge.data[Graphs.EDGE_NAME] = sel.attr("port-name");
+        jsEdge.data[Graphs.EDGE_DETAILS] = sel.attr("port-details");
     });
     return _.pluck(jsEdges, "data");
 }
