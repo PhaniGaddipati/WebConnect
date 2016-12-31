@@ -167,7 +167,12 @@ function getJSPlumbInstance(self) {
             callback(data);
         },
         beforeConnect: function (source, target) {
-            return source !== target && source.getNode() !== target;
+            // Make sure it's not a loopback connection and also
+            // that an option won't have more than 1 outgoing edge
+            return source !== target && source.getNode() !== target
+                && _.filter(source.getNode().getAllEdges(), function (edge) {
+                    return edge.source.data.id === source.data.id;
+                }).length == 0;
         }
     });
 }
@@ -229,15 +234,7 @@ function getJSPlumbOptions() {
                         lineWidth: 8,
                         strokeStyle: "#05518a"
                     }, // hover paint style for this edge type.
-                    overlays: [["Arrow", {location: 1, width: 15, length: 20}]],
-                    beforeDrop: function (p) {
-                        let con = p.connection;
-                        if (p.sourceId == p.targetId) {
-                            // This should never really happen...
-                            return false;
-                        }
-                        return con.source.getAttribute("data-parent-node") != p.targetId;
-                    }
+                    overlays: [["Arrow", {location: 1, width: 15, length: 20}]]
                 }
             },
             ports: {
