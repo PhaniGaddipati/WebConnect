@@ -1,6 +1,4 @@
-/**
- * Created by phani on 12/30/16.
- */
+import "meteor/random";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getGraph, getNodeEdgeMap} from "/imports/api/graphs/methods.js";
 
@@ -106,3 +104,12 @@ function labelNodeTypes(graph, nodeMap, newGraph) {
     });
     return newGraph;
 }
+
+export const getOptionObject = function (optionText, parentId) {
+    let opt = {};
+    opt[OPTION_NAME] = optionText;
+    opt[OPTION_DETAILS] = "";
+    opt[OPTION_ID] = Random.id();
+    opt[OPTION_PARENT_NODE_ID] = parentId;
+    return opt;
+};

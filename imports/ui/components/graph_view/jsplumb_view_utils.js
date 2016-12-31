@@ -40,7 +40,7 @@ export const layoutGraph = function (graph) {
     return graph;
 };
 
-function computeHeight(node) {
+export const computeHeight = function (node) {
     if (node[TYPE] === NODE_TYPE_TERMINATOR) {
         // No options for this kind of node
         document.getElementById("dummyTerminatorTitle").innerHTML = node[Graphs.NODE_NAME];
@@ -52,6 +52,7 @@ function computeHeight(node) {
         _.each(node[OPTIONS], function (opt) {
             element.innerHTML = element.innerHTML + "<li class=\"list-group-item\">" + opt[OPTION_NAME] + "</li>";
         });
+        element.innerHTML = element.innerHTML + "<li class=\"form-group\"><input class=\"form-control input-sm\"></input></li>";
         return document.getElementById("processDummyNode").offsetHeight;
     }
-}
+};

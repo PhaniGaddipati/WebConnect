@@ -46,5 +46,6 @@
   "options": "Options",
   "select_node_view": "Select a node to view it",
   "resources": "Resources",
-  "no_resources": "No Resources"
+  "no_resources": "No Resources",
+  "add_option": "Add Option"
 }

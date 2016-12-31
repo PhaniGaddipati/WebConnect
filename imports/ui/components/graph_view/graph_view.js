@@ -1,16 +1,19 @@
 import "/imports/ui/components/app_loading/app_loading.js";
 import "/imports/utils/jsplumb/jsPlumb-2.1.5.js";
 import "/imports/utils/jsplumb/jsPlumbToolkit-1.0.26-min.js";
+import "/imports/ui/components/graph_view/templates/option_tmpl.html";
 import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {layoutGraph} from "/imports/ui/components/graph_view/jsplumb_utils.js";
+import {layoutGraph} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
 const NODE_FILL = 0.2;
+
+jstk = null;
 
 Template.graph_view.onCreated(function () {
     let self = Template.instance();
@@ -19,11 +22,8 @@ Template.graph_view.onCreated(function () {
     self.loadingGraph = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
 
-    self.jsPlumbToolkit = jsPlumbToolkit.newInstance({
-        idFunction: function (data) {
-            return data["_id"];
-        }
-    });
+    self.jsPlumbToolkit = getJSPlumbInstance(self);
+    jstk = self.jsPlumbToolkit;
     GraphUtils.getGraphAsJSPlumb.call(self.graphId, function (err, graph) {
         if (err || !graph) {
             console.log(err);
@@ -114,6 +114,21 @@ Template.graph_view.events({
             let id = node[Graphs.NODE_ID];
             self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getNode(id), NODE_FILL);
         }
+    },
+    "keyup #addOptionInput": function (evt) {
+        if (evt.keyCode === 13) {
+            evt.preventDefault();
+            let self = Template.instance();
+            let txt = evt.target.value;
+            let nodeId = evt.currentTarget.parentElement.parentElement.parentElement.parentElement.id;
+            let node = self.jsPlumbToolkit.getNode(nodeId);
+            if (!_.contains(_.pluck(node.data[GraphUtils.OPTIONS], GraphUtils.OPTION_NAME), txt)) {
+                let opt = GraphUtils.getOptionObject(txt, nodeId);
+                self.jsPlumbToolkit.addNewPort(nodeId, "option", opt);
+                evt.target.value = "";
+                setSelection(self, node);
+            }
+        }
     }
 });
 
@@ -139,9 +154,27 @@ function loadFlowchart() {
     }
 }
 
+function getJSPlumbInstance(self) {
+    return jsPlumbToolkit.newInstance({
+        idFunction: function (data) {
+            return data["_id"];
+        },
+        portExtractor: function (node) {
+            return node[GraphUtils.OPTIONS] || [];
+        },
+        portFactory: function (params, data, callback) {
+            params.node.data[GraphUtils.OPTIONS].push(data);
+            callback(data);
+        },
+        beforeConnect: function (source, target) {
+            return source !== target && source.getNode() !== target;
+        }
+    });
+}
+
 function getJSPlumbOptions() {
     let self = Template.instance();
-    var events = {
+    let events = {
         tap: function (params) {
             if (params.e.button == 0) {
                 setSelection(self, params.node);
@@ -152,7 +185,7 @@ function getJSPlumbOptions() {
         }
     };
     return {
-        container: Template.instance().find("#jsplumbContainer"),
+        container: self.find("#jsplumbContainer"),
         miniview: {
             container: "jsplumbMiniviewContainer"
         },
@@ -209,18 +242,20 @@ function getJSPlumbOptions() {
             },
             ports: {
                 "default": {
+                    template: "option_tmpl",
                     edgeType: "default",
-                    allowLoopback: false,
-                    allowNodeLoopback: false
-                },
-                "option": {
-                    maxConnections: 1,
                     allowLoopback: false,
                     allowNodeLoopback: false
                 }
             }
         },
         events: {
+            portAdded: function (params) {
+                let addOpt = params.nodeEl.querySelectorAll(".add-option")[0];
+                params.nodeEl.querySelectorAll("ul")[0].insertBefore(params.portEl, addOpt);
+                //params.node.data.height = computeHeight(params.node.data);
+                //self.jsPlumbToolkit.updateNode(params.node);
+            },
             canvasClick: function (e) {
                 clearSelection(self);
             }

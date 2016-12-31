@@ -170,6 +170,10 @@
     font-weight: bold;
 }
 
+.list-group-item.add-option {
+    border: 1px solid rgba(52, 103, 137, 0.28);
+}
+
 #jsplumbContainer {
     height: 100%;
     min-height: 90vh;
