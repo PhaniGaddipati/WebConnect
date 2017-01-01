@@ -1,5 +1,5 @@
 import "/imports/ui/components/app_loading/app_loading.js";
-import "/imports/utils/jsplumb/jsPlumb-2.1.5.js";
+import "/imports/utils/jsplumb/jsPlumb-2.2.8.js";
 import "/imports/utils/jsplumb/jsPlumbToolkit-1.0.26-min.js";
 import "/imports/ui/components/graph_view/templates/option_tmpl.html";
 import "/imports/ui/components/graph_view/templates/terminator_node.html";
@@ -247,12 +247,12 @@ function getJSPlumbOptions() {
                     endpoint: ["Dot", {radius: 8}],
                     connector: ["StateMachine", {cornerRadius: 5, stub: [10, 50], midpoint: 0.1}],
                     paintStyle: {
-                        lineWidth: 3,
-                        strokeStyle: "#0878CB"
+                        strokeWidth: 3,
+                        stroke: "#0878CB"
                     },	//	paint style for this edge type.
                     hoverPaintStyle: {
-                        lineWidth: 8,
-                        strokeStyle: "#05518a"
+                        strokeWidth: 8,
+                        stroke: "#05518a"
                     }, // hover paint style for this edge type.
                     overlays: [["Arrow", {location: 1, width: 15, length: 20}]]
                 }

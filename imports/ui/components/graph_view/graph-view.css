@@ -56,7 +56,7 @@
     display: block;
 }
 
-.flowchart-object .edgeLabel.jsplumb-hover {
+.flowchart-object .edgeLabel.jtk-hover {
     background-color: #5C96BC;
     color: white;
     border: 1px solid white;
@@ -80,7 +80,7 @@
     border: 1px solid #685f3d;
 }
 
-.flowchart-object:not(.jsplumb-connected) {
+.flowchart-object:not(.jtk-connected) {
     background-color: #ffcdc8;
 }
 
@@ -111,7 +111,7 @@
     fill: black;
 }
 
-.jsplumb-drag {
+.jtk-drag {
     box-shadow: 2px 2px 19px #15988A !important;
 }
 
@@ -124,20 +124,20 @@
     padding: 4px 6px;
 }
 
-.jsplumb-endpoint {
+.jtk-endpoint {
     z-index: 26;
     opacity: .5;
 }
 
-.jsplumb-connector {
+.jtk-connector {
     z-index: 5;
 }
 
-.jsplumb-connector.jsplumb-hover {
+.jtk-connector.jtk-hover {
     z-index: 25;
 }
 
-.jsplumb-connector.jsplumb-dragging {
+.jtk-connector.jtk-dragging {
     z-index: 25;
 }
 
@@ -170,7 +170,7 @@
     padding-right: 10px;
 }
 
-.node-option-text:not(.jsplumb-connected) {
+.node-option-text:not(.jtk-connected) {
     color: #cb0c08;
     font-weight: bold;
 }
@@ -189,7 +189,7 @@
     font-size: 18px;
 }
 
-.node-option-text:not(.jsplumb-connected) ~ .deleteSpan {
+.node-option-text:not(.jtk-connected) ~ .deleteSpan {
     visibility: visible !important;
 }
 
