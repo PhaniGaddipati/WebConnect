@@ -3,6 +3,7 @@ import * as Graphs from "/imports/api/graphs/graphs.js";
 import {getGraph, getNodeEdgeMap} from "/imports/api/graphs/methods.js";
 
 export const TYPE = "type";
+export const ID = "id";
 export const HAS_ATTACHMENT = "hasAttachment";
 export const NODE_TYPE_PROCESS = "process";
 export const NODE_TYPE_DECISION = "decision";
@@ -12,7 +13,6 @@ export const NODE_TYPE_FIRST = "first";
 export const OPTIONS = "options";
 export const OPTION_NAME = Graphs.EDGE_NAME;
 export const OPTION_DETAILS = Graphs.EDGE_DETAILS;
-export const OPTION_ID = Graphs.EDGE_ID;
 export const OPTION_PARENT_NODE_ID = "parentNode";
 export const EDGE_NODE_SOURCE = "nodeSource";
 
@@ -43,9 +43,27 @@ export const getGraphAsJSPlumb = new ValidatedMethod({
         newGraph = labelNodeOptions(graph, nodeMap, newGraph);
         newGraph = labelNodeExtras(newGraph);
         newGraph = cleanEdges(newGraph);
+        newGraph = convertIds(newGraph);
         return newGraph;
     }
 });
+
+function convertIds(newGraph) {
+    _.each(newGraph[Graphs.NODES], function (node) {
+        node[ID] = node[Graphs.NODE_ID];
+        delete node[Graphs.NODE_ID];
+        _.each(node[OPTIONS], function (opt) {
+            // option was made from an edge
+            opt[ID] = opt[Graphs.EDGE_ID];
+            delete opt[Graphs.EDGE_ID];
+        })
+    });
+    _.each(newGraph[Graphs.EDGES], function (edge) {
+        edge[ID] = edge[Graphs.EDGE_ID];
+        delete edge[Graphs.EDGE_ID];
+    });
+    return newGraph;
+}
 
 function cleanEdges(newGraph) {
     // JSPlumb edges are strictly source to target,
@@ -109,7 +127,7 @@ export const getOptionObject = function (optionText, parentId) {
     let opt = {};
     opt[OPTION_NAME] = optionText;
     opt[OPTION_DETAILS] = "";
-    opt[OPTION_ID] = Random.id();
+    opt[ID] = Random.id();
     opt[OPTION_PARENT_NODE_ID] = parentId;
     return opt;
 };

@@ -3,6 +3,7 @@ import "/imports/ui/components/graph_view/templates/terminator_dummy_node.html";
 import "/imports/api/jsplumb/graph_utils.js";
 import {NODE_TYPE_TERMINATOR, TYPE, OPTIONS, OPTION_NAME, EDGE_NODE_SOURCE} from "/imports/api/jsplumb/graph_utils";
 import * as Graphs from "/imports/api/graphs/graphs";
+import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 
 const dagre = require("dagre");
 const NODE_WIDTH = 250; // Make sure to also change in dummy nodes
@@ -23,8 +24,7 @@ export const layoutGraph = function (graph) {
     _.each(nodes, function (node) {
         node.width = NODE_WIDTH;
         node.height = computeHeight(node);
-        // TODO trim text
-        dagreGraph.setNode(node[Graphs.NODE_ID], node);
+        dagreGraph.setNode(node[GraphUtils.ID], node);
     });
     _.each(edges, function (edge) {
         dagreGraph.setEdge(edge[EDGE_NODE_SOURCE], edge[Graphs.EDGE_TARGET]);

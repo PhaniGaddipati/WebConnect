@@ -12,11 +12,6 @@ Template.guide_view.onCreated(function () {
     let self = Template.instance();
     self.currentNode = new ReactiveVar(null);
 
-    self.jsPlumbToolkit = jsPlumbToolkit.newInstance({
-        idFunction: function (data) {
-            return data["_id"];
-        }
-    });
     Tracker.autorun(function () {
         updateCurrentNode(self);
     });

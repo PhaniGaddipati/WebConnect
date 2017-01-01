@@ -111,7 +111,7 @@ Template.graph_view.events({
         let self = Template.instance();
         let node = Session.get(SELECTION_NODE_DATA);
         if (node) {
-            let id = node[Graphs.NODE_ID];
+            let id = node[GraphUtils.ID];
             self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getNode(id), NODE_FILL);
         }
     },
@@ -129,6 +129,22 @@ Template.graph_view.events({
                 setSelection(self, node);
             }
         }
+    },
+    "click #deleteOptionBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let portId = evt.currentTarget.getAttribute("data-option-id");
+        let nodeId = evt.currentTarget.getAttribute("data-node-id");
+        let node = self.jsPlumbToolkit.getNode(nodeId);
+        node.data[GraphUtils.OPTIONS] = _.reject(node.data[GraphUtils.OPTIONS], function (opt) {
+            return opt[GraphUtils.ID] === portId;
+        });
+        try {
+            self.jsPlumbToolkit.removePort(node, portId);
+        } catch (err) {
+            console.log(err);
+        }
+        setSelection(self, node);
     }
 });
 
@@ -138,6 +154,7 @@ function loadFlowchart() {
     if (graph) {
         graph = layoutGraph(graph);
         self.jsPlumbToolkit.load({
+            type: "json",
             data: {
                 "nodes": graph[Graphs.NODES],
                 "edges": graph[Graphs.EDGES]
@@ -157,13 +174,16 @@ function loadFlowchart() {
 function getJSPlumbInstance(self) {
     return jsPlumbToolkit.newInstance({
         idFunction: function (data) {
-            return data["_id"];
+            return data[GraphUtils.ID];
         },
         portExtractor: function (node) {
             return node[GraphUtils.OPTIONS] || [];
         },
         portFactory: function (params, data, callback) {
             params.node.data[GraphUtils.OPTIONS].push(data);
+            callback(data);
+        },
+        edgeFactory: function (params, data, callback) {
             callback(data);
         },
         beforeConnect: function (source, target) {
@@ -250,8 +270,6 @@ function getJSPlumbOptions() {
             portAdded: function (params) {
                 let addOpt = params.nodeEl.querySelectorAll(".add-option")[0];
                 params.nodeEl.querySelectorAll("ul")[0].insertBefore(params.portEl, addOpt);
-                //params.node.data.height = computeHeight(params.node.data);
-                //self.jsPlumbToolkit.updateNode(params.node);
             },
             canvasClick: function (e) {
                 clearSelection(self);

@@ -159,19 +159,38 @@
 }
 
 .list-group-item.node-option {
-    margin-bottom: 2px;
+    margin-top: 1px;
+    margin-bottom: 1px;
     border: 1px solid rgba(52, 103, 137, 0.28);
 }
 
-.list-group-item.node-option:not(.jsplumb-connected) {
-    margin-bottom: 2px;
-    border: 1px solid rgba(52, 103, 137, 0.28);
-    background: #ffcdc8;
+.node-option-text {
+    word-wrap: break-word;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.node-option-text:not(.jsplumb-connected) {
+    color: #cb0c08;
     font-weight: bold;
 }
 
 .list-group-item.add-option {
     border: 1px solid rgba(52, 103, 137, 0.28);
+}
+
+.deleteSpan {
+    visibility: hidden;
+    float: left;
+    position: absolute;
+    top: 50%;
+    margin-top: -9px;
+    left: 5px;
+    font-size: 18px;
+}
+
+.node-option-text:not(.jsplumb-connected) ~ .deleteSpan {
+    visibility: visible !important;
 }
 
 #jsplumbContainer {
