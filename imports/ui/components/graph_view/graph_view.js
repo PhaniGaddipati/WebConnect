@@ -264,7 +264,7 @@ function getJSPlumbOptions() {
             edges: {
                 "default": {
                     anchors: [["Right", "Left"], ["Perimeter", {shape: "Rectangle", anchorCount: 10}]],
-                    endpoint: ["Dot", {radius: 8}],
+                    endpoint: ["Dot", {radius: 12}],
                     connector: ["StateMachine", {cornerRadius: 5, stub: [10, 50], midpoint: 0.1}],
                     paintStyle: {
                         strokeWidth: 3,
@@ -274,7 +274,7 @@ function getJSPlumbOptions() {
                         strokeWidth: 8,
                         stroke: "#05518a"
                     }, // hover paint style for this edge type.
-                    overlays: [["Arrow", {location: 1, width: 15, length: 20}]]
+                    overlays: [["Arrow", {location: 1, width: 20, length: 25}]]
                 }
             },
             ports: {

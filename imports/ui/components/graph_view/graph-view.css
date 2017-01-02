@@ -122,7 +122,12 @@
 
 .jtk-endpoint {
     z-index: 26;
-    opacity: .5;
+    opacity: 0;
+}
+
+.jtk-endpoint.jtk-hover {
+    z-index: 26;
+    opacity: .75;
 }
 
 .jtk-connector {
