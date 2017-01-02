@@ -52,7 +52,7 @@ export const computeHeight = function (node) {
         _.each(node[OPTIONS], function (opt) {
             element.innerHTML = element.innerHTML + "<li class=\"list-group-item\">" + opt[OPTION_NAME] + "</li>";
         });
-        element.innerHTML = element.innerHTML + "<li class=\"form-group\"><input class=\"form-control input-sm\"></input></li>";
+        element.innerHTML = element.innerHTML + "<li class=\"form-group\"><input class=\"form-control input-sm\"></input></li><br/>";
         return document.getElementById("processDummyNode").offsetHeight;
     }
 };

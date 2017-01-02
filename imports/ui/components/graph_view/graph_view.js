@@ -5,6 +5,8 @@ import "/imports/ui/components/graph_view/templates/option_tmpl.html";
 import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
+import "/imports/ui/components/graph_view/modals/delete_node_modal.js";
+import {DATA_NODE, DATA_DELETE_CALLBACK} from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {layoutGraph} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
@@ -138,6 +140,20 @@ Template.graph_view.events({
 
         removePort(node, portId, self);
         setSelection(self, node);
+    },
+    "click #deleteNodeBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let nodeId = evt.currentTarget.getAttribute("data-node-id");
+        let node = self.jsPlumbToolkit.getNode(nodeId);
+
+        let data = {};
+        data[DATA_NODE] = node.data;
+        data[DATA_DELETE_CALLBACK] = function () {
+            self.jsPlumbToolkit.removeNode(node);
+            clearSelection(self);
+        };
+        Modal.show("delete_node_modal", data);
     }
 });
 

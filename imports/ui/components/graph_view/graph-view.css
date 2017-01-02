@@ -18,7 +18,7 @@
     opacity: .90;
     min-width: 0;
     min-height: 0;
-    padding: 15px 10px 5px 10px;
+    padding: 5px 10px 5px 10px;
     cursor: pointer;
     text-align: center;
     z-index: 10;
@@ -156,7 +156,7 @@
     left: 25px;
     top: 25px;
     display: block;
-    z-index: 100000;
+    z-index: 30;
 }
 
 .list-group-item.node-option {
@@ -180,7 +180,7 @@
     border: 1px solid rgba(52, 103, 137, 0.28);
 }
 
-.deleteSpan {
+.deleteOptSpan {
     visibility: hidden;
     float: left;
     position: absolute;
@@ -190,8 +190,37 @@
     font-size: 18px;
 }
 
-.node-option-text:not(.jtk-connected) ~ .deleteSpan {
+.node-option-text:not(.jtk-connected) ~ .deleteOptSpan {
     visibility: visible !important;
+}
+
+.nodeEditBtns {
+    font-size: 18px;
+    width: 100%;
+    text-align: right;
+}
+
+.nodeEditBtns a {
+    margin-left: 8px;
+    color: black;
+    opacity: .2;
+}
+
+#deleteNodeBtn:hover {
+    color: #cb0c08;
+    opacity: 1;
+    font-weight: bold;
+}
+
+#editNodeBtn:hover {
+    color: #52aae0;
+    opacity: 1;
+    font-weight: bold;
+}
+
+.first-node > .nodeEditBtns a {
+    color: white;
+    opacity: .35;
 }
 
 #jsplumbContainer {

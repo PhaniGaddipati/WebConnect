@@ -1,0 +1,23 @@
+<template name="delete_node_modal">
+    <div class="modal fade" id="deleteNodeModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3>{{_ "delete_node"}}</h3>
+                    {{_ "delete_modal_msg"}}
+                    <br/><br/>
+                    <p style="text-indent:20px">
+                        <b>"{{nodeName}}"</b>
+                    </p>
+                    <br/><br/>
+                    <form>
+                        <div class="form-group">
+                            <a class="btn btn-primary" id="cancelModalBtn">{{_ "cancel"}}</a>
+                            <a class="btn btn-danger pull-right" id="deleteNodeModalBtn">{{_ "delete"}}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
