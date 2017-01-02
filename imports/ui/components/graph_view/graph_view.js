@@ -136,14 +136,36 @@ Template.graph_view.events({
         let portId = evt.currentTarget.getAttribute("data-option-id");
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         let node = self.jsPlumbToolkit.getNode(nodeId);
-        node.data[GraphUtils.OPTIONS] = _.reject(node.data[GraphUtils.OPTIONS], function (opt) {
-            return opt[GraphUtils.ID] === portId;
+
+        let nodeData = node.data;
+        let nodeEdges = node.getAllEdges();
+        let edges = [];
+        _.each(nodeEdges, function (nEdge) {
+            if (nEdge.source.id !== portId) {
+                let edge = {};
+                edge[Graphs.EDGE_SOURCE] = nEdge.source.getNode().id + "." + nEdge.source.id;
+                edge[Graphs.EDGE_TARGET] = nEdge.target.id;
+                edges.push(edge);
+            }
         });
-        try {
-            self.jsPlumbToolkit.removePort(node, portId);
-        } catch (err) {
-            console.log(err);
-        }
+        /**
+         * Just removing the port is buggy, so going to be hacky about it.
+         * Remove the node, remove the port, add the node back and restore edges.
+         */
+        jsPlumb.batch(function () {
+            self.jsPlumbToolkit.removeNode(node);
+            nodeData[GraphUtils.OPTIONS] = _.reject(node.data[GraphUtils.OPTIONS], function (opt) {
+                // Remove the port from the data
+                return opt[GraphUtils.ID] === portId;
+            });
+            // add the node back
+            self.jsPlumbToolkit.addNode(nodeData);
+            // add the edges back
+            _.each(edges, function (edge) {
+                self.jsPlumbToolkit.addEdge(edge);
+            });
+
+        });
         setSelection(self, node);
     }
 });
@@ -153,6 +175,7 @@ function loadFlowchart() {
     let graph = self.graph.get();
     if (graph) {
         graph = layoutGraph(graph);
+        self.jsplumbRenderer = self.jsPlumbToolkit.render(getJSPlumbOptions());
         self.jsPlumbToolkit.load({
             type: "json",
             data: {
@@ -160,9 +183,6 @@ function loadFlowchart() {
                 "edges": graph[Graphs.EDGES]
             }
         });
-        self.jsplumbRenderer =
-            self.jsPlumbToolkit.render(getJSPlumbOptions());
-        self.jsplumbRenderer.magnetize();
         let node = self.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
         if (node) {
             setSelection(self, node);
@@ -200,7 +220,7 @@ function getJSPlumbInstance(self) {
 function getJSPlumbOptions() {
     let self = Template.instance();
     let events = {
-        tap: function (params) {
+        mousedown: function (params) {
             if (params.e.button == 0) {
                 setSelection(self, params.node);
             }

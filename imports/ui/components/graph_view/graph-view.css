@@ -111,10 +111,6 @@
     fill: black;
 }
 
-.jtk-drag {
-    box-shadow: 2px 2px 19px #15988A !important;
-}
-
 .dummyRender {
     visibility: hidden;
 }
