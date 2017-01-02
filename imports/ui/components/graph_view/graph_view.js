@@ -84,7 +84,6 @@ Template.graph_view.helpers({
     }
 });
 
-
 Template.graph_view.events({
     "click #zoomToFitBtn": function (evt) {
         evt.preventDefault();
@@ -137,38 +136,48 @@ Template.graph_view.events({
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         let node = self.jsPlumbToolkit.getNode(nodeId);
 
-        let nodeData = node.data;
-        let nodeEdges = node.getAllEdges();
-        let edges = [];
-        _.each(nodeEdges, function (nEdge) {
-            if (nEdge.source.id !== portId) {
-                let edge = {};
-                edge[Graphs.EDGE_SOURCE] = nEdge.source.getNode().id + "." + nEdge.source.id;
-                edge[Graphs.EDGE_TARGET] = nEdge.target.id;
-                edges.push(edge);
-            }
-        });
-        /**
-         * Just removing the port is buggy, so going to be hacky about it.
-         * Remove the node, remove the port, add the node back and restore edges.
-         */
-        jsPlumb.batch(function () {
-            self.jsPlumbToolkit.removeNode(node);
-            nodeData[GraphUtils.OPTIONS] = _.reject(node.data[GraphUtils.OPTIONS], function (opt) {
-                // Remove the port from the data
-                return opt[GraphUtils.ID] === portId;
-            });
-            // add the node back
-            self.jsPlumbToolkit.addNode(nodeData);
-            // add the edges back
-            _.each(edges, function (edge) {
-                self.jsPlumbToolkit.addEdge(edge);
-            });
-
-        });
+        removePort(node, portId, self);
         setSelection(self, node);
     }
 });
+
+/**
+ * HACK ALERT
+ * Work-around for some issues with using jsPlumbInstance.removePort.
+ * Instead, remove the node completley, pull the port out, and add the
+ * node and edges back. yeah, it's gross.
+ * @param node
+ * @param portId
+ * @param self
+ */
+function removePort(node, portId, self) {
+    let nodeData = node.data;
+    let nodeEdges = node.getAllEdges();
+    let edges = [];
+    _.each(nodeEdges, function (nEdge) {
+        if (nEdge.source.id !== portId) {
+            let edge = {};
+            edge[Graphs.EDGE_SOURCE] = nEdge.source.getNode().id + "." + nEdge.source.id;
+            edge[Graphs.EDGE_TARGET] = nEdge.target.id;
+            edges.push(edge);
+        }
+    });
+
+    jsPlumb.batch(function () {
+        self.jsPlumbToolkit.removeNode(node);
+        nodeData[GraphUtils.OPTIONS] = _.reject(node.data[GraphUtils.OPTIONS], function (opt) {
+            // Remove the port from the data
+            return opt[GraphUtils.ID] === portId;
+        });
+        // add the node back
+        self.jsPlumbToolkit.addNode(nodeData);
+        // add the edges back
+        _.each(edges, function (edge) {
+            self.jsPlumbToolkit.addEdge(edge);
+        });
+
+    });
+}
 
 function loadFlowchart() {
     let self = Template.instance();
