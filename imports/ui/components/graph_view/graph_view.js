@@ -105,10 +105,6 @@ Template.graph_view.events({
         evt.preventDefault();
         Template.instance().jsplumbRenderer.magnetize();
     },
-    "click #clearSelectionBtn": function (evt) {
-        evt.preventDefault();
-        clearSelection(Template.instance());
-    },
     "click #zoomToSelectionBtn": function (evt) {
         evt.preventDefault();
         let self = Template.instance();
@@ -143,35 +139,57 @@ Template.graph_view.events({
         removePort(node, portId, self);
         setSelection(self, node);
     },
+    "click #toolbarDeleteNodeBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let node = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
+        onDeleteNode(self, node[GraphUtils.ID]);
+    },
     "click #deleteNodeBtn": function (evt) {
         evt.preventDefault();
         let self = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
-        let node = self.jsPlumbToolkit.getNode(nodeId);
-
-        let data = {};
-        data[DeleteNodeModal.DATA_NODE] = node.data;
-        data[DeleteNodeModal.DATA_DELETE_CALLBACK] = function () {
-            self.jsPlumbToolkit.removeNode(node);
-            clearSelection(self);
-        };
-        Modal.show("delete_node_modal", data);
+        onDeleteNode(self, nodeId);
+    },
+    "click #tooblarEditNodeBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let node = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
+        if (node) {
+            onEditNode(self, node[GraphUtils.ID]);
+        }
     },
     "click #editNodeBtn": function (evt) {
         evt.preventDefault();
         let self = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
-        let node = self.jsPlumbToolkit.getNode(nodeId);
-
-        let data = {};
-        data[EditNodeModal.DATA_NODE] = node.data;
-        data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
-            self.jsPlumbToolkit.updateNode(node, newNodeData);
-            setSelection(self, node);
-        };
-        Modal.show("edit_node_modal", data);
+        if (node) {
+            onEditNode(self, nodeId);
+        }
     }
 });
+
+function onDeleteNode(self, nodeId) {
+    let node = self.jsPlumbToolkit.getNode(nodeId);
+
+    let data = {};
+    data[DeleteNodeModal.DATA_NODE] = node.data;
+    data[DeleteNodeModal.DATA_DELETE_CALLBACK] = function () {
+        self.jsPlumbToolkit.removeNode(node);
+        clearSelection(self);
+    };
+    Modal.show("delete_node_modal", data);
+}
+function onEditNode(self, nodeId) {
+    let node = self.jsPlumbToolkit.getNode(nodeId);
+    let data = {};
+    data[EditNodeModal.DATA_NODE] = node.data;
+    data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
+        self.jsPlumbToolkit.updateNode(node, newNodeData);
+        setSelection(self, node);
+    };
+    Modal.show("edit_node_modal", data);
+}
 
 /**
  * HACK ALERT
