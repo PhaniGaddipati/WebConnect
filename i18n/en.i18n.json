@@ -44,11 +44,18 @@
   "failed_load_graph": "Failed to load the graph! Check the URL and try again",
   "open_subguide": "Open Sub-guide",
   "options": "Options",
-  "select_node_view": "Select a node to view it",
+  "select_node_view": "Select a step to view it",
   "resources": "Resources",
   "no_resources": "No Resources",
   "add_option": "Add Option",
-  "delete_node": "Delete Node",
+  "delete_node": "Delete Step",
   "delete": "Delete",
-  "delete_modal_msg": "Are you sure you want to delete the following node? Any attached edges will be removed. This cannot be undone."
+  "delete_modal_msg": "Are you sure you want to delete the following step? Any attached edges will be removed. This cannot be undone.",
+  "edit_node": "Edit Step",
+  "title": "Title",
+  "details": "Details",
+  "images": "Images",
+  "add_resource": "Add Resource URL",
+  "add": "Add",
+  "is_first_node": "Is this step first?"
 }

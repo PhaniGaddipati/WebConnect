@@ -148,7 +148,7 @@
     left: 25px;
     bottom: 25px;
     display: block;
-    z-index: 10000;
+    z-index: 30;
 }
 
 #jsplumbToolbar {

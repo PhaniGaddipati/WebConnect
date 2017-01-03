@@ -6,7 +6,9 @@ import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import "/imports/ui/components/graph_view/modals/delete_node_modal.js";
-import {DATA_NODE, DATA_DELETE_CALLBACK} from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
+import "/imports/ui/components/graph_view/modals/edit_node_modal.js";
+import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
+import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {layoutGraph} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
@@ -148,12 +150,26 @@ Template.graph_view.events({
         let node = self.jsPlumbToolkit.getNode(nodeId);
 
         let data = {};
-        data[DATA_NODE] = node.data;
-        data[DATA_DELETE_CALLBACK] = function () {
+        data[DeleteNodeModal.DATA_NODE] = node.data;
+        data[DeleteNodeModal.DATA_DELETE_CALLBACK] = function () {
             self.jsPlumbToolkit.removeNode(node);
             clearSelection(self);
         };
         Modal.show("delete_node_modal", data);
+    },
+    "click #editNodeBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let nodeId = evt.currentTarget.getAttribute("data-node-id");
+        let node = self.jsPlumbToolkit.getNode(nodeId);
+
+        let data = {};
+        data[EditNodeModal.DATA_NODE] = node.data;
+        data[EditNodeModal.DATA_SAVE_CALLBACK] = function (oldNodeData, newNodeData) {
+            console.log(oldNodeData);
+            console.log(newNodeData);
+        };
+        Modal.show("edit_node_modal", data);
     }
 });
 

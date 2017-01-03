@@ -16,6 +16,9 @@ Template.delete_node_modal.events({
     },
     "click #deleteNodeModalBtn": function () {
         $("#deleteNodeModal").modal("hide");
-        Template.instance().data[DATA_DELETE_CALLBACK]();
+        let callback = Template.instance().data[DATA_DELETE_CALLBACK];
+        if (callback) {
+            callback();
+        }
     },
 });
