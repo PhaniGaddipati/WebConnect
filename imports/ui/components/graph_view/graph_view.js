@@ -313,14 +313,14 @@ function getJSPlumbOptions() {
                         // that an option won't have more than 1 outgoing edge
 
                         let con = p.connection;
-                        let sourceNodeId = con.source.parentElement.getAttribute("data-parent-node");
-                        let sourcePortId = con.source.parentElement.getAttribute("data-port-id");
+                        let sourceNodeId = con.source.getAttribute("data-parent-node");
+                        let sourcePortId = con.source.getAttribute("data-port-id");
                         let sourceNode = self.jsPlumbToolkit.getNode(sourceNodeId);
                         let targetNodeId = p.targetId;
 
                         return sourceNodeId !== targetNodeId
                             && _.filter(sourceNode.getAllEdges(), function (edge) {
-                                return edge.source.data.id === sourcePortId;
+                                return edge != con.edge && edge.source.data.id === sourcePortId;
                             }).length == 0;
                     }
                 }

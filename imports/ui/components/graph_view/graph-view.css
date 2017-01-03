@@ -165,13 +165,13 @@
     border: 1px solid rgba(52, 103, 137, 0.28);
 }
 
-.node-option-text {
+.node-option {
     word-wrap: break-word;
     padding-left: 10px;
     padding-right: 10px;
 }
 
-.node-option-text:not(.jtk-connected) {
+.node-option:not(.jtk-connected) {
     color: #cb0c08;
     font-weight: bold;
 }
@@ -190,7 +190,7 @@
     font-size: 18px;
 }
 
-.node-option-text:not(.jtk-connected) ~ .deleteOptSpan {
+.node-option:not(.jtk-connected) > .deleteOptSpan {
     visibility: visible !important;
 }
 
