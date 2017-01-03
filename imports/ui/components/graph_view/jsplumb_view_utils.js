@@ -56,3 +56,11 @@ export const computeHeight = function (node) {
         return document.getElementById("processDummyNode").offsetHeight;
     }
 };
+
+export const initNodeView = function (node, x, y) {
+    node.width = NODE_WIDTH;
+    node.height = computeHeight(node);
+    node.left = x;
+    node.top = y;
+    return node;
+};

@@ -10,7 +10,7 @@ import "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {layoutGraph} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
+import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
@@ -186,6 +186,15 @@ Template.graph_view.events({
                 }
             });
         }
+    },
+    "click #newNodeBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let node = GraphUtils.getNodeObject("New Step");
+        let center = self.jsplumbRenderer.getViewportCenter();
+        node = initNodeView(node, center[0], center[1]);
+        self.jsPlumbToolkit.addNode(node);
+        onEditNode(self, node[GraphUtils.ID]);
     }
 });
 
@@ -265,7 +274,7 @@ function loadFlowchart() {
         let node = self.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
         if (node) {
             setSelection(self, node);
-            self.jsplumbRenderer.centerOnAndZoom(node, NODE_FILL);
+            self.jsplumbRenderer.zoomToFit({doNotAnimate: true, fill: .75});
         }
     }
 }

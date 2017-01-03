@@ -120,6 +120,21 @@ function labelNodeTypes(graph, nodeMap, newGraph) {
     return newGraph;
 }
 
+export const getNodeObject = function (name) {
+    let node = {};
+    node[ID] = Random.id();
+    node[Graphs.NODE_NAME] = name;
+    node[Graphs.EDGE_DETAILS] = "";
+    node[TYPE] = NODE_TYPE_PROCESS;
+    node[OPTIONS] = [];
+    node[HAS_ATTACHMENT] = false;
+    node[Graphs.NODE_RESOURCES] = [];
+    node[Graphs.NODE_IMAGES] = [];
+    node[Graphs.NODE_COMMENTS] = [];
+
+    return node;
+};
+
 export const getOptionObject = function (optionText, parentId) {
     let opt = {};
     opt[OPTION_NAME] = optionText;
