@@ -165,9 +165,9 @@ Template.graph_view.events({
 
         let data = {};
         data[EditNodeModal.DATA_NODE] = node.data;
-        data[EditNodeModal.DATA_SAVE_CALLBACK] = function (oldNodeData, newNodeData) {
-            console.log(oldNodeData);
-            console.log(newNodeData);
+        data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
+            self.jsPlumbToolkit.updateNode(node, newNodeData);
+            setSelection(self, node);
         };
         Modal.show("edit_node_modal", data);
     }

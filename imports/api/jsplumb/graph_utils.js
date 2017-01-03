@@ -6,7 +6,6 @@ export const TYPE = "type";
 export const ID = "id";
 export const HAS_ATTACHMENT = "hasAttachment";
 export const NODE_TYPE_PROCESS = "process";
-export const NODE_TYPE_DECISION = "decision";
 export const NODE_TYPE_TERMINATOR = "terminator";
 export const NODE_TYPE_VIRTUAL = "virtual";
 export const NODE_TYPE_FIRST = "first";
@@ -112,10 +111,8 @@ function labelNodeTypes(graph, nodeMap, newGraph) {
             node[TYPE] = NODE_TYPE_FIRST;
         } else if (node[Graphs.NODE_GRAPH_ID]) {
             node[TYPE] = NODE_TYPE_VIRTUAL;
-        } else if (nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length == 1) {
+        } else if (nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length >= 1) {
             node[TYPE] = NODE_TYPE_PROCESS;
-        } else if (nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length > 1) {
-            node[TYPE] = NODE_TYPE_DECISION;
         } else {
             node[TYPE] = NODE_TYPE_TERMINATOR;
         }

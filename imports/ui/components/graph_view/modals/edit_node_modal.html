@@ -10,61 +10,62 @@
                                 <label class="control-label" for="nodeNameField">{{_ "title"}}</label>
                                 <input type="text" class="form-control" id="nodeNameField" value="{{name}}"/>
                             </div>
-                            <div class="form-group">
-                                {{_ "is_first_node"}} <input type="checkbox"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="nodeDetailsField">{{_ "details"}}</label>
-                                <textarea type="text" class="form-control" id="nodeDetailsField"
-                                          value="{{details}}"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="nodeImagesRow">{{_ "images"}}</label>
-                                <div class="row" id="nodeImagesRow" style="margin-left: 5px; margin-right: 5px">
-                                    {{#each images}}
-                                        <div class="col-xs-4">
-                                            <a href="{{this}}" target="_blank" style="position: relative;">
-                                                <img class="img-thumbnail" src="{{this}}">
-                                            </a>
-                                            <a class="text-danger" href="#" id="deleteNodeImgBtn"
-                                               data-img-idx="{{@index}}" style="position: absolute; top:5px;left:25px;">
-                                                <i class="fa fa-times-circle"></i>
+                            {{#unless graphId}}
+                                <div class="form-group">
+                                    <label class="control-label" for="nodeDetailsField">{{_ "details"}}</label>
+                                    <textarea type="text" class="form-control" id="nodeDetailsField"
+                                              value="{{details}}"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="nodeImagesRow">{{_ "images"}}</label>
+                                    <div class="row" id="nodeImagesRow" style="margin-left: 5px; margin-right: 5px">
+                                        {{#each images}}
+                                            <div class="col-xs-4">
+                                                <a href="{{this}}" target="_blank" style="position: relative;">
+                                                    <img class="img-thumbnail" src="{{this}}">
+                                                </a>
+                                                <a class="text-danger" href="#" id="deleteNodeImgBtn"
+                                                   data-img-idx="{{@index}}"
+                                                   style="position: absolute; top:5px;left:25px;">
+                                                    <i class="fa fa-times-circle"></i>
+                                                </a>
+                                            </div>
+                                        {{/each}}
+                                        <div class="col-xs-2">
+                                            <a href="#" id="addImageBtn">
+                                                <i class="fa fa-plus text-muted text-center"
+                                                   style="font-size: 48px;"></i>
                                             </a>
                                         </div>
-                                    {{/each}}
-                                    <div class="col-xs-2">
-                                        <a href="#" id="addImageBtn">
-                                            <i class="fa fa-plus text-muted text-center" style="font-size: 48px;"></i>
-                                        </a>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="nodeResourceList">{{_ "resources"}}</label>
-                                <ul class="list-group form-group" id="nodeResourceList">
-                                    {{#each resources}}
+                                <div class="form-group">
+                                    <label class="control-label" for="nodeResourceList">{{_ "resources"}}</label>
+                                    <ul class="list-group form-group" id="nodeResourceList">
+                                        {{#each resources}}
+                                            <li class="list-group-item">
+                                                <a href="#" id="deleteResourceBtn" class="text-danger"
+                                                   data-resource-idx="{{@index}}">
+                                                    <i class="fa fa-times-circle"></i>
+                                                </a>
+                                                <a href="{{this}}" target="_blank" style="margin-left:8px;">
+                                                    {{formatResource this}}
+                                                </a>
+                                            </li>
+                                        {{/each}}
                                         <li class="list-group-item">
-                                            <a href="#" id="deleteResourceBtn" class="text-danger"
-                                               data-resource-idx="{{@index}}">
-                                                <i class="fa fa-times-circle"></i>
-                                            </a>
-                                            <a href="{{this}}" target="_blank" style="margin-left:8px;">
-                                                {{formatResource this}}
-                                            </a>
-                                        </li>
-                                    {{/each}}
-                                    <li class="list-group-item">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" id="addResourceField"
-                                                   placeholder="{{_ "add_resource"}}"/>
-                                            <span class="input-group-btn">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="addResourceField"
+                                                       placeholder="{{_ "add_resource"}}"/>
+                                                <span class="input-group-btn">
                                                     <button class="btn btn-default" type="button"
                                                             id="addResourceBtn">{{_ "add"}}</button>
                                                 </span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {{/unless}}
                         {{/with}}
                         <div class="form-group">
                             <a class="btn btn-muted" id="cancelModalBtn">{{_ "cancel"}}</a>
