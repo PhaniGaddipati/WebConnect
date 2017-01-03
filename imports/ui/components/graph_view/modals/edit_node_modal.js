@@ -4,15 +4,14 @@ import * as Graphs from "/imports/api/graphs/graphs.js";
 export const DATA_NODE = "node";
 export const DATA_SAVE_CALLBACK = "save_callback";
 
-editNodeO = null;
-
 Template.edit_node_modal.onCreated(function () {
-    editNodeO = Template.instance().data[DATA_NODE];
+    let self = Template.instance();
+    self.node = new ReactiveVar(self.data[DATA_NODE]);
 });
 
 Template.edit_node_modal.helpers({
     node: function () {
-        return Template.instance().data[DATA_NODE];
+        return Template.instance().node.get();
     },
     formatResource: function (res) {
         if (res) {
@@ -29,8 +28,39 @@ Template.edit_node_modal.events({
     "click #saveNodeModalBtn": function (evt, self) {
         $("#editNodeModal").modal("hide");
         onSaveNode(self);
+    },
+    "keyup #addResourceField": function (evt, self) {
+        if (evt.which == 13) {
+            evt.preventDefault();
+            onAddResource(self);
+        }
+    },
+    "click #addResourceBtn": function (evt, self) {
+        evt.preventDefault();
+        onAddResource(self);
+    },
+    "click #deleteResourceBtn": function (evt, self) {
+        evt.preventDefault();
+        let removeIdx = evt.currentTarget.getAttribute("data-resource-idx");
+        self.data[DATA_NODE][Graphs.NODE_RESOURCES].splice(removeIdx, 1);
+        self.node.set(self.data[DATA_NODE]);
     }
 });
+
+function onAddResource(self) {
+    let newRes = self.find("#addResourceField").value;
+    if (newRes) {
+        newRes = newRes.trim();
+        if (newRes.endsWith("/")) {
+            newRes = newRes.substring(0, newRes.length - 1);
+        }
+        if (!_.contains(self.data[DATA_NODE][Graphs.NODE_RESOURCES], newRes)) {
+            self.data[DATA_NODE][Graphs.NODE_RESOURCES].push(newRes);
+            self.node.set(self.data[DATA_NODE]);
+            self.find("#addResourceField").value = "";
+        }
+    }
+}
 
 function onSaveNode(self) {
     let newNode = {};

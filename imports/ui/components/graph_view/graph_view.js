@@ -148,7 +148,9 @@ Template.graph_view.events({
         evt.preventDefault();
         let self = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
-        onDeleteNode(self, nodeId);
+        if (nodeId) {
+            onDeleteNode(self, nodeId);
+        }
     },
     "click #tooblarEditNodeBtn": function (evt) {
         evt.preventDefault();
@@ -162,7 +164,7 @@ Template.graph_view.events({
         evt.preventDefault();
         let self = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
-        if (node) {
+        if (nodeId) {
             onEditNode(self, nodeId);
         }
     },
