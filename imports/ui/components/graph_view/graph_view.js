@@ -30,7 +30,6 @@ Template.graph_view.onCreated(function () {
     jstk = self.jsPlumbToolkit;
     GraphUtils.getGraphAsJSPlumb.call(self.graphId, function (err, graph) {
         if (err || !graph) {
-            console.log(err);
             self.errorLoadingGraph.set(true);
         } else {
             self.graph.set(graph);
@@ -360,8 +359,8 @@ function getJSPlumbOptions() {
                         // that an option won't have more than 1 outgoing edge
 
                         let con = p.connection;
-                        let sourceNodeId = con.source.getAttribute("data-parent-node");
-                        let sourcePortId = con.source.getAttribute("data-port-id");
+                        let sourceNodeId = con.source.parentElement.getAttribute("data-parent-node");
+                        let sourcePortId = con.source.parentElement.getAttribute("data-port-id");
                         let sourceNode = self.jsPlumbToolkit.getNode(sourceNodeId);
                         let targetNodeId = p.targetId;
 

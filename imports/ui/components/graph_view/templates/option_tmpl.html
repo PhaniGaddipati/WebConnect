@@ -1,9 +1,12 @@
 <body>
 <script type="jtk" id="option_tmpl">
     <li class="list-group-item node-option jtk-port" data-port-id="${id}" data-parent-node="${parentNode}">
+        <div class="node-option-text">
             ${name}
-            <jtk-source port-id="${id}" port-type="option" scope="${datatype}" port-name="${name}" port-details="${details}"></jtk-source>
-            <span class="deleteOptSpan">
+         <jtk-source port-id="${id}" port-type="option" scope="${datatype}" port-name="${name}"
+             port-details="${details}"></jtk-source>
+        </div>
+         <span class="deleteOptSpan">
             <a href="#" class="text-danger" id="deleteOptionBtn" data-option-id="${id}" data-node-id="${parentNode}">
                 <i class="fa fa-times-circle pull-left"></i>
             </a>

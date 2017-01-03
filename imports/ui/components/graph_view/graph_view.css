@@ -167,16 +167,16 @@
 .list-group-item.node-option {
     margin-top: 1px;
     margin-bottom: 1px;
+    padding: 0 0 0 0;
     border: 1px solid rgba(52, 103, 137, 0.28);
 }
 
-.node-option {
+.node-option-text {
     word-wrap: break-word;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
 }
 
-.node-option:not(.jtk-connected) {
+.node-option-text:not(.jtk-connected) {
     color: #cb0c08;
     font-weight: bold;
 }
@@ -195,7 +195,7 @@
     font-size: 18px;
 }
 
-.node-option:not(.jtk-connected) > .deleteOptSpan {
+.node-option-text:not(.jtk-connected) ~ .deleteOptSpan {
     visibility: visible !important;
 }
 
