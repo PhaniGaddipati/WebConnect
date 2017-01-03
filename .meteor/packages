@@ -40,3 +40,4 @@ random@1.0.10
 nimble:restivus             # REST api helper
 3stack:country-codes        # Country codes helper
 shell-server@0.2.1
+lepozepo:s3

@@ -31,11 +31,19 @@
                                                 </a>
                                             </div>
                                         {{/each}}
-                                        <div class="col-xs-2">
-                                            <a href="#" id="addImageBtn">
-                                                <i class="fa fa-plus text-muted text-center"
-                                                   style="font-size: 48px;"></i>
-                                            </a>
+                                        {{#each uploadingFiles}}
+                                            <div class="col-xs-4">
+                                                <progress
+                                                        value={{percent_uploaded}} max="100">{{percent_uploaded}}</progress>
+                                            </div>
+                                        {{/each}}
+                                        <div class="col-xs-12 image-upload">
+                                            <label for="addImageBtn">
+                                                <p class="btn btn-default btn-sm" style="margin-top:10px;">{{_
+                                                        "add_images"}}</p>
+                                            </label>
+                                            <input href="#" id="addImageBtn" type="file" accept="image/*"
+                                                   style="display:none;" multiple/>
                                         </div>
                                     </div>
                                 </div>

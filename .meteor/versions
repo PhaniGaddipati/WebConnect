@@ -50,6 +50,7 @@ jquery@1.11.10
 kadira:blaze-layout@2.3.0
 kadira:flow-router@2.12.1
 launch-screen@1.0.12
+lepozepo:s3@5.2.4
 less@2.7.5
 livedata@1.0.18
 localstorage@1.0.12

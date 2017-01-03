@@ -3,3 +3,4 @@ node_modules/
 **/jsPlumbToolkit*.js
 mup.json
 doc/
+**/keys.js

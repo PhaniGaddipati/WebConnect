@@ -27,6 +27,11 @@ Template.edit_node_modal.helpers({
             return res.substring(res.lastIndexOf("/") + 1, res.length);
         }
         return "";
+    },
+    uploadingFiles: function () {
+        // Return files that are not currently uploading
+        // This collection is created by the lepozepo:s3 package
+        return S3.collection.find({percent_uploaded: {$lt: 100}});
     }
 });
 
@@ -59,8 +64,27 @@ Template.edit_node_modal.events({
         let removeIdx = evt.currentTarget.getAttribute("data-img-idx");
         self.node[Graphs.NODE_IMAGES].splice(removeIdx, 1);
         self.nodeRx.set(self.node);
+    },
+    "change #addImageBtn": function (evt, self) {
+        evt.preventDefault();
+        onAddImage(self, evt.target.files);
     }
 });
+
+function onAddImage(self, files) {
+    // Start upload
+    S3.upload({
+        files: files,
+        path: "images"
+    }, function (e, r) {
+        // file done uploading, or errored out
+        // TODO show if there's an error
+        if (r.status == "complete") {
+            self.node[Graphs.NODE_IMAGES].push(r.url);
+            self.nodeRx.set(self.node);
+        }
+    });
+}
 
 function onAddResource(self) {
     let newRes = self.find("#addResourceField").value;

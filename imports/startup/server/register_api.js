@@ -6,3 +6,4 @@ import "/imports/api/charts/methods.js";
 import "/imports/api/charts/server/publications.js";
 import "/imports/api/sys/methods.js";
 import "/imports/api/jsplumb/graph_utils.js";
+import "/imports/api/s3/server/S3Interface.js";
