@@ -31,7 +31,7 @@
                                                 </a>
                                             </div>
                                         {{/each}}
-                                        {{#each uploadingFiles}}
+                                        {{#each uploadingImages}}
                                             <div class="col-xs-4">
                                                 <progress
                                                         value={{percent_uploaded}} max="100">{{percent_uploaded}}</progress>
@@ -39,7 +39,7 @@
                                         {{/each}}
                                         <div class="col-xs-12 image-upload">
                                             <label for="addImageBtn">
-                                                <p class="btn btn-default btn-sm" style="margin-top:10px;">{{_
+                                                <p class="btn btn-default btn-xs" style="margin-top:10px;">{{_
                                                         "add_images"}}</p>
                                             </label>
                                             <input href="#" id="addImageBtn" type="file" accept="image/*"
@@ -61,6 +61,12 @@
                                                 </a>
                                             </li>
                                         {{/each}}
+                                        {{#each uploadingResources}}
+                                            <li class="list-group-item">
+                                                <progress
+                                                        value={{percent_uploaded}} max="100">{{percent_uploaded}}</progress>
+                                            </li>
+                                        {{/each}}
                                         <li class="list-group-item">
                                             <div class="input-group">
                                                 <input type="text" class="form-control" id="addResourceField"
@@ -72,7 +78,17 @@
                                             </div>
                                         </li>
                                     </ul>
+                                    <div class="uploadRes">
+                                        <label for="uploadResBtn">
+                                            <p class="btn btn-default btn-xs">
+                                                {{_ "upload_resource"}}
+                                            </p>
+                                        </label>
+                                        <input href="#" id="uploadResBtn" type="file" accept="application/pdf"
+                                               style="display:none;" multiple/>
+                                    </div>
                                 </div>
+                                <br/>
                             {{/unless}}
                         {{/with}}
                         <div class="form-group">

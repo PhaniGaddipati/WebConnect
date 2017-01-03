@@ -28,10 +28,19 @@ Template.edit_node_modal.helpers({
         }
         return "";
     },
-    uploadingFiles: function () {
+    uploadingImages: function () {
         // Return files that are not currently uploading
         // This collection is created by the lepozepo:s3 package
-        return S3.collection.find({percent_uploaded: {$lt: 100}});
+        return S3.collection.find({
+            percent_uploaded: {$lt: 100},
+            "file.type": {$regex: /^image/}
+        });
+    },
+    uploadingResources: function () {
+        return S3.collection.find({
+            percent_uploaded: {$lt: 100},
+            "file.type": "application/pdf"
+        });
     }
 });
 
@@ -67,11 +76,31 @@ Template.edit_node_modal.events({
     },
     "change #addImageBtn": function (evt, self) {
         evt.preventDefault();
-        onAddImage(self, evt.target.files);
+        onUploadImage(self, evt.target.files);
+    },
+    "change #uploadResBtn": function (evt, self) {
+        evt.preventDefault();
+        onUploadResource(self, evt.target.files);
     }
 });
 
-function onAddImage(self, files) {
+function onUploadResource(self, files) {
+    // Start upload
+    S3.upload({
+        files: files,
+        path: "resources",
+        unique_name: false
+    }, function (e, r) {
+        // file done uploading, or errored out
+        // TODO show if there's an error
+        if (r.status == "complete") {
+            self.node[Graphs.NODE_RESOURCES].push(r.url);
+            self.nodeRx.set(self.node);
+        }
+    });
+}
+
+function onUploadImage(self, files) {
     // Start upload
     S3.upload({
         files: files,

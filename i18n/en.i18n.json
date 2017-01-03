@@ -58,5 +58,6 @@
   "add_resource": "Add Resource URL",
   "add": "Add",
   "is_first_node": "Is this step first?",
-  "add_images": "Add Images"
+  "add_images": "Add Images",
+  "upload_resource": "Upload PDF"
 }
