@@ -194,8 +194,15 @@ Template.graph_view.events({
         let node = GraphUtils.getJSPlumbNodeObject("New Step");
         let center = self.jsplumbRenderer.getViewportCenter();
         node = initNodeView(node, center[0], center[1]);
-        self.jsPlumbToolkit.addNode(node);
-        onEditNode(self, node[GraphUtils.ID]);
+
+        let data = {};
+        data[EditNodeModal.DATA_NODE] = node;
+        data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
+            self.jsPlumbToolkit.addNode(newNodeData);
+            setSelection(self, self.jsPlumbToolkit.getNode(newNodeData[GraphUtils.ID]));
+        };
+        Modal.show("edit_node_modal", data);
+
     }
 });
 
