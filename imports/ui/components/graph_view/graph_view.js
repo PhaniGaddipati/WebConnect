@@ -246,14 +246,6 @@ function getJSPlumbInstance(self) {
         },
         edgeFactory: function (params, data, callback) {
             callback(data);
-        },
-        beforeConnect: function (source, target) {
-            // Make sure it's not a loopback connection and also
-            // that an option won't have more than 1 outgoing edge
-            return source !== target && source.getNode() !== target
-                && _.filter(source.getNode().getAllEdges(), function (edge) {
-                    return edge.source.data.id === source.data.id;
-                }).length == 0;
         }
     });
 }
@@ -315,7 +307,26 @@ function getJSPlumbOptions() {
                         strokeWidth: 8,
                         stroke: "#05518a"
                     }, // hover paint style for this edge type.
-                    overlays: [["Arrow", {location: 1, width: 20, length: 25}]]
+                    overlays: [["Arrow", {location: 1, width: 20, length: 25}]],
+                    beforeDrop: function (p) {
+                        // Make sure it's not a loopback connection and also
+                        // that an option won't have more than 1 outgoing edge
+
+                        let con = p.connection;
+                        let sourceNodeId = con.source.parentElement.getAttribute("data-parent-node");
+                        let sourcePortId = con.source.parentElement.getAttribute("data-port-id");
+                        let sourceNode = self.jsPlumbToolkit.getNode(sourceNodeId);
+                        let targetNodeId = p.targetId;
+
+                        console.log(_.filter(sourceNode.getAllEdges(), function (edge) {
+                            return edge.source.data.id === sourcePortId;
+                        }));
+
+                        return sourceNodeId !== targetNodeId
+                            && _.filter(sourceNode.getAllEdges(), function (edge) {
+                                return edge.source.data.id === sourcePortId;
+                            }).length == 0;
+                    }
                 }
             },
             ports: {
