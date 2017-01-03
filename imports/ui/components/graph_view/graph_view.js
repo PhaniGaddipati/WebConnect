@@ -15,7 +15,7 @@ import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
-const NODE_FILL = 0.2;
+const NODE_FILL = 0.25;
 
 jstk = null;
 
@@ -227,7 +227,7 @@ function loadFlowchart() {
         let node = self.jsPlumbToolkit.getNode(graph[Graphs.FIRST_NODE]);
         if (node) {
             setSelection(self, node);
-            self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getSelection().getNodes()[0], .25);
+            self.jsplumbRenderer.centerOnAndZoom(node, NODE_FILL);
         }
     }
 }
@@ -317,10 +317,6 @@ function getJSPlumbOptions() {
                         let sourcePortId = con.source.parentElement.getAttribute("data-port-id");
                         let sourceNode = self.jsPlumbToolkit.getNode(sourceNodeId);
                         let targetNodeId = p.targetId;
-
-                        console.log(_.filter(sourceNode.getAllEdges(), function (edge) {
-                            return edge.source.data.id === sourcePortId;
-                        }));
 
                         return sourceNodeId !== targetNodeId
                             && _.filter(sourceNode.getAllEdges(), function (edge) {
