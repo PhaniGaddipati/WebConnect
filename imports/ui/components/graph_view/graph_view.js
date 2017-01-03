@@ -343,7 +343,7 @@ function getJSPlumbOptions() {
             edges: {
                 "default": {
                     anchors: [["Right", "Left"], ["Perimeter", {shape: "Rectangle", anchorCount: 10}]],
-                    endpoint: ["Dot", {radius: 12}],
+                    endpoint: ["Dot", {radius: 14}],
                     connector: ["StateMachine", {cornerRadius: 5, stub: [10, 50], midpoint: 0.1}],
                     paintStyle: {
                         strokeWidth: 3,
