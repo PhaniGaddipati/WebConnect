@@ -53,6 +53,12 @@ Template.edit_node_modal.events({
         let removeIdx = evt.currentTarget.getAttribute("data-resource-idx");
         self.node[Graphs.NODE_RESOURCES].splice(removeIdx, 1);
         self.nodeRx.set(self.node);
+    },
+    "click #deleteNodeImgBtn": function (evt, self) {
+        evt.preventDefault();
+        let removeIdx = evt.currentTarget.getAttribute("data-img-idx");
+        self.node[Graphs.NODE_IMAGES].splice(removeIdx, 1);
+        self.nodeRx.set(self.node);
     }
 });
 
