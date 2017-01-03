@@ -89,6 +89,11 @@
     border: 1px solid #3e7a47;
 }
 
+#tooblarMakeFirstNodeBtn {
+    background-color: #8BC34A;
+    border-color: #8BC34A;
+}
+
 .outer {
     fill: gray;
     opacity: 0.3;

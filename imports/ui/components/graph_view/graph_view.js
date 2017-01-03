@@ -91,7 +91,14 @@ Template.graph_view.helpers({
 Template.graph_view.events({
     "click #zoomToFitBtn": function (evt) {
         evt.preventDefault();
-        Template.instance().jsplumbRenderer.zoomToFit();
+        let self = Template.instance();
+        let node = Session.get(SELECTION_NODE_DATA);
+        if (node) {
+            let id = node[GraphUtils.ID];
+            self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getNode(id), NODE_FILL);
+        } else {
+            self.jsplumbRenderer.zoomToFit();
+        }
     },
     "click #zoomOutBtn": function (evt) {
         evt.preventDefault();
@@ -104,15 +111,6 @@ Template.graph_view.events({
     "click #relayoutBtn": function (evt) {
         evt.preventDefault();
         Template.instance().jsplumbRenderer.magnetize();
-    },
-    "click #zoomToSelectionBtn": function (evt) {
-        evt.preventDefault();
-        let self = Template.instance();
-        let node = Session.get(SELECTION_NODE_DATA);
-        if (node) {
-            let id = node[GraphUtils.ID];
-            self.jsplumbRenderer.centerOnAndZoom(self.jsPlumbToolkit.getNode(id), NODE_FILL);
-        }
     },
     "keyup #addOptionInput": function (evt) {
         if (evt.keyCode === 13) {
@@ -142,8 +140,10 @@ Template.graph_view.events({
     "click #toolbarDeleteNodeBtn": function (evt) {
         evt.preventDefault();
         let self = Template.instance();
-        let node = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
-        onDeleteNode(self, node[GraphUtils.ID]);
+        let node = Session.get(SELECTION_NODE_DATA);
+        if (node) {
+            onDeleteNode(self, node[GraphUtils.ID]);
+        }
     },
     "click #deleteNodeBtn": function (evt) {
         evt.preventDefault();
@@ -154,7 +154,7 @@ Template.graph_view.events({
     "click #tooblarEditNodeBtn": function (evt) {
         evt.preventDefault();
         let self = Template.instance();
-        let node = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
+        let node = Session.get(SELECTION_NODE_DATA);
         if (node) {
             onEditNode(self, node[GraphUtils.ID]);
         }
@@ -165,6 +165,26 @@ Template.graph_view.events({
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         if (node) {
             onEditNode(self, nodeId);
+        }
+    },
+    "click #tooblarMakeFirstNodeBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        let newFirstNode = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
+        if (newFirstNode && newFirstNode[GraphUtils.TYPE] != GraphUtils.NODE_TYPE_VIRTUAL) {
+            // make this node the only type:"first" node
+            let nodeData = newFirstNode.data;
+            nodeData[GraphUtils.TYPE] = GraphUtils.NODE_TYPE_FIRST;
+            self.jsPlumbToolkit.updateNode(newFirstNode, nodeData);
+            $("#" + nodeData[GraphUtils.ID]).addClass("first-node");
+
+            _.each(self.jsPlumbToolkit.getNodes(), function (node) {
+                if (node != newFirstNode && node.data[GraphUtils.TYPE] == GraphUtils.NODE_TYPE_FIRST) {
+                    node.data[GraphUtils.TYPE] = GraphUtils.NODE_TYPE_PROCESS;
+                    $("#" + node.data[GraphUtils.ID]).removeClass("first-node");
+                    self.jsPlumbToolkit.updateNode(node, node.data);
+                }
+            });
         }
     }
 });

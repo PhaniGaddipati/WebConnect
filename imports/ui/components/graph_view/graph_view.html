@@ -18,22 +18,26 @@
                     <div class="btn-toolbar" id="jsplumbToolbar">
                         <div class="btn-group">
                             <a href="#" class="btn btn-default" id="zoomInBtn"><i class="fa fa-plus"></i></a>
-                            <a href="#" class="btn btn-default" id="zoomToFitBtn"><i class="fa fa-eye"></i></a>
+                            <a href="#" class="btn {{#if nodesSelection}}btn-info{{else}}btn-default{{/if}}"
+                               id="zoomToFitBtn"><i class="fa fa-eye"></i></a>
                             <a href="#" class="btn btn-default" id="zoomOutBtn"><i class="fa fa-minus"></i></a>
                         </div>
                         <div class="btn-group">
                             <a href="#" class="btn btn-default" id="relayoutBtn"><i class="fa fa-magic"></i> </a>
                         </div>
                         {{#if nodesSelection}}
-                            {{#if selectedVirtual}}
-                                <div class="btn-group">
+
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-primary" id="tooblarEditNodeBtn"><i class="fa fa-pencil"></i></a>
+                                {{#if selectedVirtual}}
                                     <a href="/graph/{{selectedVirtualGraphId}}" target="_blank" class="btn btn-warning"
                                        id="openVirtualGraphBtn"> <i class="fa fa-external-link"></i></a>
-                                </div>
-                            {{/if}}
+                                {{else}}
+                                    <a href="#" class="btn btn-primary" id="tooblarMakeFirstNodeBtn"><i
+                                            class="fa fa-arrow-down"></i></a>
+                                {{/if}}
+                            </div>
                             <div class="btn-group">
-                                <a class="btn btn-info" id="zoomToSelectionBtn"><i class="fa fa-expand"></i></a>
-                                <a href="#" class="btn btn-primary" id="tooblarEditNodeBtn"><i class="fa fa-pencil"></i></a>
                                 <a href="#" class="btn btn-danger" id="toolbarDeleteNodeBtn"><i class="fa fa-trash"></i></a>
                             </div>
                         {{/if}}
