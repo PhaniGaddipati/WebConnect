@@ -6,17 +6,20 @@
                     <h3>{{_ "edit_node"}}</h3>
                     <form>
                         {{#with node}}
+                        {{!-------------------------- Name ------------------------}}
                             <div class="form-group">
                                 <label class="control-label" for="nodeNameField">{{_ "title"}}</label>
                                 <input type="text" class="form-control" id="nodeNameField" value="{{name}}"/>
                             </div>
                             {{#unless graphId}}
+                            {{! ------------------------- Details --------------------}}
                                 <div class="form-group">
                                     <label class="control-label" for="nodeDetailsField">{{_ "details"}}</label>
                                     <textarea type="text" class="form-control" id="nodeDetailsField"
                                               value="{{details}}"></textarea>
                                 </div>
                                 <div class="form-group">
+                                    {{! ------------------------- Image Display --------------------}}
                                     <label class="control-label" for="nodeImagesRow">{{_ "images"}}</label>
                                     <div class="row" id="nodeImagesRow" style="margin-left: 5px; margin-right: 5px">
                                         {{#each images}}
@@ -31,22 +34,35 @@
                                                 </a>
                                             </div>
                                         {{/each}}
+                                        {{! ------------------------- Uplading Images --------------------}}
                                         {{#each uploadingImages}}
                                             <div class="col-xs-4">
                                                 <progress
                                                         value={{percent_uploaded}} max="100">{{percent_uploaded}}</progress>
                                             </div>
                                         {{/each}}
-                                        <div class="col-xs-12 image-upload">
-                                            <label for="addImageBtn">
-                                                <p class="btn btn-default btn-xs" style="margin-top:10px;">{{_
-                                                        "add_images"}}</p>
-                                            </label>
-                                            <input href="#" id="addImageBtn" type="file" accept="image/*"
-                                                   style="display:none;" multiple/>
-                                        </div>
+                                    </div>
+                                    {{! ------------------------- Add Image By URL --------------------}}
+                                    <div class="input-group" style="margin-top:15px;">
+                                        <input type="text" class="form-control" id="addImgField"
+                                               placeholder="{{_ "add_image"}}"/>
+                                        <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="button"
+                                                            id="addImageBtn">{{_ "add"}}</button>
+                                                </span>
+                                    </div>
+                                    {{! ------------------------- Upload Image --------------------}}
+                                    <div class="image-upload">
+                                        <label for="uploadImgBtn">
+                                            <p class="btn btn-default btn-xs" style="margin-top:10px;">{{_
+                                                    "upload_images"}}</p>
+                                        </label>
+                                        <input href="#" id="uploadImgBtn" type="file" accept="image/*"
+                                               style="display:none;" multiple/>
                                     </div>
                                 </div>
+                                <hr/>
+                                {{! ------------------------- Resources --------------------}}
                                 <div class="form-group">
                                     <label class="control-label" for="nodeResourceList">{{_ "resources"}}</label>
                                     <ul class="list-group form-group" id="nodeResourceList">
@@ -67,20 +83,20 @@
                                                         value={{percent_uploaded}} max="100">{{percent_uploaded}}</progress>
                                             </li>
                                         {{/each}}
-                                        <li class="list-group-item">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" id="addResourceField"
-                                                       placeholder="{{_ "add_resource"}}"/>
-                                                <span class="input-group-btn">
+                                    </ul>
+                                    {{! ------------------------- Add Resource by URL --------------------}}
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="addResourceField"
+                                               placeholder="{{_ "add_resource"}}"/>
+                                        <span class="input-group-btn">
                                                     <button class="btn btn-default" type="button"
                                                             id="addResourceBtn">{{_ "add"}}</button>
                                                 </span>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                    </div>
+                                    {{! ------------------------- Upload Resource --------------------}}
                                     <div class="uploadRes">
                                         <label for="uploadResBtn">
-                                            <p class="btn btn-default btn-xs">
+                                            <p class="btn btn-default btn-xs" style="margin-top:10px;">
                                                 {{_ "upload_resource"}}
                                             </p>
                                         </label>
@@ -88,13 +104,14 @@
                                                style="display:none;" multiple/>
                                     </div>
                                 </div>
-                                <br/>
                             {{/unless}}
                         {{/with}}
-                        <div class="form-group">
-                            <a class="btn btn-muted" id="cancelModalBtn">{{_ "cancel"}}</a>
-                            <a class="btn btn-primary pull-right" id="saveNodeModalBtn">{{_ "save_changes"}}</a>
+                        <hr/>
+                        <div class="form-group pull-right">
+                            <a class="btn btn-default" id="cancelModalBtn">{{_ "cancel"}}</a>
+                            <a class="btn btn-primary" id="saveNodeModalBtn">{{_ "save_changes"}}</a>
                         </div>
+                        <br/><br/>
                     </form>
                 </div>
             </div>

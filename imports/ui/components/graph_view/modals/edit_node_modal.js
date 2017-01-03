@@ -52,16 +52,6 @@ Template.edit_node_modal.events({
         $("#editNodeModal").modal("hide");
         onSaveNode(self);
     },
-    "keyup #addResourceField": function (evt, self) {
-        if (evt.which == 13) {
-            evt.preventDefault();
-            onAddResource(self);
-        }
-    },
-    "click #addResourceBtn": function (evt, self) {
-        evt.preventDefault();
-        onAddResource(self);
-    },
     "click #deleteResourceBtn": function (evt, self) {
         evt.preventDefault();
         let removeIdx = evt.currentTarget.getAttribute("data-resource-idx");
@@ -74,9 +64,29 @@ Template.edit_node_modal.events({
         self.node[Graphs.NODE_IMAGES].splice(removeIdx, 1);
         self.nodeRx.set(self.node);
     },
-    "change #addImageBtn": function (evt, self) {
+    "keyup #addImgField": function (evt, self) {
+        if (evt.which == 13) {
+            evt.preventDefault();
+            onAddImage(self);
+        }
+    },
+    "click #addImageBtn": function (evt, self) {
+        evt.preventDefault();
+        onAddImage(self);
+    },
+    "change #uploadImgBtn": function (evt, self) {
         evt.preventDefault();
         onUploadImage(self, evt.target.files);
+    },
+    "keyup #addResourceField": function (evt, self) {
+        if (evt.which == 13) {
+            evt.preventDefault();
+            onAddResource(self);
+        }
+    },
+    "click #addResourceBtn": function (evt, self) {
+        evt.preventDefault();
+        onAddResource(self);
     },
     "change #uploadResBtn": function (evt, self) {
         evt.preventDefault();
@@ -126,6 +136,21 @@ function onAddResource(self) {
             self.node[Graphs.NODE_RESOURCES].push(newRes);
             self.nodeRx.set(self.node);
             self.find("#addResourceField").value = "";
+        }
+    }
+}
+
+function onAddImage(self) {
+    let newRes = self.find("#addImgField").value;
+    if (newRes) {
+        newRes = newRes.trim();
+        if (newRes.endsWith("/")) {
+            newRes = newRes.substring(0, newRes.length - 1);
+        }
+        if (!_.contains(self.node[Graphs.NODE_IMAGES], newRes)) {
+            self.node[Graphs.NODE_IMAGES].push(newRes);
+            self.nodeRx.set(self.node);
+            self.find("#addImgField").value = "";
         }
     }
 }
