@@ -6,12 +6,21 @@ export const DATA_SAVE_CALLBACK = "save_callback";
 
 Template.edit_node_modal.onCreated(function () {
     let self = Template.instance();
-    self.node = new ReactiveVar(self.data[DATA_NODE]);
+    let nodeClone = {};
+    _.each(_.keys(self.data[DATA_NODE]), function (key) {
+        if (Array.isArray(self.data[DATA_NODE][key])) {
+            nodeClone[key] = self.data[DATA_NODE][key].slice();
+        } else {
+            nodeClone[key] = self.data[DATA_NODE][key];
+        }
+    });
+    self.node = nodeClone;
+    self.nodeRx = new ReactiveVar(nodeClone);
 });
 
 Template.edit_node_modal.helpers({
     node: function () {
-        return Template.instance().node.get();
+        return Template.instance().nodeRx.get();
     },
     formatResource: function (res) {
         if (res) {
@@ -42,8 +51,8 @@ Template.edit_node_modal.events({
     "click #deleteResourceBtn": function (evt, self) {
         evt.preventDefault();
         let removeIdx = evt.currentTarget.getAttribute("data-resource-idx");
-        self.data[DATA_NODE][Graphs.NODE_RESOURCES].splice(removeIdx, 1);
-        self.node.set(self.data[DATA_NODE]);
+        self.node[Graphs.NODE_RESOURCES].splice(removeIdx, 1);
+        self.nodeRx.set(self.node);
     }
 });
 
@@ -54,26 +63,21 @@ function onAddResource(self) {
         if (newRes.endsWith("/")) {
             newRes = newRes.substring(0, newRes.length - 1);
         }
-        if (!_.contains(self.data[DATA_NODE][Graphs.NODE_RESOURCES], newRes)) {
-            self.data[DATA_NODE][Graphs.NODE_RESOURCES].push(newRes);
-            self.node.set(self.data[DATA_NODE]);
+        if (!_.contains(self.node[Graphs.NODE_RESOURCES], newRes)) {
+            self.node[Graphs.NODE_RESOURCES].push(newRes);
+            self.nodeRx.set(self.node);
             self.find("#addResourceField").value = "";
         }
     }
 }
 
 function onSaveNode(self) {
-    let newNode = {};
-    _.each(_.keys(self.data[DATA_NODE]), function (key) {
-        newNode[key] = self.data[DATA_NODE][key];
-    });
-
-    newNode[Graphs.NODE_NAME] = self.find("#nodeNameField").value;
-    newNode[Graphs.NODE_DETAILS] = self.find("#nodeDetailsField").value;
+    self.node[Graphs.NODE_NAME] = self.find("#nodeNameField").value;
+    self.node[Graphs.NODE_DETAILS] = self.find("#nodeDetailsField").value;
     // images & resources are updated as the user makes changes
 
     let callback = self.data[DATA_SAVE_CALLBACK];
     if (callback) {
-        callback(newNode);
+        callback(self.node);
     }
 }
