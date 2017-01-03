@@ -190,7 +190,7 @@ Template.graph_view.events({
     "click #newNodeBtn": function (evt) {
         evt.preventDefault();
         let self = Template.instance();
-        let node = GraphUtils.getNodeObject("New Step");
+        let node = GraphUtils.getJSPlumbNodeObject("New Step");
         let center = self.jsplumbRenderer.getViewportCenter();
         node = initNodeView(node, center[0], center[1]);
         self.jsPlumbToolkit.addNode(node);

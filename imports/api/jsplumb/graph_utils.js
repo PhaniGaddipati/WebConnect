@@ -4,7 +4,6 @@ import {getGraph, getNodeEdgeMap} from "/imports/api/graphs/methods.js";
 
 export const TYPE = "type";
 export const ID = "id";
-export const HAS_ATTACHMENT = "hasAttachment";
 export const NODE_TYPE_PROCESS = "process";
 export const NODE_TYPE_TERMINATOR = "terminator";
 export const NODE_TYPE_VIRTUAL = "virtual";
@@ -18,8 +17,12 @@ export const EDGE_NODE_SOURCE = "nodeSource";
 /**
  * Retrieves a graph from the graphs collection and
  * transforms it into a format expected by the JSPlumb library.
- * The original ID field name is retained and should be
- * declared in the jsplumb configuration.
+ * Changes in the JSPlumb form:
+ *      - Different ID key
+ *      - Outgoing edge information is stored in the node in the form of options (ports)
+ *      - Edges are just source and target containers
+ *      - Edge source is extended to be nodeId.optionId
+ *      - Nodes have a new TYPE field
  * @param graphId
  */
 export const getGraphAsJSPlumb = new ValidatedMethod({
@@ -37,16 +40,20 @@ export const getGraphAsJSPlumb = new ValidatedMethod({
         newGraph[Graphs.NODES] = graph[Graphs.NODES];
         newGraph[Graphs.EDGES] = graph[Graphs.EDGES];
 
-        let nodeMap = getNodeEdgeMap(graph);
-        newGraph = labelNodeTypes(graph, nodeMap, newGraph);
-        newGraph = labelNodeOptions(graph, nodeMap, newGraph);
-        newGraph = labelNodeExtras(newGraph);
+        newGraph = labelNodeOptions(graph, newGraph);
+        newGraph = labelNodeTypes(graph, newGraph);
         newGraph = cleanEdges(newGraph);
         newGraph = convertIds(newGraph);
         return newGraph;
     }
 });
 
+/**
+ * Convert the _id field to id for nodes, edges, and options.
+ * TODO: convert comment IDs
+ * @param newGraph
+ * @returns {*}
+ */
 function convertIds(newGraph) {
     _.each(newGraph[Graphs.NODES], function (node) {
         node[ID] = node[Graphs.NODE_ID];
@@ -64,6 +71,12 @@ function convertIds(newGraph) {
     return newGraph;
 }
 
+/**
+ * Extend the edge sources and remove every other attribute since it's
+ * now a part of the option.
+ * @param newGraph
+ * @returns {*}
+ */
 function cleanEdges(newGraph) {
     // JSPlumb edges are strictly source to target,
     // the other information is in the options as a part
@@ -81,19 +94,17 @@ function cleanEdges(newGraph) {
     return newGraph;
 }
 
-function labelNodeExtras(newGraph) {
-    // a boolean if there are any resources or images
-    _.each(newGraph[Graphs.NODES], function (node) {
-        node[HAS_ATTACHMENT] = node[Graphs.NODE_RESOURCES].length > 0 ||
-            node[Graphs.NODE_IMAGES].length > 0;
-    });
-    return newGraph;
-}
-
-function labelNodeOptions(graph, nodeMap, newGraph) {
+/**
+ * Convert outgoing edges into options by copying the edge, sans source and target
+ * @param graph
+ * @param newGraph
+ * @returns {*}
+ */
+function labelNodeOptions(graph, newGraph) {
     // All outgoing edges are transformed into node options, which will become
     // the ports. Each option has all of the edge information, with the ID
     // being the old edge ID, and no source and targets.
+    let nodeMap = getNodeEdgeMap(graph);
     _.each(newGraph[Graphs.NODES], function (node) {
         node[OPTIONS] = [];
         _.each(nodeMap[node[Graphs.NODE_ID]].outgoingEdges, function (edge) {
@@ -105,13 +116,19 @@ function labelNodeOptions(graph, nodeMap, newGraph) {
     return newGraph;
 }
 
-function labelNodeTypes(graph, nodeMap, newGraph) {
+/**
+ * Label node types
+ * @param graph
+ * @param newGraph
+ * @returns {*}
+ */
+function labelNodeTypes(graph, newGraph) {
     _.each(newGraph[Graphs.NODES], function (node) {
         if (graph[Graphs.FIRST_NODE] == node[Graphs.NODE_ID]) {
             node[TYPE] = NODE_TYPE_FIRST;
         } else if (node[Graphs.NODE_GRAPH_ID]) {
             node[TYPE] = NODE_TYPE_VIRTUAL;
-        } else if (nodeMap[node[Graphs.NODE_ID]].outgoingEdges.length >= 1) {
+        } else if (node[OPTIONS].length >= 1) {
             node[TYPE] = NODE_TYPE_PROCESS;
         } else {
             node[TYPE] = NODE_TYPE_TERMINATOR;
@@ -120,14 +137,19 @@ function labelNodeTypes(graph, nodeMap, newGraph) {
     return newGraph;
 }
 
-export const getNodeObject = function (name) {
+/**
+ * Returns a new empty node object in JSPlumb format.
+ * A random ID is assigned
+ * @param name
+ * @returns {{}}
+ */
+export const getJSPlumbNodeObject = function (name) {
     let node = {};
     node[ID] = Random.id();
-    node[Graphs.NODE_NAME] = name;
+    node[Graphs.NODE_NAME] = name || "";
     node[Graphs.EDGE_DETAILS] = "";
     node[TYPE] = NODE_TYPE_PROCESS;
     node[OPTIONS] = [];
-    node[HAS_ATTACHMENT] = false;
     node[Graphs.NODE_RESOURCES] = [];
     node[Graphs.NODE_IMAGES] = [];
     node[Graphs.NODE_COMMENTS] = [];
@@ -135,9 +157,16 @@ export const getNodeObject = function (name) {
     return node;
 };
 
+/**
+ * Returns a new option object with a randomly assigned ID
+ * and the given parentId
+ * @param optionText
+ * @param parentId
+ * @returns {{}}
+ */
 export const getOptionObject = function (optionText, parentId) {
     let opt = {};
-    opt[OPTION_NAME] = optionText;
+    opt[OPTION_NAME] = optionText || "";
     opt[OPTION_DETAILS] = "";
     opt[ID] = Random.id();
     opt[OPTION_PARENT_NODE_ID] = parentId;
