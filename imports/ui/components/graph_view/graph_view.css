@@ -185,6 +185,16 @@
     border: 1px solid rgba(52, 103, 137, 0.28);
 }
 
+.add-option input {
+    border: 2px solid #cb0c08;
+    background-color: rgb(255, 232, 232);
+}
+
+.node-option ~ .add-option input {
+    border: 1px solid rgba(52, 103, 137, 0.28);
+    background-color: white;
+}
+
 .deleteOptSpan {
     visibility: hidden;
     float: left;
