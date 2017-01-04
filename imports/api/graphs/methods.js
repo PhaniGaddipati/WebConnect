@@ -98,9 +98,9 @@ export const validateGraph = new ValidatedMethod({
                 });
             }
         } catch (err) {
-            errorMsgs = errorMsgs.log("\nunexpected error");
-            errorMsgs = errorMsgs.log(err);
-            valid = false;
+            errorMsgs = errorMsgs.concat("\nunexpected error");
+            errorMsgs = errorMsgs.concat(err);
+            valid     = false;
         }
         if (valid) {
             return null;
