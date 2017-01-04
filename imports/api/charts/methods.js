@@ -97,11 +97,13 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
         let graph = Graphs.Graphs.findOne({_id: params.graphId});
         if (!chart || !graph) {
             // bad chart or graph ID
-            return null;
+            throw new Meteor.Error("charts.updateChartGraphWithHistory.badIds",
+                "The supplied chart or graph ID were not found");
         }
         if (chart[Charts.OWNER] != userId) {
             // Someone is up to no good...
-            return null;
+            throw new Meteor.Error("charts.updateChartGraphWithHistory.accessDenied",
+                "The current user is not allowed to do this.");
         }
         // Continue with the update
         let hist                         = {};
@@ -134,7 +136,13 @@ export const removeChart = new ValidatedMethod({
         }
     }).validator(),
     run({_id:id}){
-        return Charts.Charts.remove({_id: id});
+        let chart = Charts.Charts.findOne({_id: id});
+        if (chart && chart[Charts.OWNER] == Meteor.userId()) {
+            return Charts.Charts.remove({_id: id});
+        } else {
+            // Either the chart doesn't exist or no permission
+            return null;
+        }
     }
 });
 
