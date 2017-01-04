@@ -66,6 +66,63 @@ export const upsertChart = new ValidatedMethod({
 });
 
 /**
+ * Updates the ID of the graph for the given chart by ID, and
+ * stores the previous graph in the history.
+ *
+ * Returns null on update failure (due to permission or bad IDs) or the result
+ * of Mongo.update
+ */
+export const updateChartGraphWithHistory = new ValidatedMethod({
+    name: "charts.updateChartGraphWithHistory",
+    validate: new SimpleSchema({
+        chartId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        },
+        graphId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        },
+        version: {
+            type: String,
+            regEx: /\d+(\.\d+)+/
+        }
+    }).validator(),
+    run(params){
+        let userId = Meteor.userId();
+        if (!userId) {
+            return null;
+        }
+        let chart = Charts.Charts.findOne({_id: params.chartId});
+        let graph = Graphs.Graphs.findOne({_id: params.graphId});
+        if (!chart || !graph) {
+            // bad chart or graph ID
+            return null;
+        }
+        if (chart[Charts.OWNER] != userId) {
+            // Someone is up to no good...
+            return null;
+        }
+        // Continue with the update
+        let hist                         = {};
+        hist[Charts.GRAPH_HIST_VERSION]  = chart[Charts.VERSION];
+        hist[Charts.GRAPH_HIST_GRAPH_ID] = chart[Charts.GRAPH_ID];
+        // Add the history entry
+        let push                         = {};
+        push[Charts.GRAPH_HIST]          = hist;
+        // Set the new graph Id and version
+        let set                          = {};
+        set[Charts.VERSION]              = params.version;
+        set[Charts.GRAPH_ID]             = params.graphId;
+
+        return Charts.Charts.update({_id: params.chartId}, {
+            $push: push,
+            $set: set
+        });
+    }
+});
+
+/**
  * Removes a chart by ID.
  */
 export const removeChart = new ValidatedMethod({

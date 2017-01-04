@@ -6,21 +6,24 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {Comments} from "/imports/api/comments/comments.js";
 
 // Constants for document field names
-export const CHART_ID      = "_id";
-export const OWNER         = "owner";
-export const NAME          = "name";
-export const DESCRIPTION   = "description";
-export const CREATED_DATE  = "createdDate";
-export const UPDATED_DATE  = "updatedDate";
-export const VERSION       = "version";
-export const UPVOTED_IDS   = "upvoted";
-export const DOWNVOTED_IDS = "downvoted";
-export const DOWNLOADS     = "downloads";
-export const GRAPH_ID      = "graph";
-export const COMMENTS      = "comments";
-export const RESOURCES     = "resources";
-export const IMAGE         = "image";
-export const IN_CATALOG = "inCatalog";
+export const CHART_ID            = "_id";
+export const OWNER               = "owner";
+export const NAME                = "name";
+export const DESCRIPTION         = "description";
+export const CREATED_DATE        = "createdDate";
+export const UPDATED_DATE        = "updatedDate";
+export const VERSION             = "version";
+export const UPVOTED_IDS         = "upvoted";
+export const DOWNVOTED_IDS       = "downvoted";
+export const DOWNLOADS           = "downloads";
+export const GRAPH_ID            = "graph";
+export const GRAPH_HIST          = "graphHist";
+export const GRAPH_HIST_VERSION  = "version";
+export const GRAPH_HIST_GRAPH_ID = "graphId";
+export const COMMENTS            = "comments";
+export const RESOURCES           = "resources";
+export const IMAGE               = "image";
+export const IN_CATALOG          = "inCatalog";
 
 export const TYPE         = "type";
 export const TYPE_MISC    = "misc";
@@ -47,6 +50,19 @@ Charts.deny({
     },
     update(){
         return true;
+    }
+});
+
+Charts.graphHistSchema = new SimpleSchema({
+    version: {
+        type: String,
+        optional: false,
+        regEx: /\d+(\.\d+)+/
+    },
+    graph: {
+        type: String,
+        optional: false,
+        regEx: SimpleSchema.RegEx.Id
     }
 });
 
@@ -115,6 +131,11 @@ Charts.schema = new SimpleSchema({
         type: String,
         optional: false,
         regEx: SimpleSchema.RegEx.Id
+    },
+    graphHist: {
+        type: [Charts.graphHistSchema],
+        optional: false,
+        defaultValue: []
     },
     comments: {
         type: [Comments.schema],
