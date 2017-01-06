@@ -8,6 +8,7 @@ import {Comments} from "/imports/api/comments/comments.js";
 // Constants for document field names
 export const CHART_ID            = "_id";
 export const OWNER               = "owner";
+export const EDITORS = "editors";
 export const NAME                = "name";
 export const DESCRIPTION         = "description";
 export const CREATED_DATE        = "createdDate";
@@ -96,6 +97,15 @@ Charts.schema = new SimpleSchema({
         type: String,
         regEx: SimpleSchema.RegEx.Id,
         optional: false
+    },
+    editors: {
+        type: Array,
+        optional: false,
+        defaultValue: []
+    },
+    "editors.$": {
+        type: String,
+        regEx: SimpleSchema.RegEx.Id
     },
     name: {
         type: String,
