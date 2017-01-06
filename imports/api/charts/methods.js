@@ -86,6 +86,10 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
         version: {
             type: String,
             regEx: /\d+(\.\d+)+/
+        },
+        comments: {
+            type: String,
+            optional: true
         }
     }).validator(),
     run(params){
@@ -109,8 +113,11 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
         let hist                         = {};
         hist[Charts.GRAPH_HIST_VERSION]  = chart[Charts.VERSION];
         hist[Charts.GRAPH_HIST_GRAPH_ID] = chart[Charts.GRAPH_ID];
+        hist[Charts.GRAPH_HIST_COMMENTS] = params.comments;
+        hist[Charts.GRAPH_HIST_USER_ID]  = userId;
         // Add the history entry
-        let push                         = {};
+        let
+            push                         = {};
         push[Charts.GRAPH_HIST]          = hist;
         // Set the new graph Id and version
         let set                          = {};
