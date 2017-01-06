@@ -40,6 +40,54 @@ export const insertNewChart = new ValidatedMethod({
 });
 
 /**
+ * Checks to see if the current user can edit the given chart by ID.
+ * Returns true if the current user can edit the chart, and false
+ * if the user cannot edit the chart or the chart doesn't exist.
+ */
+export const canCurrentUserEditChart = new ValidatedMethod({
+    name: "charts.canCurrentUserEditChart",
+    validate: new function () {
+    },
+    run({chartId:chartId}){
+        let userId = Meteor.userId();
+        if (!userId) {
+            // No one is logged in
+            return false;
+        }
+        let chart = getChart.call(chartId);
+        if (!chart) {
+            // Chart doesn't exist
+            return false;
+        }
+        // Check if user is the owner or if they are in the editor list
+        return chart[Charts.OWNER] == userId || _.contains((chart[Charts.EDITORS] || []), userId);
+    }
+});
+
+/**
+ * Checks if the current user is the owner of the given chart.
+ * Returns false if the chart doesn't exist or they are not the owner.
+ */
+export const isCurrentUserChartOwner = new ValidatedMethod({
+    name: "charts.isCurrentUserChartOwner",
+    validate: new function () {
+    },
+    run({chartId:chartId}){
+        let userId = Meteor.userId();
+        if (!userId) {
+            // No one is logged in
+            return false;
+        }
+        let chart = getChart.call(chartId);
+        if (!chart) {
+            // Chart doesn't exist
+            return false;
+        }
+        return chart[Charts.OWNER] == userId;
+    }
+});
+
+/**
  * Attempts to upsert a chart. If the chart doesn't exist in the DB,
  * it is inserted with a new ID. The chart owner must be the current
  * user. The result of the upsert operation is returned.
@@ -56,11 +104,11 @@ export const upsertChart = new ValidatedMethod({
             throw new Meteor.Error("charts.upsertChart.accessDenied",
                 "A user must be logged in to insert or update a Chart");
         }
-        if (chart[Charts.OWNER] === ownerId) {
+        if (isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
             return Charts.Charts.upsert(chart);
         } else {
             throw new Meteor.Error("charts.upsertChart.accessDenied",
-                "The given Chart's owner does not match the current user");
+                "The given Chart's owner or editors does not match the current user");
         }
     }
 });
@@ -104,7 +152,7 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
             throw new Meteor.Error("charts.updateChartGraphWithHistory.badIds",
                 "The supplied chart or graph ID were not found");
         }
-        if (chart[Charts.OWNER] != userId) {
+        if (isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
             // Someone is up to no good...
             throw new Meteor.Error("charts.updateChartGraphWithHistory.accessDenied",
                 "The current user is not allowed to do this.");
@@ -144,7 +192,7 @@ export const removeChart = new ValidatedMethod({
     }).validator(),
     run({_id:id}){
         let chart = Charts.Charts.findOne({_id: id});
-        if (chart && chart[Charts.OWNER] == Meteor.userId()) {
+        if (chart && isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
             return Charts.Charts.remove({_id: id});
         } else {
             // Either the chart doesn't exist or no permission
