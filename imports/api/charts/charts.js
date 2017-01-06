@@ -8,7 +8,7 @@ import {Comments} from "/imports/api/comments/comments.js";
 // Constants for document field names
 export const CHART_ID            = "_id";
 export const OWNER               = "owner";
-export const EDITORS = "editors";
+export const EDITORS          = "editors";
 export const NAME                = "name";
 export const DESCRIPTION         = "description";
 export const CREATED_DATE        = "createdDate";
@@ -17,6 +17,7 @@ export const VERSION             = "version";
 export const UPVOTED_IDS         = "upvoted";
 export const DOWNVOTED_IDS       = "downvoted";
 export const DOWNLOADS           = "downloads";
+export const EDITING_GRAPH_ID = "editingGraph";
 export const GRAPH_ID            = "graph";
 export const GRAPH_HIST          = "graphHist";
 export const GRAPH_HIST_VERSION  = "version";
@@ -161,6 +162,11 @@ Charts.schema = new SimpleSchema({
         type: Number,
         optional: false,
         defaultValue: 0
+    },
+    editingGraph: {
+        type: String,
+        optional: true, // It is created on request
+        regEx: SimpleSchema.RegEx.Id
     },
     graph: {
         type: String,

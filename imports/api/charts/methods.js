@@ -6,7 +6,91 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Charts from "./charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
-import {insertGraph, getGraphWithoutLinks} from "../graphs/methods.js";
+import {insertGraph, getGraphWithoutLinks, getGraph, validateGraph} from "../graphs/methods.js";
+
+/**
+ * Returns the graph associated with the chart's currently editing graph.
+ * Returns null if the chart wasn't found.
+ */
+export const getChartEditingGraph = new ValidatedMethod({
+    name: "getChartEditingGraph",
+    validate: new SimpleSchema({
+        chartId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        }
+    }).validator(),
+    run({chartId: chartId}){
+        let chart = getChart.call(chartId);
+        if (!chart) {
+            return null;
+        }
+        let editingGraphId = chart[Charts.EDITING_GRAPH_ID];
+        if (!editingGraphId) {
+            // No editing graph yet
+            // duplicate the publishing one and set it as the editing graph
+            let graph = getGraph.call(chart[Charts.GRAPH_ID]);
+            if (!graph) {
+                // huh?
+                console.error("Chart ID " + chart[Charts.CHART_ID] + " has graph ID " + chart[Charts.GRAPH_ID] + ", but it doesn't exist!");
+                return null;
+            }
+            delete graph[Graphs.GRAPH_ID];
+
+            // Chart owner will own the editing graph
+            graph[Graphs.OWNER] = chart[Charts.OWNER];
+            editingGraphId      = Graphs.Graphs.insert(graph);
+
+            if (!editingGraphId) {
+                // huh?
+                console.error("Could insert editing graph for chart ID " + chart[Charts.CHART_ID] + "!");
+                return null;
+            }
+        }
+        // Now we have an editing graph
+        let set                      = {};
+        set[Charts.EDITING_GRAPH_ID] = editingGraphId;
+
+        Charts.Charts.update({_id: chart[Charts.CHART_ID]}, {$set: set});
+
+        return getChart.call(editingGraphId);
+    }
+});
+
+/**
+ * Updates the current editing graph of the chart if the user
+ * is allowed to. The graph is validated before updating.
+ * Returns the result of the update operation, or null on failure.
+ */
+export const updateChartEditingGraph = new ValidatedMethod({
+    name: "updateChartEditingGraph",
+    validate: function ({chartId: chartId, graph:graph}) {
+        // First check to see if the graph is cool with the schema
+        Graphs.Graphs.schema.graphSchema.validate(graph);
+
+        // Now do our own integrity validation
+        let error = validateGraph.call(graph);
+        if (error) {
+            throw new Error("Graph is not valid:\n" + error);
+        }
+    },
+    run({chartId: chartId, graph:graph}){
+        let userId = Meteor.userId();
+        let chart  = getChart.call(chartId);
+        if (!chart) {
+            return null;
+        }
+        if (!canCurrentUserEditChart.call({chartId: chartId})) {
+            // No permission
+            return null;
+        }
+        // Make sure no one is trying to edit the owner
+        graph[Graphs.OWNER] = chart[Charts.OWNER];
+
+        // We good, update the graph
+        return Graphs.Graphs.update({_id: graph[Graphs.GRAPH_ID]}, graph);
+    }
+});
 
 /**
  * Inserts a new chart into the database, given the name and description.
@@ -46,7 +130,7 @@ export const insertNewChart = new ValidatedMethod({
  */
 export const canCurrentUserEditChart = new ValidatedMethod({
     name: "charts.canCurrentUserEditChart",
-    validate: new function () {
+    validate: function () {
     },
     run({chartId:chartId}){
         let userId = Meteor.userId();
@@ -70,7 +154,7 @@ export const canCurrentUserEditChart = new ValidatedMethod({
  */
 export const isCurrentUserChartOwner = new ValidatedMethod({
     name: "charts.isCurrentUserChartOwner",
-    validate: new function () {
+    validate: function () {
     },
     run({chartId:chartId}){
         let userId = Meteor.userId();
