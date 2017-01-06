@@ -1,5 +1,4 @@
-import "meteor/random";
-import "/imports/utils/jsplumb/jsPlumbToolkit-1.0.26-min.js";
+import {Random} from "meteor/random";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import {validateGraph, getGraph, getNodeEdgeMap} from "/imports/api/graphs/methods.js";
 
