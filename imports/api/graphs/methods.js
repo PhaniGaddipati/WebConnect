@@ -4,6 +4,7 @@
 import {ValidatedMethod} from "meteor/mdg:validated-method";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
+import * as Charts from "/imports/api/charts/charts.js";
 
 export const NODE_MAP_NODE = "node";
 export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
@@ -40,7 +41,7 @@ export const validateGraph = new ValidatedMethod({
                     if (!Graphs.Graphs.schema.nodeSchema.newContext().validate(
                             Graphs.Graphs.schema.nodeSchema.clean(node))) {
                         errorMsgs = errorMsgs.concat("\ninvalid node "
-                            + ((!!node[Graphs.NODE_GRAPH_ID]) ? node[Graphs.NODE_GRAPH_ID] : ""));
+                            + ((!!node[Graphs.NODE_ID]) ? node[Graphs.NODE_ID] : ""));
                         valid = false;
                     }
                 });
@@ -69,7 +70,7 @@ export const validateGraph = new ValidatedMethod({
                 let virtualNodes = [];
                 _.each(g[Graphs.NODES], function (node) {
                     nodeMap[node[Graphs.NODE_ID]] = true;
-                    if (node[Graphs.NODE_GRAPH_ID]) {
+                    if (node[Graphs.NODE_CHART_ID]) {
                         virtualNodes.push(node);
                     }
                 });
@@ -90,10 +91,18 @@ export const validateGraph = new ValidatedMethod({
                     }
                 });
                 _.each(virtualNodes, function (vNode) {
-                    if (!Graphs.Graphs.findOne({_id: vNode[Graphs.NODE_GRAPH_ID]})) {
+                    let chart = Charts.Charts.findOne({_id: vNode[Graphs.NODE_CHART_ID]});
+                    if (!chart) {
                         errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
-                            + " refers to nonexistant graph " + vNode[Graphs.NODE_GRAPH_ID]);
-                        valid = false;
+                            + " refers to nonexistant chart " + vNode[Graphs.NODE_CHART_ID]);
+                        valid     = false;
+                    } else {
+                        if (!Graphs.Graphs.findOne(chart[Charts.GRAPH_ID])) {
+                            // Virtual node's graph doesn't exist
+                            errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
+                                + " refers to chart " + vNode[Graphs.NODE_CHART_ID] + " with non-existant graph " + chart[Charts.GRAPH_ID]);
+                            valid     = false;
+                        }
                     }
                 });
             }
@@ -173,7 +182,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         let newNodes = [];
         let newEdges = [];
         _.each(graph[Graphs.NODES], function (vNode) {
-            if (vNode[Graphs.NODE_GRAPH_ID]) {
+            if (vNode[Graphs.NODE_CHART_ID]) {
                 // Virtual node found
                 let bypass = false;
                 if (nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges.length < 1) {
@@ -183,7 +192,8 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                     bypass = true;
                 } else {
                     let vNodeOutEdges = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges;
-                    let subGraphId = vNode[Graphs.NODE_GRAPH_ID];
+                    let subChartId = vNode[Graphs.NODE_CHART_ID];
+                    let subGraphId = Charts.Charts.findOne({_id: subChartId})[Charts.GRAPH_ID];
                     let subGraph = getGraphWithoutLinks.call(subGraphId);
 
                     if (!subGraph) {
@@ -270,7 +280,7 @@ export const getNodeEdgeMap = function (graph) {
         nodeMap[node[Graphs.NODE_ID]] = {
             incomingEdges: [],
             outgoingEdges: [],
-            isVirtual: node[Graphs.NODE_GRAPH_ID] != null,
+            isVirtual: node[Graphs.NODE_CHART_ID] != null,
             node: node
         }
     });

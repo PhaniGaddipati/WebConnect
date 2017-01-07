@@ -79,12 +79,12 @@ Template.graph_view.helpers({
         if (!node) {
             return false;
         }
-        return node[Graphs.NODE_GRAPH_ID] != null;
+        return node[Graphs.NODE_CHART_ID] != null;
     },
-    selectedVirtualGraphId: function () {
+    selectedVirtualChartId: function () {
         let node = Session.get(SELECTION_NODE_DATA);
         if (node) {
-            return node[Graphs.NODE_GRAPH_ID];
+            return node[Graphs.NODE_CHART_ID];
         }
         return "#";
     },

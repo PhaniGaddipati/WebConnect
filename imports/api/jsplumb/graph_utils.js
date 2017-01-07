@@ -231,7 +231,7 @@ function labelJSPlumbNodeTypes(graph, newGraph) {
     _.each(newGraph[Graphs.NODES], function (node) {
         if (graph[Graphs.FIRST_NODE] == node[Graphs.NODE_ID]) {
             node[TYPE] = NODE_TYPE_FIRST;
-        } else if (node[Graphs.NODE_GRAPH_ID]) {
+        } else if (node[Graphs.NODE_CHART_ID]) {
             node[TYPE] = NODE_TYPE_VIRTUAL;
         } else if (node[OPTIONS].length >= 1) {
             node[TYPE] = NODE_TYPE_PROCESS;

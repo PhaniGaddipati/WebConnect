@@ -13,7 +13,7 @@ export const EDGES          = "edges";
 export const OWNER          = "owner";
 export const FIRST_NODE     = "firstNode";
 export const NODE_ID        = "_id";
-export const NODE_GRAPH_ID  = "graphId";
+export const NODE_CHART_ID = "chartId";
 export const NODE_NAME      = "name";
 export const NODE_DETAILS   = "details";
 export const NODE_RESOURCES = "resources";
@@ -43,7 +43,7 @@ Graphs.deny({
 });
 
 Graphs.schema            = {};
-Graphs.schema.nodeSchema = new SimpleSchema({
+Graphs.schema.nodeSchema   = new SimpleSchema({
     _id: {
         type: String,
         regEx: SimpleSchema.RegEx.Id,
@@ -54,7 +54,7 @@ Graphs.schema.nodeSchema = new SimpleSchema({
             }
         }
     },
-    graphId: {
+    chartId: {
         type: String,
         regEx: SimpleSchema.RegEx.Id,
         optional: true,

@@ -12,7 +12,7 @@ import "../../ui/pages/account/logout.js";
 import "/imports/ui/pages/chart/chart.js";
 import {DATA_CHART_ID} from "/imports/ui/pages/chart/chart.js";
 import "/imports/ui/pages/graph_guide/graph_guide.js";
-import {DATA_GRAPH_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
+import {DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
 import {incrementChartDownload} from "/imports/api/charts/methods.js";
 
 //Routes
@@ -60,21 +60,6 @@ FlowRouter.route("/chart/:chartId", {
     },
 });
 
-FlowRouter.route("/graph/:graphId", {
-    name: "App.chart",
-    action(params) {
-        let context             = {};
-        context[DATA_GRAPH_ID]  = params.graphId;
-        context[DATA_READ_ONLY] = true;
-        BlazeLayout.render("app_body_fluid",
-            {
-                main: "graph_guide",
-                dataContext: context
-            }
-        );
-    },
-});
-
 FlowRouter.route("/chart/:chartId/edit", {
     name: "App.chart",
     action(params) {
@@ -85,21 +70,6 @@ FlowRouter.route("/chart/:chartId/edit", {
         BlazeLayout.render("app_body_fluid",
             {
                 main: "chart",
-                dataContext: context
-            }
-        );
-    },
-});
-
-FlowRouter.route("/graph/:graphId/edit", {
-    name: "App.chart",
-    action(params) {
-        let context             = {};
-        context[DATA_GRAPH_ID]  = params.graphId;
-        context[DATA_READ_ONLY] = false;
-        BlazeLayout.render("app_body_fluid",
-            {
-                main: "graph_guide",
                 dataContext: context
             }
         );
