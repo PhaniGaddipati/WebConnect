@@ -15,13 +15,14 @@ import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
+export const DATA_GRAPH_ID = "graphId";
 const NODE_FILL = 0.25;
 
 jstk = null;
 
 Template.graph_view.onCreated(function () {
     let self = Template.instance();
-    self.graphId = self.data.graphId;
+    self.graphId = self.data[DATA_GRAPH_ID];
     self.graph = new ReactiveVar(null);
     self.loadingGraph = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
