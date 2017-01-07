@@ -12,7 +12,7 @@ import {insertGraph, getGraphWithoutLinks, getGraph, validateGraph} from "../gra
  * Returns the graph associated with the chart's currently editing graph.
  * Returns null if the chart wasn't found.
  */
-export const getChartEditingGraph = new ValidatedMethod({
+export const getChartEditingGraphId = new ValidatedMethod({
     name: "getChartEditingGraph",
     validate: new SimpleSchema({
         chartId: {
@@ -46,14 +46,13 @@ export const getChartEditingGraph = new ValidatedMethod({
                 console.error("Could insert editing graph for chart ID " + chart[Charts.CHART_ID] + "!");
                 return null;
             }
+            let set                      = {};
+            set[Charts.EDITING_GRAPH_ID] = editingGraphId;
+
+            Charts.Charts.update({_id: chart[Charts.CHART_ID]}, {$set: set});
         }
         // Now we have an editing graph
-        let set                      = {};
-        set[Charts.EDITING_GRAPH_ID] = editingGraphId;
-
-        Charts.Charts.update({_id: chart[Charts.CHART_ID]}, {$set: set});
-
-        return getChart.call(editingGraphId);
+        return editingGraphId;
     }
 });
 

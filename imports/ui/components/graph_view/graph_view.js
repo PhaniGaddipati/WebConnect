@@ -15,20 +15,22 @@ import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
-export const DATA_GRAPH_ID = "graphId";
-const NODE_FILL = 0.25;
+export const DATA_GRAPH_ID  = "graphId";
+export const DATA_READ_ONLY = "readOnly";
+const NODE_FILL             = 0.25;
 
 jstk = null;
 
 Template.graph_view.onCreated(function () {
-    let self = Template.instance();
-    self.graphId = self.data[DATA_GRAPH_ID];
-    self.graph = new ReactiveVar(null);
-    self.loadingGraph = new ReactiveVar(true);
+    let self               = Template.instance();
+    self.graphId           = self.data[DATA_GRAPH_ID];
+    self.readOnly          = self.data[DATA_READ_ONLY];
+    self.graph             = new ReactiveVar(null);
+    self.loadingGraph      = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
 
     self.jsPlumbToolkit = getJSPlumbInstance(self);
-    jstk = self.jsPlumbToolkit;
+    jstk                   = self.jsPlumbToolkit;
     GraphUtils.getGraphAsJSPlumb.call(self.graphId, function (err, graph) {
         if (err || !graph) {
             self.errorLoadingGraph.set(true);
@@ -85,6 +87,9 @@ Template.graph_view.helpers({
             return node[Graphs.NODE_GRAPH_ID];
         }
         return "#";
+    },
+    readOnly: function () {
+        return Template.instance().readOnly;
     }
 });
 
@@ -115,10 +120,10 @@ Template.graph_view.events({
     "keyup #addOptionInput": function (evt) {
         if (evt.keyCode === 13) {
             evt.preventDefault();
-            let self = Template.instance();
-            let txt = evt.target.value;
+            let self   = Template.instance();
+            let txt    = evt.target.value;
             let nodeId = evt.currentTarget.parentElement.parentElement.parentElement.parentElement.id;
-            let node = self.jsPlumbToolkit.getNode(nodeId);
+            let node   = self.jsPlumbToolkit.getNode(nodeId);
             if (!_.contains(_.pluck(node.data[GraphUtils.OPTIONS], GraphUtils.OPTION_NAME), txt)) {
                 let opt = GraphUtils.getOptionObject(txt, nodeId);
                 self.jsPlumbToolkit.addNewPort(nodeId, "option", opt);
@@ -129,10 +134,10 @@ Template.graph_view.events({
     },
     "click #deleteOptionBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self   = Template.instance();
         let portId = evt.currentTarget.getAttribute("data-option-id");
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
-        let node = self.jsPlumbToolkit.getNode(nodeId);
+        let node   = self.jsPlumbToolkit.getNode(nodeId);
 
         removePort(node, portId, self);
         setSelection(self, node);
@@ -147,7 +152,7 @@ Template.graph_view.events({
     },
     "click #deleteNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self   = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         if (nodeId) {
             onDeleteNode(self, nodeId);
@@ -163,7 +168,7 @@ Template.graph_view.events({
     },
     "click #editNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self   = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         if (nodeId) {
             onEditNode(self, nodeId);
@@ -171,11 +176,11 @@ Template.graph_view.events({
     },
     "click #tooblarMakeFirstNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self         = Template.instance();
         let newFirstNode = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
         if (newFirstNode && newFirstNode[GraphUtils.TYPE] != GraphUtils.NODE_TYPE_VIRTUAL) {
             // make this node the only type:"first" node
-            let nodeData = newFirstNode.data;
+            let nodeData              = newFirstNode.data;
             nodeData[GraphUtils.TYPE] = GraphUtils.NODE_TYPE_FIRST;
             self.jsPlumbToolkit.updateNode(newFirstNode, nodeData);
             $("#" + nodeData[GraphUtils.ID]).addClass("first-node");
@@ -193,11 +198,11 @@ Template.graph_view.events({
         evt.preventDefault();
         let self = Template.instance();
         let node = GraphUtils.getJSPlumbNodeObject("New Step");
-        let center = self.jsplumbRenderer.getViewportCenter();
-        node = initNodeView(node, center[0], center[1]);
+        let center                             = self.jsplumbRenderer.getViewportCenter();
+        node     = initNodeView(node, center[0], center[1]);
 
-        let data = {};
-        data[EditNodeModal.DATA_NODE] = node;
+        let data                               = {};
+        data[EditNodeModal.DATA_NODE]          = node;
         data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
             self.jsPlumbToolkit.addNode(newNodeData);
             setSelection(self, self.jsPlumbToolkit.getNode(newNodeData[GraphUtils.ID]));
@@ -210,7 +215,7 @@ Template.graph_view.events({
 function onDeleteNode(self, nodeId) {
     let node = self.jsPlumbToolkit.getNode(nodeId);
 
-    let data = {};
+    let data                        = {};
     data[DeleteNodeModal.DATA_NODE] = node.data;
     data[DeleteNodeModal.DATA_DELETE_CALLBACK] = function () {
         self.jsPlumbToolkit.removeNode(node);
@@ -219,9 +224,9 @@ function onDeleteNode(self, nodeId) {
     Modal.show("delete_node_modal", data);
 }
 function onEditNode(self, nodeId) {
-    let node = self.jsPlumbToolkit.getNode(nodeId);
-    let data = {};
-    data[EditNodeModal.DATA_NODE] = node.data;
+    let node                               = self.jsPlumbToolkit.getNode(nodeId);
+    let data                               = {};
+    data[EditNodeModal.DATA_NODE]          = node.data;
     data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
         self.jsPlumbToolkit.updateNode(node, newNodeData);
         setSelection(self, node);
@@ -239,12 +244,12 @@ function onEditNode(self, nodeId) {
  * @param self
  */
 function removePort(node, portId, self) {
-    let nodeData = node.data;
+    let nodeData  = node.data;
     let nodeEdges = node.getAllEdges();
-    let edges = [];
+    let edges     = [];
     _.each(nodeEdges, function (nEdge) {
         if (nEdge.source.id !== portId) {
-            let edge = {};
+            let edge                 = {};
             edge[Graphs.EDGE_SOURCE] = nEdge.source.getNode().id + "." + nEdge.source.id;
             edge[Graphs.EDGE_TARGET] = nEdge.target.id;
             edges.push(edge);
@@ -268,10 +273,16 @@ function removePort(node, portId, self) {
 }
 
 function loadFlowchart() {
-    let self = Template.instance();
+    let self  = Template.instance();
     let graph = self.graph.get();
     if (graph) {
         graph = layoutGraph(graph);
+
+        // Add readOnly attr
+        _.each(graph[Graphs.NODES], function (node) {
+            node[DATA_READ_ONLY] = self.readOnly;
+        });
+
         self.jsplumbRenderer = self.jsPlumbToolkit.render(getJSPlumbOptions());
         self.jsPlumbToolkit.load({
             type: "json",
@@ -307,7 +318,7 @@ function getJSPlumbInstance(self) {
 }
 
 function getJSPlumbOptions() {
-    let self = Template.instance();
+    let self   = Template.instance();
     let events = {
         mousedown: function (params) {
             if (params.e.button == 0) {
@@ -365,20 +376,24 @@ function getJSPlumbOptions() {
                     }, // hover paint style for this edge type.
                     overlays: [["Arrow", {location: 1, width: 20, length: 25}]],
                     beforeDrop: function (p) {
+                        if (self.readOnly) {
+                            return false;
+                        }
+
                         // Make sure it's not a loopback connection and also
                         // that an option won't have more than 1 outgoing edge
-
-                        let con = p.connection;
+                        let con          = p.connection;
                         let sourceNodeId = con.source.parentElement.getAttribute("data-parent-node");
                         let sourcePortId = con.source.parentElement.getAttribute("data-port-id");
-                        let sourceNode = self.jsPlumbToolkit.getNode(sourceNodeId);
+                        let sourceNode   = self.jsPlumbToolkit.getNode(sourceNodeId);
                         let targetNodeId = p.targetId;
 
                         return sourceNodeId !== targetNodeId
                             && _.filter(sourceNode.getAllEdges(), function (edge) {
                                 return edge != con.edge && edge.source.data.id === sourcePortId;
                             }).length == 0;
-                    }
+                    },
+                    detachable: !self.readOnly
                 }
             },
             ports: {

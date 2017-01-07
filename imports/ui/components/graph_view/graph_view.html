@@ -25,24 +25,29 @@
                         <div class="btn-group">
                             <a href="#" class="btn btn-default" id="relayoutBtn"><i class="fa fa-magnet"></i> </a>
                         </div>
-                        <div class="btn-group">
-                            <a href="#" class="btn btn-default" id="newNodeBtn"><i class="fa fa-plus"></i> </a>
-                        </div>
-                        {{#if nodesSelection}}
+                        {{#unless readOnly}}
                             <div class="btn-group">
-                                <a href="#" class="btn btn-primary" id="tooblarEditNodeBtn"><i class="fa fa-pencil"></i></a>
-                                {{#if selectedVirtual}}
-                                    <a href="/graph/{{selectedVirtualGraphId}}" target="_blank" class="btn btn-warning"
-                                       id="openVirtualGraphBtn"> <i class="fa fa-external-link"></i></a>
-                                {{else}}
-                                    <a href="#" class="btn btn-primary" id="tooblarMakeFirstNodeBtn"><i
-                                            class="fa fa-arrow-down"></i></a>
-                                {{/if}}
+                                <a href="#" class="btn btn-default" id="newNodeBtn"><i class="fa fa-plus"></i> </a>
                             </div>
-                            <div class="btn-group">
-                                <a href="#" class="btn btn-danger" id="toolbarDeleteNodeBtn"><i class="fa fa-trash"></i></a>
-                            </div>
-                        {{/if}}
+                            {{#if nodesSelection}}
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-primary" id="tooblarEditNodeBtn"><i
+                                            class="fa fa-pencil"></i></a>
+                                    {{#if selectedVirtual}}
+                                        <a href="/graph/{{selectedVirtualGraphId}}" target="_blank"
+                                           class="btn btn-warning"
+                                           id="openVirtualGraphBtn"> <i class="fa fa-external-link"></i></a>
+                                    {{else}}
+                                        <a href="#" class="btn btn-primary" id="tooblarMakeFirstNodeBtn"><i
+                                                class="fa fa-arrow-down"></i></a>
+                                    {{/if}}
+                                </div>
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-danger" id="toolbarDeleteNodeBtn"><i
+                                            class="fa fa-trash"></i></a>
+                                </div>
+                            {{/if}}
+                        {{/unless}}
                     </div>
                 </div>
                 <div class="container-fluid" id="jsplumbContainer"></div>

@@ -3,12 +3,14 @@
     <div style="left:${left}px;top:${top}px;width:${width}px;" class="flowchart-object ${node_class}" id="${id}">
         <jtk-target port-type="default" scope="${datatype}"></jtk-target>
         <div class="nodeEditBtns pull-right">
-            <a href="#" id="editNodeBtn" id="editNodeBtn" data-node-id="${id}">
-                <i class="fa fa-pencil"></i>
-            </a>
-            <a href="#" class="text-muted" id="deleteNodeBtn" data-node-id="${id}">
-                <i class="fa fa-times-circle"></i>
-            </a>
+            <r-if test="readOnly == false">
+                <a href="#" id="editNodeBtn" id="editNodeBtn" data-node-id="${id}">
+                    <i class="fa fa-pencil"></i>
+                </a>
+                <a href="#" class="text-muted" id="deleteNodeBtn" data-node-id="${id}">
+                    <i class="fa fa-times-circle"></i>
+                </a>
+            </r-if>
         </div>
         <div class="processTitle">
             ${name}
@@ -19,18 +21,15 @@
                 <r-each in="options">
                      <r-tmpl id="option_tmpl"></r-tmpl>
                 </r-each>
-                <li class="add-option form-group">
-                    <input class="form-control input-sm" type="text" id="addOptionInput" placeholder="{{_ "add_option"}}"></input>
-                </li>
+                <r-if test="readOnly == false">
+                    <li class="add-option form-group">
+                        <input class="form-control input-sm" type="text" id="addOptionInput" placeholder="{{_
+        "add_option"}}"></input>
+                    </li>
+                </r-if>
             </ul>
         </div>
   </div>
-
-
-
-
-
-
 
 </script>
 </body>
