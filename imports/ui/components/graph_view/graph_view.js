@@ -11,7 +11,7 @@ import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delet
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
-import {getChartEditingGraphId, getChart} from "/imports/api/charts/methods.js";
+import {getChartEditingGraphId, getChart, canCurrentUserEditChart} from "/imports/api/charts/methods.js";
 import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
@@ -29,9 +29,10 @@ Template.graph_view.onCreated(function () {
     self.graph             = new ReactiveVar(null);
     self.loadingGraph      = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
+    self.canUserEdit = new ReactiveVar(false);
 
     self.jsPlumbToolkit = getJSPlumbInstance(self);
-    jstk = self.jsPlumbToolkit;
+    jstk             = self.jsPlumbToolkit;
 
     if (self.readOnly) {
         getChart.call(self.data[DATA_CHART_ID], function (err, chart) {
@@ -42,6 +43,9 @@ Template.graph_view.onCreated(function () {
         getChartEditingGraphId.call({chartId: self.data[DATA_CHART_ID]}, function (err, editingGraphId) {
             self.graphId = editingGraphId;
             loadGraph(self);
+        });
+        canCurrentUserEditChart.call({chartId: self.data[DATA_CHART_ID]}, function (err, permission) {
+            self.canUserEdit.set(permission);
         });
     }
 });
@@ -103,7 +107,8 @@ Template.graph_view.helpers({
         return "#";
     },
     readOnly: function () {
-        return Template.instance().readOnly;
+        let self = Template.instance();
+        return self.readOnly || !self.canUserEdit.get();
     }
 });
 
