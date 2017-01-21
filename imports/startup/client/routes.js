@@ -10,9 +10,8 @@ import "../../ui/pages/about/about.js";
 import "../../ui/pages/account/account.js";
 import "../../ui/pages/account/logout.js";
 import "/imports/ui/pages/chart/chart.js";
-import {DATA_CHART_ID} from "/imports/ui/pages/chart/chart.js";
+import {DATA_CHART_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
 import "/imports/ui/pages/graph_guide/graph_guide.js";
-import {DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
 import {incrementChartDownload} from "/imports/api/charts/methods.js";
 
 //Routes

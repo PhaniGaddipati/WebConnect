@@ -5,19 +5,17 @@ import {getUserName} from "/imports/api/users/methods.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 import "/imports/ui/pages/graph_guide/graph_guide.js";
-import {DATA_GRAPH_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
-
-export const DATA_CHART_ID = "chartId";
+import {DATA_CHART_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
 
 Template.chart.onCreated(function () {
-    var self          = Template.instance();
+    let self          = Template.instance();
     self.chartId      = self.data[DATA_CHART_ID];
     self.readOnly     = self.data[DATA_READ_ONLY];
     self.chartLoading = new ReactiveVar(true);
     self.chart        = new ReactiveVar(null);
     getChart.call(this.chartId, function (err, chart) {
         self.chart.set(chart);
-        self.chartLoading = new ReactiveVar(false);
+        self.chartLoading.set(false);
     });
 });
 
@@ -41,9 +39,6 @@ Template.chart.helpers({
         return getUserName.call({userId: owner});
     },
     graphParams: function () {
-        let self               = Template.instance();
-        let context            = self.data;
-        context[DATA_GRAPH_ID] = self.chart.get()[Charts.GRAPH_ID];
-        return context;
+        return Template.instance().data;
     }
 });

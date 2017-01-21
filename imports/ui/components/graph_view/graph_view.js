@@ -10,27 +10,43 @@ import "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
+import * as Charts from "/imports/api/charts/charts.js";
+import {getChartEditingGraphId, getChart} from "/imports/api/charts/methods.js";
 import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
-export const DATA_GRAPH_ID  = "graphId";
 export const DATA_READ_ONLY = "readOnly";
+export const DATA_CHART_ID  = "chartId";
 const NODE_FILL             = 0.25;
 
 jstk = null;
 
 Template.graph_view.onCreated(function () {
     let self               = Template.instance();
-    self.graphId           = self.data[DATA_GRAPH_ID];
     self.readOnly          = self.data[DATA_READ_ONLY];
     self.graph             = new ReactiveVar(null);
     self.loadingGraph      = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
 
     self.jsPlumbToolkit = getJSPlumbInstance(self);
-    jstk                   = self.jsPlumbToolkit;
+    jstk = self.jsPlumbToolkit;
+
+    if (self.readOnly) {
+        getChart.call(self.data[DATA_CHART_ID], function (err, chart) {
+            self.graphId = chart[Charts.GRAPH_ID];
+            loadGraph(self);
+        });
+    } else {
+        getChartEditingGraphId.call({chartId: self.data[DATA_CHART_ID]}, function (err, editingGraphId) {
+            self.graphId = editingGraphId;
+            loadGraph(self);
+        });
+    }
+});
+
+function loadGraph(self) {
     GraphUtils.getGraphAsJSPlumb.call(self.graphId, function (err, graph) {
         if (err || !graph) {
             self.errorLoadingGraph.set(true);
@@ -39,9 +55,7 @@ Template.graph_view.onCreated(function () {
         }
         self.loadingGraph.set(false);
     });
-
-
-});
+}
 
 Template.graph_view.onRendered(function () {
     Session.set(SELECTION_NODE_DATA, null);
@@ -196,10 +210,10 @@ Template.graph_view.events({
     },
     "click #newNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
-        let node = GraphUtils.getJSPlumbNodeObject("New Step");
-        let center                             = self.jsplumbRenderer.getViewportCenter();
-        node     = initNodeView(node, center[0], center[1]);
+        let self   = Template.instance();
+        let node   = GraphUtils.getJSPlumbNodeObject("New Step");
+        let center = self.jsplumbRenderer.getViewportCenter();
+        node       = initNodeView(node, center[0], center[1]);
 
         let data                               = {};
         data[EditNodeModal.DATA_NODE]          = node;
