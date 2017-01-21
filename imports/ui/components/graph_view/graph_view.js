@@ -223,6 +223,9 @@ Template.graph_view.events({
         let data                               = {};
         data[EditNodeModal.DATA_NODE]          = node;
         data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
+            // Add the read only attr so the template can display accordingly
+            newNodeData.readOnly = self.readOnly;
+
             self.jsPlumbToolkit.addNode(newNodeData);
             setSelection(self, self.jsPlumbToolkit.getNode(newNodeData[GraphUtils.ID]));
         };
@@ -297,7 +300,7 @@ function loadFlowchart() {
     if (graph) {
         graph = layoutGraph(graph);
 
-        // Add readOnly attr
+        // Add readOnly attr so the template can change based on it
         _.each(graph[Graphs.NODES], function (node) {
             node[DATA_READ_ONLY] = self.readOnly;
         });
