@@ -16,6 +16,14 @@
                 <div id="jsplumbMiniviewContainer"></div>
                 <div>
                     <div class="btn-toolbar" id="jsplumbToolbar">
+                        {{#unless readOnly}}
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-default" id="saveBtn" disabled="{{savingGraph}}"><i
+                                        class="fa fa-save"></i>
+                                    &nbsp;&nbsp;{{_ "save"}}
+                                </a>
+                            </div>
+                        {{/unless}}
                         <div class="btn-group">
                             <a href="#" class="btn btn-default" id="zoomInBtn"><i class="fa fa-plus"></i></a>
                             <a href="#" class="btn {{#if nodesSelection}}btn-info{{else}}btn-default{{/if}}"

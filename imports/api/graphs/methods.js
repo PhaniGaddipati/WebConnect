@@ -5,6 +5,7 @@ import {ValidatedMethod} from "meteor/mdg:validated-method";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
+import {getChart} from "/imports/api/charts/methods.js";
 
 export const NODE_MAP_NODE = "node";
 export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
@@ -91,7 +92,7 @@ export const validateGraph = new ValidatedMethod({
                     }
                 });
                 _.each(virtualNodes, function (vNode) {
-                    let chart = Charts.Charts.findOne({_id: vNode[Graphs.NODE_CHART_ID]});
+                    let chart = getChart.call(vNode[Graphs.NODE_CHART_ID]);
                     if (!chart) {
                         errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
                             + " refers to nonexistant chart " + vNode[Graphs.NODE_CHART_ID]);

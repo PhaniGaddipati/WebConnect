@@ -39,6 +39,8 @@
   "skills": "Skills",
   "edit": "Edit",
   "save_changes": "Save Changes",
+  "save": "Save",
+  "saving": "Saving...",
   "cancel": "Cancel",
   "selected": "selected",
   "failed_load_graph": "Failed to load the graph! Check the URL and try again",

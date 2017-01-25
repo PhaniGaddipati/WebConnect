@@ -1,6 +1,6 @@
 import {Random} from "meteor/random";
 import * as Graphs from "/imports/api/graphs/graphs.js";
-import {validateGraph, getGraph, getNodeEdgeMap} from "/imports/api/graphs/methods.js";
+import {getGraph, getNodeEdgeMap} from "/imports/api/graphs/methods.js";
 
 export const TYPE                 = "type";
 export const ID                   = "id";
@@ -26,7 +26,7 @@ export const EDGE_NODE_SOURCE     = "nodeSource";
  *      - Validating the graph (graphs/methods/validateGraph)
  * @param jgraph graph in JSPlumb format
  */
-export const getJSPlumbAsGraph = function (jgraph) {
+export const getJSPlumbAsGraph = function (jgraph, graphId) {
     let jnodes = jgraph.getNodes();
 
     let owner = Meteor.userId();
@@ -45,12 +45,10 @@ export const getJSPlumbAsGraph = function (jgraph) {
     graph[Graphs.FIRST_NODE] = firstNode;
     graph[Graphs.EDGES]      = edges;
     graph[Graphs.NODES]      = nodes;
+    graph[Graphs.GRAPH_ID] = graphId;
 
-    let error = validateGraph.call(graph);
-    if (!error) {
-        return graph;
-    }
-    throw new Error("The graph was invalid.\n\n" + error);
+    console.log(graph);
+    return graph;
 };
 
 /**
@@ -76,10 +74,10 @@ function getNodesFromJSPlumb(jnodes) {
         _.each(_.keys(jnode.data), function (key) {
             node[key] = jnode.data[key];
         });
-
+        node[Graphs.NODE_ID] = node[ID];
         // Clean the node with the MongoDB Schema
         Graphs.Graphs.schema.nodeSchema.clean(node);
-        node.push(node);
+        nodes.push(node);
     });
 
     return nodes;

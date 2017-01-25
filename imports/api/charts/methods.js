@@ -74,7 +74,6 @@ export const updateChartEditingGraph = new ValidatedMethod({
         }
     },
     run({chartId: chartId, graph:graph}){
-        let userId = Meteor.userId();
         let chart  = getChart.call(chartId);
         if (!chart) {
             return null;

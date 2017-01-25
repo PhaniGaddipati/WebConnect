@@ -11,7 +11,12 @@ import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delet
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
-import {getChartEditingGraphId, getChart, canCurrentUserEditChart} from "/imports/api/charts/methods.js";
+import {
+    getChartEditingGraphId,
+    getChart,
+    canCurrentUserEditChart,
+    updateChartEditingGraph
+} from "/imports/api/charts/methods.js";
 import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
@@ -30,6 +35,7 @@ Template.graph_view.onCreated(function () {
     self.loadingGraph      = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
     self.canUserEdit = new ReactiveVar(false);
+    self.savingGraph = new ReactiveVar(false);
 
     self.jsPlumbToolkit = getJSPlumbInstance(self);
     jstk             = self.jsPlumbToolkit;
@@ -109,6 +115,10 @@ Template.graph_view.helpers({
     readOnly: function () {
         let self = Template.instance();
         return self.readOnly || !self.canUserEdit.get();
+    },
+    savingGraph: function () {
+        let self = Template.instance();
+        return self.savingGraph.get();
     }
 });
 
@@ -231,8 +241,29 @@ Template.graph_view.events({
         };
         Modal.show("edit_node_modal", data);
 
+    },
+    "click #saveBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        onSave(self);
     }
 });
+
+function onSave(self) {
+    self.savingGraph.set(true);
+    let graph = GraphUtils.getJSPlumbAsGraph(self.jsPlumbToolkit.getGraph(), self.graphId);
+    console.log(graph);
+    updateChartEditingGraph.call({
+        chartId: self.data[DATA_CHART_ID],
+        graph: graph
+    }, function (err, res) {
+        if (err) {
+            console.log(err);
+        }
+        console.log(res);
+        self.savingGraph.set(false);
+    });
+}
 
 function onDeleteNode(self, nodeId) {
     let node = self.jsPlumbToolkit.getNode(nodeId);

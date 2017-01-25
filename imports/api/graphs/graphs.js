@@ -118,6 +118,16 @@ Graphs.schema.edgeSchema = new SimpleSchema({
 });
 
 Graphs.schema.graphSchema = new SimpleSchema({
+    _id: {
+        type: String,
+        regEx: SimpleSchema.RegEx.Id,
+        optional: false,
+        autoValue: function () {
+            if (this.isInsert && !this.isSet) {
+                return Random.id();
+            }
+        }
+    },
     owner: {
         type: String,
         regEx: SimpleSchema.RegEx.Id,
