@@ -5,7 +5,11 @@ import {Meteor} from "meteor/meteor";
 import {ValidatedMethod} from "meteor/mdg:validated-method";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {CountryCodes} from "meteor/3stack:country-codes";
+import * as Charts from "/imports/api/charts/charts.js";
 import {Users, PROFILE, PROFILE_NAME} from "./users.js";
+
+export const UPVOTES   = "upvotes";
+export const DOWNVOTES = "downvotes";
 
 const DEFAULT_SEARCH_LIMIT = 10;
 
@@ -105,5 +109,33 @@ export const updateUserProfile = new ValidatedMethod({
             return Users.update({_id: id}, set);
         }
         return null;
+    }
+});
+
+export const getUserVotedCharts = new ValidatedMethod({
+    name: "getUserVotedCharts",
+    validate: new SimpleSchema({
+        userId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        }
+    }).validator(),
+    run({userId:userId}){
+        let results = {};
+
+        let upSelector                     = {};
+        upSelector[Charts.UPVOTED_IDS]     = userId;
+        let downSelector                   = {};
+        downSelector[Charts.DOWNVOTED_IDS] = userId;
+        let fields                         = {};
+        fields[Charts.CHART_ID]            = 1;
+
+        let upResults   = Charts.Charts.find(upSelector, {fields: fields}).fetch();
+        let downResults = Charts.Charts.find(downSelector, {fields: fields}).fetch();
+
+        results[UPVOTES]   = _.pluck(upResults, Charts.CHART_ID);
+        results[DOWNVOTES] = _.pluck(downResults, Charts.CHART_ID);
+
+        return results;
     }
 });

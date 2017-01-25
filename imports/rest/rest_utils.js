@@ -5,25 +5,27 @@
  * returned objects in the REST interface. This maps the mongo
  * objects into the REST format. It is mostly similar with some differences.
  */
-
 import * as Charts from "/imports/api/charts/charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
 import * as Users from "/imports/api/users/users.js";
 import {getGraphWithoutLinks} from "/imports/api/graphs/methods.js";
 import {getAllChartResources, getAllChartUsers} from "/imports/api/charts/methods";
+import {getUserVotedCharts, UPVOTES, DOWNVOTES} from "/imports/api/users/methods.js";
 
 /**
  * Names of the user REST json fields
  */
-export const USER_ID           = "_id";
-export const USER_EMAIL        = "email";
-export const USER_NAME         = "name";
-export const USER_COUNTRY_CODE = "countryCode";
-export const USER_COUNTRY      = "country";
-export const USER_ORGANIZATION = "organization";
-export const USER_EXPERTISES   = "expertises";
-export const USER_PIC          = "pic";
+export const USER_ID               = "_id";
+export const USER_EMAIL            = "email";
+export const USER_NAME             = "name";
+export const USER_COUNTRY_CODE     = "countryCode";
+export const USER_COUNTRY          = "country";
+export const USER_ORGANIZATION     = "organization";
+export const USER_EXPERTISES       = "expertises";
+export const USER_PIC              = "pic";
+export const USER_UPVOTED_CHARTS   = "upCharts";
+export const USER_DOWNVOTED_CHARTS = "downCharts";
 
 /**
  * Names of the flowchart REST json fields.
@@ -82,6 +84,11 @@ export const formatUserForREST = function (rawUser) {
     user[USER_ORGANIZATION] = rawUser[Users.PROFILE][Users.PROFILE_ORGANIZATION];
     user[USER_EXPERTISES]   = rawUser[Users.PROFILE][Users.PROFILE_EXPERTISES];
     user[USER_PIC]          = rawUser[Users.PROFILE][Users.PROFILE_PIC];
+
+    let votes               = getUserVotedCharts.call({userId: rawUser[Users.USER_ID]});
+    user[USER_UPVOTED_CHARTS] = votes[UPVOTES];
+    user[USER_DOWNVOTED_CHARTS] = votes[DOWNVOTES];
+
     return user;
 };
 
