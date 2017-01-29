@@ -255,6 +255,8 @@ export const getAllChartUsers = new ValidatedMethod({
 /**
  * Updates a user's feedback on a chart as an upvote or a downvote.
  * If feedback is true, then any downvote is removed and an upvote is marked.
+ * If clear (optional) is true, then any feedback by the user is removed. In this
+ * case, feedback is ignored.
  *
  * Returns whether the operation was successful
  */
@@ -272,20 +274,31 @@ export const updateUserChartFeedback = new ValidatedMethod({
         feedback: {
             type: Boolean,
             optional: false
+        },
+        clear: {
+            type: Boolean,
+            optional: true
         }
     }).validator(),
-    run({chartId:chartId, userId:userId, feedback:feedback}){
-        let selector = {};
+    run({chartId:chartId, userId:userId, feedback:feedback, clear:clear}){
         let addToSet = {};
         let pop      = {};
 
-        selector[Charts.CHART_ID]                                      = chartId;
-        addToSet[feedback ? Charts.UPVOTED_IDS : Charts.DOWNVOTED_IDS] = userId;
-        pop[feedback ? Charts.DOWNVOTED_IDS : Charts.UPVOTED_IDS]      = userId;
+        if (clear) {
+            pop[Charts.DOWNVOTED_IDS] = userId;
+            pop[Charts.UPVOTED_IDS]   = userId;
+            Charts.Charts.update({_id: chartId}, {
+                $pop: pop
+            });
+            return true;
+        } else {
+            addToSet[feedback ? Charts.UPVOTED_IDS : Charts.DOWNVOTED_IDS] = userId;
+            pop[feedback ? Charts.DOWNVOTED_IDS : Charts.UPVOTED_IDS]      = userId;
 
-        return Charts.Charts.update({_id: chartId}, {
-                $pop: pop,
-                $addToSet: addToSet
-            }) > 0;
+            return Charts.Charts.update({_id: chartId}, {
+                    $pop: pop,
+                    $addToSet: addToSet
+                }) > 0;
+        }
     }
 });

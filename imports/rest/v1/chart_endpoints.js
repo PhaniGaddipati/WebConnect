@@ -300,12 +300,18 @@ RestAPI.addRoute("chart/:id/feedback", {authRequired: true}, {
     post: function () {
         let chartId  = this.urlParams.id;
         let feedback = this.bodyParams.feedback == "true";
+        let clear = !!this.bodyParams.clear;
         console.log("POST chart/" + chartId + "/feedback");
 
         let response = {};
 
         if (this.userId) {
-            let res = updateUserChartFeedback.call({chartId: chartId, userId: this.userId, feedback: feedback});
+            let res = updateUserChartFeedback.call({
+                chartId: chartId,
+                userId: this.userId,
+                feedback: feedback,
+                clear: clear
+            });
             if (res) {
                 response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
                 response[RESPONSE_DATA]   = {
