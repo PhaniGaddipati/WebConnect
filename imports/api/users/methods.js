@@ -94,21 +94,18 @@ export const updateUserProfile = new ValidatedMethod({
     }),
     run({user}){
         let id = user._id;
-        if (id == Meteor.userId()) {
-            delete user._id;
-            let profile = {};
-            _.each(user, function (val, key) {
-                if (key === "countryCode") {
-                    profile["profile.country.code"] = val;
-                    profile["profile.country.name"] = CountryCodes.countryName(val);
-                } else {
-                    profile["profile." + key] = val;
-                }
-            });
-            let set = {$set: profile};
-            return Users.update({_id: id}, set);
-        }
-        return null;
+        delete user._id;
+        let profile = {};
+        _.each(user, function (val, key) {
+            if (key === "countryCode") {
+                profile["profile.country.code"] = val;
+                profile["profile.country.name"] = CountryCodes.countryName(val);
+            } else {
+                profile["profile." + key] = val;
+            }
+        });
+        let set = {$set: profile};
+        return Users.update({_id: id}, set);
     }
 });
 
