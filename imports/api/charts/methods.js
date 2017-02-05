@@ -68,10 +68,7 @@ export const updateChartEditingGraph = new ValidatedMethod({
         Graphs.Graphs.schema.graphSchema.validate(graph);
 
         // Now do our own integrity validation
-        let error = validateGraph.call(graph);
-        if (error) {
-            throw new Error("Graph is not valid:\n" + error);
-        }
+        validateGraph.call(graph);
     },
     run({chartId: chartId, graph:graph}){
         let chart  = getChart.call(chartId);

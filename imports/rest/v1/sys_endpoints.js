@@ -54,18 +54,20 @@ RestAPI.addRoute("sys/graph/validate", {
         if (!graph) {
             graph = flowchart[Charts.GRAPH_ID];
         }
-        let error = validateGraph.call(graph);
-        let valid = false;
-        if (!error) {
-            valid = true;
-            error = "";
+        try {
+            validateGraph.call(graph);
+            response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+            response[RESPONSE_DATA]   = {
+                valid: valid,
+                errors: []
+            };
+        } catch (err) {
+            response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
+            response[RESPONSE_DATA]   = {
+                valid: false,
+                errors: err
+            };
         }
-
-        response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
-        response[RESPONSE_DATA]   = {
-            valid: valid,
-            errors: error
-        };
         return response;
     }
 });
@@ -117,8 +119,10 @@ RestAPI.addRoute("sys/chart", {authRequired: true}, {
                 }
             }
 
-            let error = validateGraph.call(graph);
-            if (error) {
+            try {
+                validateGraph.call(graph);
+            }
+            catch (err) {
                 //Failed :(
                 response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
                 response[RESPONSE_MESSAGE] = error;

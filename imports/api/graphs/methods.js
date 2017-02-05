@@ -2,12 +2,13 @@
  * Created by Phani on 7/24/2016.
  */
 import {ValidatedMethod} from "meteor/mdg:validated-method";
+import {ValidationError} from "meteor/mdg:validation-error";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {getChart} from "/imports/api/charts/methods.js";
 
-export const NODE_MAP_NODE = "node";
+export const NODE_MAP_NODE       = "node";
 export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
 export const NODE_MAP_OUTGOING_EDGES = "outgoingEdges";
 export const NODE_MAP_IS_VIRTUAL = "isVirtual";
@@ -18,56 +19,71 @@ export const NODE_MAP_IS_VIRTUAL = "isVirtual";
  *    2) edges point to existing nodes
  *    3) objects match schema
  *
- * Returns null on successful validation, or error messages on failure
+ * Returns true on successful validation, or throws a ValidationError on failure
  */
 export const validateGraph = new ValidatedMethod({
     name: "graphs.validateGraph",
     validate: function (g) {
-    },
-    run(g){
-        let valid = true;
-        let errorMsgs = "";
+        let errors = [];
         try {
             let gId = g[Graphs.GRAPH_ID];
             if (!gId) {
-                gId = "<no id>";
-                errorMsgs = errorMsgs.concat("\nmissing _id field");
-                valid = false;
+                errors.push({
+                    name: Graphs.GRAPH_ID,
+                    type: "missing-field"
+                });
             }
             if (!g[Graphs.NODES]) {
-                errorMsgs = errorMsgs.concat("\nmissing nodes field");
-                valid = false;
+                errors.push({
+                    name: Graphs.NODES,
+                    type: "missing-field",
+                    message: "The graph's nodes field is missing"
+                });
             } else {
+                let nodeSchemaContext = Graphs.Graphs.schema.nodeSchema.newContext();
                 _.each(g[Graphs.NODES], function (node) {
-                    if (!Graphs.Graphs.schema.nodeSchema.newContext().validate(
-                            Graphs.Graphs.schema.nodeSchema.clean(node))) {
-                        errorMsgs = errorMsgs.concat("\ninvalid node "
-                            + ((!!node[Graphs.NODE_ID]) ? node[Graphs.NODE_ID] : ""));
-                        valid = false;
+                    let cleanedNode = Graphs.Graphs.schema.nodeSchema.clean(node);
+                    if (!nodeSchemaContext.validate(cleanedNode)) {
+                        errors.push({
+                            name: Graphs.NODES,
+                            type: "invalid-node",
+                            source: node[Graphs.NODE_ID],
+                            value: cleanedNode
+                        });
                     }
                 });
             }
             if (!g[Graphs.EDGES]) {
-                console.concat("\nmissing edges field");
-                valid = false;
+                errors.push({
+                    name: Graphs.EDGES,
+                    type: "missing-field",
+                    message: "The graph's edges field is missing"
+                });
             } else {
+                let edgeSchemaContext = Graphs.Graphs.schema.edgeSchema;
                 _.each(g[Graphs.EDGES], function (edge) {
-                    if (!Graphs.Graphs.schema.edgeSchema.newContext().validate(
-                            Graphs.Graphs.schema.edgeSchema.clean(edge))) {
-                        errorMsgs = errorMsgs.concat("\ninvalid edge "
-                            + (edge[Graphs.EDGE_ID] ? edge[Graphs.EDGE_ID] : ""));
-                        valid = false;
+                    let cleanedEdge = Graphs.Graphs.schema.edgeSchema.clean(edge);
+                    if (!edgeSchemaContext.newContext().validate(cleanedEdge)) {
+                        errors.push({
+                            name: Graphs.EDGES,
+                            type: "invalid-edge",
+                            source: edge[Graphs.EDGE_ID],
+                            value: cleanedEdge
+                        });
                     }
                 });
             }
             if (!g[Graphs.FIRST_NODE]) {
-                errorMsgs = errorMsgs.concat("\nmissing firstNode field");
-                valid = false;
+                errors.push({
+                    name: Graphs.FIRST_NODE,
+                    type: "missing-field",
+                    message: "The graph's firstNode field is missing"
+                });
             }
 
-            if (valid) {
+            if (errors.length == 0) {
                 // Check edges only if the rest is good
-                let nodeMap = {};
+                let nodeMap      = {};
                 let virtualNodes = [];
                 _.each(g[Graphs.NODES], function (node) {
                     nodeMap[node[Graphs.NODE_ID]] = true;
@@ -76,46 +92,71 @@ export const validateGraph = new ValidatedMethod({
                     }
                 });
                 if (!nodeMap[g[Graphs.FIRST_NODE]]) {
-                    errorMsgs = errorMsgs.concat("\nfirstNode " + g[Graphs.FIRST_NODE] + " doesn't exist");
-                    valid = false;
+                    errors.push({
+                        name: Graphs.FIRST_NODE,
+                        type: "missing-node",
+                        value: g[Graphs.FIRST_NODE],
+                        message: "The graph's firstNode does not exist"
+                    });
                 }
                 _.each(g[Graphs.EDGES], function (edge) {
                     if (!nodeMap[edge[Graphs.EDGE_SOURCE]]) {
-                        errorMsgs = errorMsgs.concat("\nedge " + edge[Graphs.EDGE_ID]
-                            + " source " + edge[Graphs.EDGE_SOURCE] + " doesn't exist");
-                        valid = false;
+                        errors.push({
+                            name: Graphs.EDGE_SOURCE,
+                            type: "missing-node",
+                            source: edge[Graphs.EDGE_ID],
+                            value: edge[Graphs.EDGE_SOURCE],
+                            message: "Edge source is missing"
+                        });
                     }
                     if (!nodeMap[edge[Graphs.EDGE_TARGET]]) {
-                        errorMsgs = errorMsgs.concat("\nedge " + edge[Graphs.EDGE_ID]
-                            + " target " + edge[Graphs.EDGE_TARGET] + " doesn't exist");
-                        valid = false;
+                        errors.push({
+                            name: Graphs.EDGE_TARGET,
+                            type: "missing-node",
+                            source: edge[Graphs.EDGE_ID],
+                            value: edge[Graphs.EDGE_TARGET],
+                            message: "Edge target is missing"
+                        });
                     }
                 });
                 _.each(virtualNodes, function (vNode) {
                     let chart = getChart.call(vNode[Graphs.NODE_CHART_ID]);
                     if (!chart) {
-                        errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
-                            + " refers to nonexistant chart " + vNode[Graphs.NODE_CHART_ID]);
-                        valid     = false;
+                        errors.push({
+                            name: Graphs.NODE_CHART_ID,
+                            type: "missing-chart",
+                            source: vNode[Graphs.NODE_ID],
+                            value: vNode[Graphs.NODE_CHART_ID],
+                            message: "Virtual node references non-existent chart"
+                        });
                     } else {
                         if (!Graphs.Graphs.findOne(chart[Charts.GRAPH_ID])) {
                             // Virtual node's graph doesn't exist
-                            errorMsgs = errorMsgs.concat("\nVirtual node " + vNode[Graphs.NODE_ID]
-                                + " refers to chart " + vNode[Graphs.NODE_CHART_ID] + " with non-existant graph " + chart[Charts.GRAPH_ID]);
-                            valid     = false;
+                            errors.push({
+                                name: Graphs.NODE_CHART_ID,
+                                type: "missing-graph",
+                                source: vNode[Graphs.NODE_ID],
+                                value: chart[Charts.GRAPH_ID],
+                                message: "Virtual node references a chart with non-existent graph"
+                            });
                         }
                     }
                 });
             }
         } catch (err) {
-            errorMsgs = errorMsgs.concat("\nunexpected error");
-            errorMsgs = errorMsgs.concat(err);
-            valid     = false;
+            errors.push({
+                name: "unknown",
+                type: "unknown",
+                value: err,
+                message: "An unknown error occured during validation"
+            });
         }
-        if (valid) {
-            return null;
+        if (errors.length > 0) {
+            throw new ValidationError(errors);
         }
-        return errorMsgs;
+    },
+    run(g){
+        return true;
     }
 });
 
@@ -195,7 +236,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                     let vNodeOutEdges = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges;
                     let subChartId = vNode[Graphs.NODE_CHART_ID];
                     let subGraphId = Charts.Charts.findOne({_id: subChartId})[Charts.GRAPH_ID];
-                    let subGraph = getGraphWithoutLinks.call(subGraphId);
+                    let subGraph   = getGraphWithoutLinks.call(subGraphId);
 
                     if (!subGraph) {
                         // Couldn't find subgraph. Ignore it by skipping the virtual node
@@ -218,7 +259,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                                 // Terminating edge, link to outgoing edges of the virtual node
                                 _.each(vNodeOutEdges, function (outEdge) {
                                     // Make a new edge incase there's more than 1 terminating node
-                                    let edge = outEdge;
+                                    let edge                 = outEdge;
                                     edge[Graphs.EDGE_SOURCE] = sgEdge[Graphs.EDGE_SOURCE];
                                     newEdges.push(edge);
                                 });
