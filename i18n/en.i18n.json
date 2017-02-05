@@ -62,5 +62,7 @@
   "add_image": "Add Image URL",
   "is_first_node": "Is this step first?",
   "upload_images": "Upload Images",
-  "upload_resource": "Upload PDFs"
+  "upload_resource": "Upload PDFs",
+  "view_guide": "View Guide",
+  "edit_guide": "Edit Guide"
 }
