@@ -252,15 +252,14 @@ Template.graph_view.events({
 function onSave(self) {
     self.savingGraph.set(true);
     let graph = GraphUtils.getJSPlumbAsGraph(self.jsPlumbToolkit.getGraph(), self.graphId);
-    console.log(graph);
     updateChartEditingGraph.call({
         chartId: self.data[DATA_CHART_ID],
         graph: graph
     }, function (err, res) {
         if (err) {
+            // TODO show errors
             console.log(err);
         }
-        console.log(res);
         self.savingGraph.set(false);
     });
 }

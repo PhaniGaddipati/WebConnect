@@ -6,7 +6,6 @@ import {ValidationError} from "meteor/mdg:validation-error";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
-import {getChart} from "/imports/api/charts/methods.js";
 
 export const NODE_MAP_NODE       = "node";
 export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
@@ -15,9 +14,8 @@ export const NODE_MAP_IS_VIRTUAL = "isVirtual";
 
 /**
  * Checks that a graph is well formed. This includes:
- *    1) subgraphs exist
- *    2) edges point to existing nodes
- *    3) objects match schema
+ *    1) edges point to existing nodes
+ *    2) objects match schema
  *
  * Returns true on successful validation, or throws a ValidationError on failure
  */
@@ -84,12 +82,8 @@ export const validateGraph = new ValidatedMethod({
             if (errors.length == 0) {
                 // Check edges only if the rest is good
                 let nodeMap      = {};
-                let virtualNodes = [];
                 _.each(g[Graphs.NODES], function (node) {
                     nodeMap[node[Graphs.NODE_ID]] = true;
-                    if (node[Graphs.NODE_CHART_ID]) {
-                        virtualNodes.push(node);
-                    }
                 });
                 if (!nodeMap[g[Graphs.FIRST_NODE]]) {
                     errors.push({
@@ -117,29 +111,6 @@ export const validateGraph = new ValidatedMethod({
                             value: edge[Graphs.EDGE_TARGET],
                             message: "Edge target is missing"
                         });
-                    }
-                });
-                _.each(virtualNodes, function (vNode) {
-                    let chart = getChart.call(vNode[Graphs.NODE_CHART_ID]);
-                    if (!chart) {
-                        errors.push({
-                            name: Graphs.NODE_CHART_ID,
-                            type: "missing-chart",
-                            source: vNode[Graphs.NODE_ID],
-                            value: vNode[Graphs.NODE_CHART_ID],
-                            message: "Virtual node references non-existent chart"
-                        });
-                    } else {
-                        if (!Graphs.Graphs.findOne(chart[Charts.GRAPH_ID])) {
-                            // Virtual node's graph doesn't exist
-                            errors.push({
-                                name: Graphs.NODE_CHART_ID,
-                                type: "missing-graph",
-                                source: vNode[Graphs.NODE_ID],
-                                value: chart[Charts.GRAPH_ID],
-                                message: "Virtual node references a chart with non-existent graph"
-                            });
-                        }
                     }
                 });
             }

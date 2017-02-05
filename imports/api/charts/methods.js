@@ -71,7 +71,7 @@ export const updateChartEditingGraph = new ValidatedMethod({
         validateGraph.call(graph);
     },
     run({chartId: chartId, graph:graph}){
-        let chart  = getChart.call(chartId);
+        let chart = getChart.call(chartId);
         if (!chart) {
             return null;
         }
@@ -82,8 +82,14 @@ export const updateChartEditingGraph = new ValidatedMethod({
         // Make sure no one is trying to edit the owner
         graph[Graphs.OWNER] = chart[Charts.OWNER];
 
+        // ID can't change
+        let graphId = graph[Graphs.GRAPH_ID];
+        delete graph[Graphs.GRAPH_ID];
+
         // We good, update the graph
-        return Graphs.Graphs.update({_id: graph[Graphs.GRAPH_ID]}, graph);
+        // Bypass validation since it's already done, and SimpleSchema doesn't support whole-document updates
+        // See https://github.com/aldeed/meteor-simple-schema/issues/175
+        return Graphs.Graphs.update({_id: graphId}, graph, {bypassCollection2: true});
     }
 });
 

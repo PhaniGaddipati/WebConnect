@@ -47,7 +47,6 @@ export const getJSPlumbAsGraph = function (jgraph, graphId) {
     graph[Graphs.NODES]      = nodes;
     graph[Graphs.GRAPH_ID] = graphId;
 
-    console.log(graph);
     return graph;
 };
 
