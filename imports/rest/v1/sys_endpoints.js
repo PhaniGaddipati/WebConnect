@@ -65,7 +65,7 @@ RestAPI.addRoute("sys/graph/validate", {
             response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
             response[RESPONSE_DATA]   = {
                 valid: false,
-                errors: err
+                errors: err.details
             };
         }
         return response;
