@@ -40,5 +40,8 @@ Template.chart.helpers({
     },
     graphParams: function () {
         return Template.instance().data;
+    },
+    readOnly: function () {
+        return Template.instance().readOnly;
     }
 });
