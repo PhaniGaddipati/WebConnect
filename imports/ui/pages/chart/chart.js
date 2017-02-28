@@ -53,5 +53,8 @@ Template.chart.helpers({
     },
     canEdit: function () {
         return Template.instance().canEdit.get();
+    },
+    editUrl: function () {
+        return FlowRouter.current().path + "/edit";
     }
 });
