@@ -16,6 +16,7 @@ export const NODE_MAP_IS_VIRTUAL = "isVirtual";
  * Checks that a graph is well formed. This includes:
  *    1) edges point to existing nodes
  *    2) objects match schema
+ *    3) every node, except for the first node or terminating nodes, is a target of at least 1 edge
  *
  * Returns true on successful validation, or throws a ValidationError on failure
  */
@@ -81,7 +82,7 @@ export const validateGraph = new ValidatedMethod({
 
             if (errors.length == 0) {
                 // Check edges only if the rest is good
-                let nodeMap      = {};
+                let nodeMap = {}; // Map of existing nodes
                 _.each(g[Graphs.NODES], function (node) {
                     nodeMap[node[Graphs.NODE_ID]] = true;
                 });
@@ -111,6 +112,23 @@ export const validateGraph = new ValidatedMethod({
                             value: edge[Graphs.EDGE_TARGET],
                             message: "Edge target is missing"
                         });
+                    }
+                });
+
+                // Now we check #3, that every node has an incoming edge
+                let nodeEdgeMap = getNodeEdgeMap(g);
+                _.each(g[Graphs.NODES], function (node) {
+                    // Don't check the first node
+                    if (node[Graphs.NODE_ID] !== g[Graphs.FIRST_NODE]) {
+                        if (nodeEdgeMap[node[Graphs.NODE_ID]][NODE_MAP_INCOMING_EDGES].length < 1) {
+                            // This node doesn't have an incoming edge
+                            errors.push({
+                                name: Graphs.EDGE_SOURCE,
+                                type: "unreferenced-node",
+                                source: node[Graphs.NODE_ID],
+                                message: "Node does not have any incoming edges"
+                            });
+                        }
                     }
                 });
             }
