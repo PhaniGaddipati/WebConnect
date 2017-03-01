@@ -1,0 +1,24 @@
+<template name="invalid_graph_modal">
+    <div class="modal fade" id="invalidGraphModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3>{{_ "invalid_chart"}}</h3>
+                    {{_ "invalid_chart_msg"}}
+                    <br>
+                    <ul>
+                        <li>{{_ "invalid_chart_pt_1"}}</li>
+                        <li>{{_ "invalid_chart_pt_2"}}</li>
+                        <li>{{_ "invalid_chart_pt_3"}}</li>
+                    </ul>
+                    <br/><br/>
+                    <form>
+                        <div class="form-group">
+                            <a class="btn btn-primary" id="continueEditingBtn">{{_ "continue_editing"}}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -6,6 +6,7 @@ import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import "/imports/ui/components/graph_view/modals/delete_node_modal.js";
+import "/imports/ui/components/graph_view/modals/invalid_graph_modal.js";
 import "/imports/ui/components/graph_view/modals/edit_node_modal.js";
 import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
@@ -257,8 +258,8 @@ function onSave(self) {
         graph: graph
     }, function (err, res) {
         if (err) {
-            // TODO show errors
             console.log(err);
+            Modal.show("invalid_graph_modal");
         }
         self.savingGraph.set(false);
     });
