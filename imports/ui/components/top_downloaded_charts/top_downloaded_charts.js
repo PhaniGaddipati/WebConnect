@@ -2,8 +2,8 @@ import "./top_downloaded_charts.html";
 import "/imports/ui/components/app_loading/app_loading.js";
 import * as Charts from "/imports/api/charts/charts.js";
 
-const NUM_TOP_CHARTS = 5;
-const MAX_DESC_LEN = 100;
+const NUM_TOP_CHARTS = 20;
+const MAX_DESC_LEN   = 100;
 
 Template.top_downloaded_charts.onCreated(function () {
     this.subscribe("topCharts", NUM_TOP_CHARTS);
@@ -32,7 +32,7 @@ Template.top_downloaded_charts.helpers({
         let desc = chart[Charts.DESCRIPTION];
         desc = desc.length > MAX_DESC_LEN ? (desc.substring(0, MAX_DESC_LEN)) : desc;
         desc = desc.substr(0, Math.min(desc.length, desc.lastIndexOf(" ")));
-        if (desc.length < chart[Charts.DESCRIPTION].length) {
+        if (MAX_DESC_LEN < chart[Charts.DESCRIPTION].length) {
             desc = desc + "\xa0.\xa0.\xa0.";
         }
         return desc;
