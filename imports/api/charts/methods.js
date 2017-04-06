@@ -93,6 +93,41 @@ export const updateChartEditingGraph = new ValidatedMethod({
     }
 });
 
+
+/**
+ * If there's an editing graph, publish it as the live graph.
+ * This results in a new graphId and a null editingGraph.
+ * Returns the result of the update or false if the chart isn't found
+ * or it doesn't have an editingGraph.
+ */
+export const publishEditingGraph = new ValidatedMethod({
+    name: "publishEditingGraph",
+    validate: new SimpleSchema({
+        chartId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        }
+    }).validator(),
+    run({chartId: chartId}){
+        let chart = getChart.call(chartId);
+        if (!chart) {
+            return false;
+        }
+        let editingGraphId = chart[Charts.EDITING_GRAPH_ID];
+        if (!editingGraphId) {
+            return false;
+        }
+        let mod = {
+            $set: {},
+            $unset: {}
+        };
+
+        mod["$set"][Charts.GRAPH_ID]           = editingGraphId;
+        mod["$unset"][Charts.EDITING_GRAPH_ID] = "";
+        return Charts.Charts.update({_id: chartId}, mod);
+    }
+});
+
 /**
  * Inserts a new chart into the database, given the name and description.
  * A graph is created and associated with the chart automatically.
