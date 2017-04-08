@@ -125,7 +125,7 @@ RestAPI.addRoute("sys/chart", {authRequired: true}, {
             catch (err) {
                 //Failed :(
                 response[RESPONSE_STATUS]  = RESPONSE_STATUS_ERROR;
-                response[RESPONSE_MESSAGE] = error;
+                response[RESPONSE_MESSAGE] = err;
                 return {
                     statusCode: 400,
                     body: response
