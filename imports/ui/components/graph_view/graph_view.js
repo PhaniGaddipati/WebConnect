@@ -8,16 +8,17 @@ import "/imports/ui/components/graph_view/graph_view.html";
 import "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import "/imports/ui/components/graph_view/modals/invalid_graph_modal.js";
 import "/imports/ui/components/graph_view/modals/edit_node_modal.js";
+import "/imports/ui/components/graph_view/modals/publish_graph_modal.js";
 import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
+import * as PublishGraphModal from "/imports/ui/components/graph_view/modals/publish_graph_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {
     getChartEditingGraphId,
     getChart,
     canCurrentUserEditChart,
-    updateChartEditingGraph,
-    publishEditingGraph
+    updateChartEditingGraph
 } from "/imports/api/charts/methods.js";
 import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
@@ -268,15 +269,9 @@ function onSaveAndPublish(self) {
             console.log(err);
             Modal.show("invalid_graph_modal");
         } else {
-            publishEditingGraph.call({chartId: self.data[DATA_CHART_ID]}, function (err, res) {
-                if (err) {
-                    console.log(err);
-                    // TODO show user
-                } else {
-                    console.log("Succesfully published graph");
-                    location.reload();
-                }
-            });
+            let data                              = {};
+            data[PublishGraphModal.DATA_CHART_ID] = self.data[DATA_CHART_ID];
+            Modal.show("publish_graph_modal", data);
         }
         self.savingGraph.set(false);
     });

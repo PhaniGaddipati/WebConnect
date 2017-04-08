@@ -106,9 +106,12 @@ export const publishEditingGraph = new ValidatedMethod({
         chartId: {
             type: String,
             regEx: SimpleSchema.RegEx.Id
-        }
+        },
+        comments: {
+            type: String
+        },
     }).validator(),
-    run({chartId: chartId}){
+    run({chartId: chartId, comments:comments}){
         let chart = getChart.call(chartId);
         if (!chart) {
             return false;
@@ -118,26 +121,22 @@ export const publishEditingGraph = new ValidatedMethod({
         if (!editingGraphId) {
             return false;
         }
+
+        // TODO add version support
+        updateChartGraphWithHistory.call({
+            chartId: chartId,
+            graphId: editingGraphId,
+            version: chart[Charts.VERSION],
+            comments: comments
+        });
+
         let mod = {
-            $set: {},
             $unset: {}
         };
 
-        mod["$set"][Charts.GRAPH_ID]           = editingGraphId;
+        // Remove the editing graph
         mod["$unset"][Charts.EDITING_GRAPH_ID] = "";
-
-        let ret = Charts.Charts.update({_id: chartId}, mod);
-
-        if (ret > 0) {
-            // Mark the old graph as such
-            let mod                               = {
-                $set: {}
-            };
-            mod["$set"][Graphs.GRAPH_OLD]         = true;
-            mod["$set"][Graphs.GRAPH_REPLACED_BY] = editingGraphId;
-            Graphs.Graphs.update({_id: oldGraphId}, mod);
-        }
-        return ret;
+        return Charts.Charts.update({_id: chartId}, mod);
     }
 });
 
@@ -285,7 +284,7 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
             throw new Meteor.Error("charts.updateChartGraphWithHistory.badIds",
                 "The supplied chart or graph ID were not found");
         }
-        if (isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
+        if (!canCurrentUserEditChart.call({chartId: chart[Charts.CHART_ID]})) {
             // Someone is up to no good...
             throw new Meteor.Error("charts.updateChartGraphWithHistory.accessDenied",
                 "The current user is not allowed to do this.");
@@ -296,6 +295,7 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
         hist[Charts.GRAPH_HIST_GRAPH_ID] = chart[Charts.GRAPH_ID];
         hist[Charts.GRAPH_HIST_COMMENTS] = params.comments;
         hist[Charts.GRAPH_HIST_USER_ID]  = userId;
+        hist[Charts.GRAPH_HIST_DATE] = new Date();
         // Add the history entry
         let
             push                         = {};

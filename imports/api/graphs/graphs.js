@@ -24,8 +24,6 @@ export const EDGE_NAME         = "name";
 export const EDGE_SOURCE       = "source";
 export const EDGE_TARGET       = "target";
 export const EDGE_DETAILS      = "details";
-export const GRAPH_OLD         = "graphOld";
-export const GRAPH_REPLACED_BY = "replacedBy";
 
 export const Graphs = new Mongo.Collection("graphs");
 

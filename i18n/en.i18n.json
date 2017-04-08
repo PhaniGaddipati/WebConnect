@@ -72,5 +72,8 @@
   "invalid_chart_pt_3": "A step is selected as the first step and is green",
   "continue_editing": "Continue Editing",
   "add_step": "Add Step",
-  "publish": "Publish"
+  "publish": "Publish",
+  "publish_graph": "Publish Guide",
+  "version": "Version",
+  "comments": "Comments"
 }

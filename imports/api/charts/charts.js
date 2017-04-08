@@ -24,6 +24,7 @@ export const GRAPH_HIST_VERSION  = "version";
 export const GRAPH_HIST_GRAPH_ID = "graphId";
 export const GRAPH_HIST_COMMENTS = "comments";
 export const GRAPH_HIST_USER_ID  = "userId";
+export const GRAPH_HIST_DATE  = "date";
 export const COMMENTS            = "comments";
 export const RESOURCES           = "resources";
 export const IMAGE               = "image";
@@ -63,23 +64,14 @@ Charts.graphHistSchema = new SimpleSchema({
         optional: false,
         regEx: /\d+(\.\d+)+/
     },
-    graph: {
+    graphId: {
         type: String,
         optional: false,
         regEx: SimpleSchema.RegEx.Id
     },
     date: {
         type: Date,
-        optional: false,
-        autoValue: function () {
-            if (this.isInsert) {
-                return new Date();
-            } else if (this.isUpsert) {
-                return {$setOnInsert: new Date()};
-            } else {
-                this.unset();  // Prevent user from supplying their own value
-            }
-        }
+        optional: false
     },
     comments: {
         type: String,
