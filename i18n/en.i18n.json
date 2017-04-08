@@ -39,6 +39,8 @@
   "skills": "Skills",
   "edit": "Edit",
   "save_changes": "Save Changes",
+  "save": "Save",
+  "saving": "Saving...",
   "cancel": "Cancel",
   "selected": "selected",
   "failed_load_graph": "Failed to load the graph! Check the URL and try again",
@@ -60,5 +62,18 @@
   "add_image": "Add Image URL",
   "is_first_node": "Is this step first?",
   "upload_images": "Upload Images",
-  "upload_resource": "Upload PDFs"
+  "upload_resource": "Upload PDFs",
+  "view_guide": "View Guide",
+  "edit_guide": "Edit Guide",
+  "invalid_chart": "Invalid Chart",
+  "invalid_chart_msg": "The guide couldn't be saved! Please check that the guide meets all of the below requirements and try to save again.",
+  "invalid_chart_pt_1": "All steps have are not red and have an incoming edge",
+  "invalid_chart_pt_2": "All steps have an outgoing edge",
+  "invalid_chart_pt_3": "A step is selected as the first step and is green",
+  "continue_editing": "Continue Editing",
+  "add_step": "Add Step",
+  "publish": "Publish",
+  "publish_graph": "Publish Guide",
+  "version": "Version",
+  "comments": "Comments"
 }

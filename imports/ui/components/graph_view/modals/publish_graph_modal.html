@@ -1,0 +1,24 @@
+<template name="publish_graph_modal">
+    <div class="modal fade" id="publishGraphModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3>{{_ "publish_graph"}}</h3>
+                    <form>
+                        <div class="form-group">
+                            <label class="control-label" for="commentsField">{{_ "comments"}}</label>
+                            <input type="text" class="form-control" id="commentsField"/>
+                        </div>
+                        <div class="form-group pull-right">
+                            <a class="btn btn-default" id="cancelModalBtn">{{_ "cancel"}}</a>
+                            <a class="btn btn-primary" id="publishBtn">{{_ "publish"}}</a>
+                        </div>
+                        <br>
+                        <br>
+                        <br>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

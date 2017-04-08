@@ -6,8 +6,6 @@ import "/imports/ui/components/guide_view/guide_view.js";
 
 Template.graph_guide.helpers({
     graphParams: function () {
-        return {
-            graphId: Template.instance().data.graphId
-        };
+        return Template.instance().data;
     }
 });

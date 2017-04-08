@@ -6,28 +6,60 @@ import "/imports/ui/components/graph_view/templates/terminator_node.html";
 import "/imports/ui/components/graph_view/templates/process_node.html";
 import "/imports/ui/components/graph_view/graph_view.html";
 import "/imports/ui/components/graph_view/modals/delete_node_modal.js";
+import "/imports/ui/components/graph_view/modals/invalid_graph_modal.js";
 import "/imports/ui/components/graph_view/modals/edit_node_modal.js";
+import "/imports/ui/components/graph_view/modals/publish_graph_modal.js";
 import * as DeleteNodeModal from "/imports/ui/components/graph_view/modals/delete_node_modal.js";
 import * as EditNodeModal from "/imports/ui/components/graph_view/modals/edit_node_modal.js";
+import * as PublishGraphModal from "/imports/ui/components/graph_view/modals/publish_graph_modal.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
+import * as Charts from "/imports/api/charts/charts.js";
+import {
+    getChartEditingGraphId,
+    getChart,
+    canCurrentUserEditChart,
+    updateChartEditingGraph
+} from "/imports/api/charts/methods.js";
 import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
 import {SELECTED_OPTION_ID} from "/imports/ui/components/guide_view/guide_view.js";
 
 export const SELECTION_NODE_DATA = "graph_selection_nodeid";
-const NODE_FILL = 0.25;
+export const DATA_READ_ONLY = "readOnly";
+export const DATA_CHART_ID  = "chartId";
+const NODE_FILL             = 0.25;
 
 jstk = null;
 
 Template.graph_view.onCreated(function () {
-    let self = Template.instance();
-    self.graphId = self.data.graphId;
-    self.graph = new ReactiveVar(null);
-    self.loadingGraph = new ReactiveVar(true);
+    let self               = Template.instance();
+    self.readOnly          = self.data[DATA_READ_ONLY];
+    self.graph             = new ReactiveVar(null);
+    self.loadingGraph      = new ReactiveVar(true);
     self.errorLoadingGraph = new ReactiveVar(false);
+    self.canUserEdit = new ReactiveVar(false);
+    self.savingGraph = new ReactiveVar(false);
 
     self.jsPlumbToolkit = getJSPlumbInstance(self);
-    jstk = self.jsPlumbToolkit;
+    jstk             = self.jsPlumbToolkit;
+
+    if (self.readOnly) {
+        getChart.call(self.data[DATA_CHART_ID], function (err, chart) {
+            self.graphId = chart[Charts.GRAPH_ID];
+            loadGraph(self);
+        });
+    } else {
+        getChartEditingGraphId.call({chartId: self.data[DATA_CHART_ID]}, function (err, editingGraphId) {
+            self.graphId = editingGraphId;
+            loadGraph(self);
+        });
+        canCurrentUserEditChart.call({chartId: self.data[DATA_CHART_ID]}, function (err, permission) {
+            self.canUserEdit.set(permission);
+        });
+    }
+});
+
+function loadGraph(self) {
     GraphUtils.getGraphAsJSPlumb.call(self.graphId, function (err, graph) {
         if (err || !graph) {
             self.errorLoadingGraph.set(true);
@@ -36,9 +68,7 @@ Template.graph_view.onCreated(function () {
         }
         self.loadingGraph.set(false);
     });
-
-
-});
+}
 
 Template.graph_view.onRendered(function () {
     Session.set(SELECTION_NODE_DATA, null);
@@ -76,14 +106,22 @@ Template.graph_view.helpers({
         if (!node) {
             return false;
         }
-        return node[Graphs.NODE_GRAPH_ID] != null;
+        return node[Graphs.NODE_CHART_ID] != null;
     },
-    selectedVirtualGraphId: function () {
+    selectedVirtualChartId: function () {
         let node = Session.get(SELECTION_NODE_DATA);
         if (node) {
-            return node[Graphs.NODE_GRAPH_ID];
+            return node[Graphs.NODE_CHART_ID];
         }
         return "#";
+    },
+    readOnly: function () {
+        let self = Template.instance();
+        return self.readOnly || !self.canUserEdit.get();
+    },
+    savingGraph: function () {
+        let self = Template.instance();
+        return self.savingGraph.get();
     }
 });
 
@@ -114,10 +152,10 @@ Template.graph_view.events({
     "keyup #addOptionInput": function (evt) {
         if (evt.keyCode === 13) {
             evt.preventDefault();
-            let self = Template.instance();
-            let txt = evt.target.value;
+            let self   = Template.instance();
+            let txt    = evt.target.value;
             let nodeId = evt.currentTarget.parentElement.parentElement.parentElement.parentElement.id;
-            let node = self.jsPlumbToolkit.getNode(nodeId);
+            let node   = self.jsPlumbToolkit.getNode(nodeId);
             if (!_.contains(_.pluck(node.data[GraphUtils.OPTIONS], GraphUtils.OPTION_NAME), txt)) {
                 let opt = GraphUtils.getOptionObject(txt, nodeId);
                 self.jsPlumbToolkit.addNewPort(nodeId, "option", opt);
@@ -128,10 +166,10 @@ Template.graph_view.events({
     },
     "click #deleteOptionBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self   = Template.instance();
         let portId = evt.currentTarget.getAttribute("data-option-id");
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
-        let node = self.jsPlumbToolkit.getNode(nodeId);
+        let node   = self.jsPlumbToolkit.getNode(nodeId);
 
         removePort(node, portId, self);
         setSelection(self, node);
@@ -146,7 +184,7 @@ Template.graph_view.events({
     },
     "click #deleteNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self   = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         if (nodeId) {
             onDeleteNode(self, nodeId);
@@ -162,7 +200,7 @@ Template.graph_view.events({
     },
     "click #editNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self   = Template.instance();
         let nodeId = evt.currentTarget.getAttribute("data-node-id");
         if (nodeId) {
             onEditNode(self, nodeId);
@@ -170,11 +208,11 @@ Template.graph_view.events({
     },
     "click #tooblarMakeFirstNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
+        let self         = Template.instance();
         let newFirstNode = (self.jsPlumbToolkit.getSelection().getNodes() || [null])[0];
         if (newFirstNode && newFirstNode[GraphUtils.TYPE] != GraphUtils.NODE_TYPE_VIRTUAL) {
             // make this node the only type:"first" node
-            let nodeData = newFirstNode.data;
+            let nodeData              = newFirstNode.data;
             nodeData[GraphUtils.TYPE] = GraphUtils.NODE_TYPE_FIRST;
             self.jsPlumbToolkit.updateNode(newFirstNode, nodeData);
             $("#" + nodeData[GraphUtils.ID]).addClass("first-node");
@@ -190,26 +228,74 @@ Template.graph_view.events({
     },
     "click #newNodeBtn": function (evt) {
         evt.preventDefault();
-        let self = Template.instance();
-        let node = GraphUtils.getJSPlumbNodeObject("New Step");
+        let self   = Template.instance();
+        let node   = GraphUtils.getJSPlumbNodeObject("New Step");
         let center = self.jsplumbRenderer.getViewportCenter();
-        node = initNodeView(node, center[0], center[1]);
+        node       = initNodeView(node, center[0], center[1]);
 
-        let data = {};
-        data[EditNodeModal.DATA_NODE] = node;
+        let data                               = {};
+        data[EditNodeModal.DATA_NODE]          = node;
         data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
+            // Add the read only attr so the template can display accordingly
+            newNodeData.readOnly = self.readOnly;
+
             self.jsPlumbToolkit.addNode(newNodeData);
             setSelection(self, self.jsPlumbToolkit.getNode(newNodeData[GraphUtils.ID]));
         };
         Modal.show("edit_node_modal", data);
 
+    },
+    "click #saveBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        onSave(self);
+    },
+    "click #publishBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        onSaveAndPublish(self);
     }
 });
+
+function onSaveAndPublish(self) {
+    // Save then publish
+    self.savingGraph.set(true);
+    let graph = GraphUtils.getJSPlumbAsGraph(self.jsPlumbToolkit.getGraph(), self.graphId);
+    updateChartEditingGraph.call({
+        chartId: self.data[DATA_CHART_ID],
+        graph: graph
+    }, function (err, res) {
+        if (err) {
+            console.log(err);
+            Modal.show("invalid_graph_modal");
+        } else {
+            let data                              = {};
+            data[PublishGraphModal.DATA_CHART_ID] = self.data[DATA_CHART_ID];
+            Modal.show("publish_graph_modal", data);
+        }
+        self.savingGraph.set(false);
+    });
+}
+
+function onSave(self) {
+    self.savingGraph.set(true);
+    let graph = GraphUtils.getJSPlumbAsGraph(self.jsPlumbToolkit.getGraph(), self.graphId);
+    updateChartEditingGraph.call({
+        chartId: self.data[DATA_CHART_ID],
+        graph: graph
+    }, function (err, res) {
+        if (err) {
+            console.log(err);
+            Modal.show("invalid_graph_modal");
+        }
+        self.savingGraph.set(false);
+    });
+}
 
 function onDeleteNode(self, nodeId) {
     let node = self.jsPlumbToolkit.getNode(nodeId);
 
-    let data = {};
+    let data                        = {};
     data[DeleteNodeModal.DATA_NODE] = node.data;
     data[DeleteNodeModal.DATA_DELETE_CALLBACK] = function () {
         self.jsPlumbToolkit.removeNode(node);
@@ -218,9 +304,9 @@ function onDeleteNode(self, nodeId) {
     Modal.show("delete_node_modal", data);
 }
 function onEditNode(self, nodeId) {
-    let node = self.jsPlumbToolkit.getNode(nodeId);
-    let data = {};
-    data[EditNodeModal.DATA_NODE] = node.data;
+    let node                               = self.jsPlumbToolkit.getNode(nodeId);
+    let data                               = {};
+    data[EditNodeModal.DATA_NODE]          = node.data;
     data[EditNodeModal.DATA_SAVE_CALLBACK] = function (newNodeData) {
         self.jsPlumbToolkit.updateNode(node, newNodeData);
         setSelection(self, node);
@@ -238,12 +324,12 @@ function onEditNode(self, nodeId) {
  * @param self
  */
 function removePort(node, portId, self) {
-    let nodeData = node.data;
+    let nodeData  = node.data;
     let nodeEdges = node.getAllEdges();
-    let edges = [];
+    let edges     = [];
     _.each(nodeEdges, function (nEdge) {
         if (nEdge.source.id !== portId) {
-            let edge = {};
+            let edge                 = {};
             edge[Graphs.EDGE_SOURCE] = nEdge.source.getNode().id + "." + nEdge.source.id;
             edge[Graphs.EDGE_TARGET] = nEdge.target.id;
             edges.push(edge);
@@ -267,10 +353,16 @@ function removePort(node, portId, self) {
 }
 
 function loadFlowchart() {
-    let self = Template.instance();
+    let self  = Template.instance();
     let graph = self.graph.get();
     if (graph) {
         graph = layoutGraph(graph);
+
+        // Add readOnly attr so the template can change based on it
+        _.each(graph[Graphs.NODES], function (node) {
+            node[DATA_READ_ONLY] = self.readOnly;
+        });
+
         self.jsplumbRenderer = self.jsPlumbToolkit.render(getJSPlumbOptions());
         self.jsPlumbToolkit.load({
             type: "json",
@@ -306,7 +398,7 @@ function getJSPlumbInstance(self) {
 }
 
 function getJSPlumbOptions() {
-    let self = Template.instance();
+    let self   = Template.instance();
     let events = {
         mousedown: function (params) {
             if (params.e.button == 0) {
@@ -364,20 +456,24 @@ function getJSPlumbOptions() {
                     }, // hover paint style for this edge type.
                     overlays: [["Arrow", {location: 1, width: 20, length: 25}]],
                     beforeDrop: function (p) {
+                        if (self.readOnly) {
+                            return false;
+                        }
+
                         // Make sure it's not a loopback connection and also
                         // that an option won't have more than 1 outgoing edge
-
-                        let con = p.connection;
+                        let con          = p.connection;
                         let sourceNodeId = con.source.parentElement.getAttribute("data-parent-node");
                         let sourcePortId = con.source.parentElement.getAttribute("data-port-id");
-                        let sourceNode = self.jsPlumbToolkit.getNode(sourceNodeId);
+                        let sourceNode   = self.jsPlumbToolkit.getNode(sourceNodeId);
                         let targetNodeId = p.targetId;
 
                         return sourceNodeId !== targetNodeId
                             && _.filter(sourceNode.getAllEdges(), function (edge) {
                                 return edge != con.edge && edge.source.data.id === sourcePortId;
                             }).length == 0;
-                    }
+                    },
+                    detachable: !self.readOnly
                 }
             },
             ports: {

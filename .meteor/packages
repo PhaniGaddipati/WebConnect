@@ -41,3 +41,4 @@ nimble:restivus             # REST api helper
 3stack:country-codes        # Country codes helper
 shell-server@0.2.1
 lepozepo:s3
+mdg:validation-error

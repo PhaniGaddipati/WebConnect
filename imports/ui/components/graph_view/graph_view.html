@@ -16,6 +16,22 @@
                 <div id="jsplumbMiniviewContainer"></div>
                 <div>
                     <div class="btn-toolbar" id="jsplumbToolbar">
+                        {{#unless readOnly}}
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-default" id="saveBtn" disabled="{{savingGraph}}"><i
+                                        class="fa fa-save"></i>
+                                    {{#if savingGraph}}
+                                        {{_ "saving"}}
+                                    {{else}}
+                                        &nbsp;&nbsp;{{_ "save"}}
+                                    {{/if}}
+                                </a>
+                                <a href="#" class="btn btn-default" id="publishBtn"><i
+                                        class="fa fa-globe"></i>
+                                    &nbsp;&nbsp;{{_ "publish"}}
+                                </a>
+                            </div>
+                        {{/unless}}
                         <div class="btn-group">
                             <a href="#" class="btn btn-default" id="zoomInBtn"><i class="fa fa-plus"></i></a>
                             <a href="#" class="btn {{#if nodesSelection}}btn-info{{else}}btn-default{{/if}}"
@@ -25,24 +41,29 @@
                         <div class="btn-group">
                             <a href="#" class="btn btn-default" id="relayoutBtn"><i class="fa fa-magnet"></i> </a>
                         </div>
-                        <div class="btn-group">
-                            <a href="#" class="btn btn-default" id="newNodeBtn"><i class="fa fa-plus"></i> </a>
-                        </div>
-                        {{#if nodesSelection}}
+                        {{#unless readOnly}}
                             <div class="btn-group">
-                                <a href="#" class="btn btn-primary" id="tooblarEditNodeBtn"><i class="fa fa-pencil"></i></a>
-                                {{#if selectedVirtual}}
-                                    <a href="/graph/{{selectedVirtualGraphId}}" target="_blank" class="btn btn-warning"
-                                       id="openVirtualGraphBtn"> <i class="fa fa-external-link"></i></a>
-                                {{else}}
-                                    <a href="#" class="btn btn-primary" id="tooblarMakeFirstNodeBtn"><i
-                                            class="fa fa-arrow-down"></i></a>
-                                {{/if}}
+                                <a href="#" class="btn btn-default" id="newNodeBtn">{{_ "add_step"}}</a>
                             </div>
-                            <div class="btn-group">
-                                <a href="#" class="btn btn-danger" id="toolbarDeleteNodeBtn"><i class="fa fa-trash"></i></a>
-                            </div>
-                        {{/if}}
+                            {{#if nodesSelection}}
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-primary" id="tooblarEditNodeBtn"><i
+                                            class="fa fa-pencil"></i></a>
+                                    {{#if selectedVirtual}}
+                                        <a href="/chart/{{selectedVirtualChartId}}" target="_blank"
+                                           class="btn btn-warning"
+                                           id="openVirtualGraphBtn"> <i class="fa fa-external-link"></i></a>
+                                    {{else}}
+                                        <a href="#" class="btn btn-primary" id="tooblarMakeFirstNodeBtn"><i
+                                                class="fa fa-arrow-down"></i></a>
+                                    {{/if}}
+                                </div>
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-danger" id="toolbarDeleteNodeBtn"><i
+                                            class="fa fa-trash"></i></a>
+                                </div>
+                            {{/if}}
+                        {{/unless}}
                     </div>
                 </div>
                 <div class="container-fluid" id="jsplumbContainer"></div>

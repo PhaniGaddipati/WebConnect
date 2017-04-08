@@ -10,6 +10,7 @@ import "../../ui/pages/about/about.js";
 import "../../ui/pages/account/account.js";
 import "../../ui/pages/account/logout.js";
 import "/imports/ui/pages/chart/chart.js";
+import {DATA_CHART_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
 import "/imports/ui/pages/graph_guide/graph_guide.js";
 import {incrementChartDownload} from "/imports/api/charts/methods.js";
 
@@ -46,22 +47,29 @@ FlowRouter.route("/chart/:chartId", {
     name: "App.chart",
     action(params) {
         incrementChartDownload.call(params.chartId);
+        let context             = {};
+        context[DATA_CHART_ID]  = params.chartId;
+        context[DATA_READ_ONLY] = true;
         BlazeLayout.render("app_body_fluid",
             {
                 main: "chart",
-                dataContext: {chartId: params.chartId}
+                dataContext: context
             }
         );
     },
 });
 
-FlowRouter.route("/graph/:graphId", {
+FlowRouter.route("/chart/:chartId/edit", {
     name: "App.chart",
     action(params) {
+        incrementChartDownload.call(params.chartId);
+        let context             = {};
+        context[DATA_CHART_ID]  = params.chartId;
+        context[DATA_READ_ONLY] = false;
         BlazeLayout.render("app_body_fluid",
             {
-                main: "graph_guide",
-                dataContext: {graphId: params.graphId}
+                main: "chart",
+                dataContext: context
             }
         );
     },
