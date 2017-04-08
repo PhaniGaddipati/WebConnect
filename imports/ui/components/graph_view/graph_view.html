@@ -20,7 +20,15 @@
                             <div class="btn-group">
                                 <a href="#" class="btn btn-default" id="saveBtn" disabled="{{savingGraph}}"><i
                                         class="fa fa-save"></i>
-                                    &nbsp;&nbsp;{{_ "save"}}
+                                    {{#if savingGraph}}
+                                        {{_ "saving"}}
+                                    {{else}}
+                                        &nbsp;&nbsp;{{_ "save"}}
+                                    {{/if}}
+                                </a>
+                                <a href="#" class="btn btn-default" id="publishBtn"><i
+                                        class="fa fa-globe"></i>
+                                    &nbsp;&nbsp;{{_ "publish"}}
                                 </a>
                             </div>
                         {{/unless}}

@@ -71,5 +71,6 @@
   "invalid_chart_pt_2": "All steps have an outgoing edge",
   "invalid_chart_pt_3": "A step is selected as the first step and is green",
   "continue_editing": "Continue Editing",
-  "add_step": "Add Step"
+  "add_step": "Add Step",
+  "publish": "Publish"
 }

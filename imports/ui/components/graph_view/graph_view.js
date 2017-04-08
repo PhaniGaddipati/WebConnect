@@ -16,7 +16,8 @@ import {
     getChartEditingGraphId,
     getChart,
     canCurrentUserEditChart,
-    updateChartEditingGraph
+    updateChartEditingGraph,
+    publishEditingGraph
 } from "/imports/api/charts/methods.js";
 import {layoutGraph, initNodeView} from "/imports/ui/components/graph_view/jsplumb_view_utils.js";
 import * as GraphUtils from "/imports/api/jsplumb/graph_utils.js";
@@ -247,8 +248,39 @@ Template.graph_view.events({
         evt.preventDefault();
         let self = Template.instance();
         onSave(self);
+    },
+    "click #publishBtn": function (evt) {
+        evt.preventDefault();
+        let self = Template.instance();
+        onSaveAndPublish(self);
     }
 });
+
+function onSaveAndPublish(self) {
+    // Save then publish
+    self.savingGraph.set(true);
+    let graph = GraphUtils.getJSPlumbAsGraph(self.jsPlumbToolkit.getGraph(), self.graphId);
+    updateChartEditingGraph.call({
+        chartId: self.data[DATA_CHART_ID],
+        graph: graph
+    }, function (err, res) {
+        if (err) {
+            console.log(err);
+            Modal.show("invalid_graph_modal");
+        } else {
+            publishEditingGraph.call({chartId: self.data[DATA_CHART_ID]}, function (err, res) {
+                if (err) {
+                    console.log(err);
+                    // TODO show user
+                } else {
+                    console.log("Succesfully published graph");
+                    location.reload();
+                }
+            });
+        }
+        self.savingGraph.set(false);
+    });
+}
 
 function onSave(self) {
     self.savingGraph.set(true);
