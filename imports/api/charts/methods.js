@@ -114,6 +114,7 @@ export const publishEditingGraph = new ValidatedMethod({
             return false;
         }
         let editingGraphId = chart[Charts.EDITING_GRAPH_ID];
+        let oldGraphId = chart[Charts.GRAPH_ID];
         if (!editingGraphId) {
             return false;
         }
@@ -124,7 +125,19 @@ export const publishEditingGraph = new ValidatedMethod({
 
         mod["$set"][Charts.GRAPH_ID]           = editingGraphId;
         mod["$unset"][Charts.EDITING_GRAPH_ID] = "";
-        return Charts.Charts.update({_id: chartId}, mod);
+
+        let ret = Charts.Charts.update({_id: chartId}, mod);
+
+        if (ret > 0) {
+            // Mark the old graph as such
+            let mod                               = {
+                $set: {}
+            };
+            mod["$set"][Graphs.GRAPH_OLD]         = true;
+            mod["$set"][Graphs.GRAPH_REPLACED_BY] = editingGraphId;
+            Graphs.Graphs.update({_id: oldGraphId}, mod);
+        }
+        return ret;
     }
 });
 

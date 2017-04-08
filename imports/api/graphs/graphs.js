@@ -7,23 +7,25 @@ import {Random} from "meteor/random";
 import {Comments} from "/imports/api/comments/comments.js";
 
 // Constants for document field names
-export const GRAPH_ID       = "_id";
-export const NODES          = "nodes";
-export const EDGES          = "edges";
-export const OWNER          = "owner";
-export const FIRST_NODE     = "firstNode";
-export const NODE_ID        = "_id";
-export const NODE_CHART_ID = "chartId";
-export const NODE_NAME      = "name";
-export const NODE_DETAILS   = "details";
-export const NODE_RESOURCES = "resources";
-export const NODE_IMAGES    = "images";
-export const NODE_COMMENTS  = "comments";
-export const EDGE_ID        = "_id";
-export const EDGE_NAME      = "name";
-export const EDGE_SOURCE    = "source";
-export const EDGE_TARGET    = "target";
-export const EDGE_DETAILS   = "details";
+export const GRAPH_ID          = "_id";
+export const NODES             = "nodes";
+export const EDGES             = "edges";
+export const OWNER             = "owner";
+export const FIRST_NODE        = "firstNode";
+export const NODE_ID           = "_id";
+export const NODE_CHART_ID     = "chartId";
+export const NODE_NAME         = "name";
+export const NODE_DETAILS      = "details";
+export const NODE_RESOURCES    = "resources";
+export const NODE_IMAGES       = "images";
+export const NODE_COMMENTS     = "comments";
+export const EDGE_ID           = "_id";
+export const EDGE_NAME         = "name";
+export const EDGE_SOURCE       = "source";
+export const EDGE_TARGET       = "target";
+export const EDGE_DETAILS      = "details";
+export const GRAPH_OLD         = "graphOld";
+export const GRAPH_REPLACED_BY = "replacedBy";
 
 export const Graphs = new Mongo.Collection("graphs");
 
@@ -43,7 +45,7 @@ Graphs.deny({
 });
 
 Graphs.schema            = {};
-Graphs.schema.nodeSchema   = new SimpleSchema({
+Graphs.schema.nodeSchema       = new SimpleSchema({
     _id: {
         type: String,
         regEx: SimpleSchema.RegEx.Id,
@@ -147,6 +149,14 @@ Graphs.schema.graphSchema = new SimpleSchema({
     firstNode: {
         type: SimpleSchema.RegEx.Id,
         optional: false
+    },
+    graphOld: {
+        type: Boolean,
+        optional: true
+    },
+    replacedBy: {
+        type: SimpleSchema.RegEx.Id,
+        optional: true
     }
 });
 
