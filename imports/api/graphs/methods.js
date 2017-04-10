@@ -6,6 +6,7 @@ import {ValidationError} from "meteor/mdg:validation-error";
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Graphs from "./graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
+import {Random} from "meteor/random";
 
 export const NODE_MAP_NODE       = "node";
 export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
@@ -186,6 +187,9 @@ export const getGraph = new ValidatedMethod({
  * If there are any, it is replaced with the subgraph.
  * Any terminations of the linked subgraph points back to the
  * virtual node's child.
+ *
+ * Sub-guide edgeIds are newly generated to ensure a unique
+ * set of edgeIds.
  */
 export const getGraphWithoutLinks = new ValidatedMethod({
     name: "graphs.getGraphWithoutLinks",
@@ -242,6 +246,8 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         // Find all terminations of subGraph and set it to vNode's target
                         let sgNodeMap = getNodeEdgeMap(subGraph);
                         _.each(subGraph[Graphs.EDGES], function (sgEdge) {
+                            // Generate a new edge ID so repeated sub-guides are guaranteed to have unique edges
+                            sgEdge[Graphs.EDGE_ID] = Random.id();
                             if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]][NODE_MAP_OUTGOING_EDGES].length == 0) {
                                 // This leaf node is no longer needed
                                 nodesToDelete[sgEdge[Graphs.EDGE_TARGET]] = true;
