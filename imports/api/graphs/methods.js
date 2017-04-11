@@ -249,12 +249,14 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                             // Generate a new edge ID so repeated sub-guides are guaranteed to have unique edges
                             sgEdge[Graphs.EDGE_ID] = Random.id();
                             if (sgNodeMap[sgEdge[Graphs.EDGE_TARGET]][NODE_MAP_OUTGOING_EDGES].length == 0) {
+                                let log                                   = false;
                                 // This leaf node is no longer needed
                                 nodesToDelete[sgEdge[Graphs.EDGE_TARGET]] = true;
                                 // Terminating edge, link to outgoing edges of the virtual node
                                 _.each(vNodeOutEdges, function (outEdge) {
                                     // Make a new edge incase there's more than 1 terminating node
-                                    let edge                 = outEdge;
+                                    let edge                 = Object.assign({}, outEdge);
+                                    edge[Graphs.EDGE_ID]     = Random.id();
                                     edge[Graphs.EDGE_SOURCE] = sgEdge[Graphs.EDGE_SOURCE];
                                     newEdges.push(edge);
                                 });
