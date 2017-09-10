@@ -4,3 +4,5 @@ node_modules/
 mup.json
 doc/
 **/keys.js
+*.pem
+*.ppk
