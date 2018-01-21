@@ -5,13 +5,7 @@
         </div>
     {{else}}
         {{#if showGraph}}
-            <div class="container">
-                <h2>{{chartName}}
-                    {{#if canEdit}}
-                        <a href="{{editUrl}}" target=_blank>&nbsp;({{_ "edit"}})</a>
-                    {{/if}}
-                </h2>
-            </div>
+            <h2>&nbsp;&nbsp;&nbsp;{{chartName}}</h2>
             {{> Template.dynamic template="graph_guide" data=graphParams}}
         {{else}}
             <div class="container">
