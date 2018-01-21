@@ -5,7 +5,8 @@
         </div>
     {{else}}
         {{#if showGraph}}
-            <h2>&nbsp;&nbsp;&nbsp;{{chartName}}</h2>
+            <h2>&nbsp;&nbsp;&nbsp;{{chartName}}&nbsp;<small>({{version}})</small>
+            </h2>
             {{> Template.dynamic template="graph_guide" data=graphParams}}
         {{else}}
             <div class="container">
@@ -35,6 +36,8 @@
                         <br>
                     {{/if}}
                     <strong>{{_ "last_updated"}}:</strong> {{chartLastUpdated}}
+                    <br>
+                    <strong>{{_ "version"}}:</strong> {{version}}
                     <br>
                     <strong>{{_ "downloads"}}:</strong> {{downloads}}
                     <br><br>

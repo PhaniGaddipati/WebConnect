@@ -110,8 +110,14 @@ export const publishEditingGraph = new ValidatedMethod({
         comments: {
             type: String
         },
+        version: {
+            type: String,
+            optional: false,
+            defaultValue: "1.0",
+            regEx: /\d+(\.\d+)+/
+        }
     }).validator(),
-    run({chartId: chartId, comments: comments}) {
+    run({chartId: chartId, comments: comments, version: version}) {
         let chart = getChart.call(chartId);
         if (!chart) {
             return false;
@@ -122,11 +128,16 @@ export const publishEditingGraph = new ValidatedMethod({
             return false;
         }
 
-        // TODO add version support
+        if (!canCurrentUserEditChart.call({chartId: chartId})) {
+            // Someone is up to no good...
+            throw new Meteor.Error("charts.publishEditingGraph.accessDenied",
+                "The current user is not allowed to do this.");
+        }
+
         updateChartGraphWithHistory.call({
             chartId: chartId,
             graphId: editingGraphId,
-            version: chart[Charts.VERSION],
+            version: version,
             comments: comments
         });
 

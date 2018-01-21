@@ -107,6 +107,9 @@ Template.chart.helpers({
     downloads: function () {
         return Template.instance().chart.get()[Charts.DOWNLOADS];
     },
+    version: function () {
+        return Template.instance().chart.get()[Charts.VERSION];
+    },
     editingDesc: function () {
         return Template.instance().editingDesc.get();
     }
