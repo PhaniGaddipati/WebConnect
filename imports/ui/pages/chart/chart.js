@@ -3,7 +3,7 @@ import "meteor/session";
 import "./chart.html";
 import {getUserName} from "/imports/api/users/methods.js";
 import * as Charts from "/imports/api/charts/charts.js";
-import {getChart, canCurrentUserEditChart} from "/imports/api/charts/methods.js";
+import {canCurrentUserEditChart, getChart} from "/imports/api/charts/methods.js";
 import "/imports/ui/pages/graph_guide/graph_guide.js";
 import {DATA_CHART_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
 
@@ -56,5 +56,8 @@ Template.chart.helpers({
     },
     editUrl: function () {
         return FlowRouter.current().path + "/edit";
+    },
+    inCatalog: function () {
+        return Template.instance().chart.get()[Charts.IN_CATALOG]
     }
 });
