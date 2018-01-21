@@ -1,7 +1,7 @@
 import "meteor/reactive-var";
 import "meteor/session";
 import "./chart.html";
-import "/imports/ui/components/modals/message_modal"
+import "/imports/ui/components/modals/message_modal";
 import {getUserName} from "/imports/api/users/methods.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {canCurrentUserEditChart, getChart, updateChartDescription} from "/imports/api/charts/methods.js";

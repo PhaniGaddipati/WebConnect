@@ -1,5 +1,6 @@
 import "./publish_graph_modal.html";
 import {publishEditingGraph} from "/imports/api/charts/methods.js";
+import "/imports/ui/components/modals/message_modal";
 
 export const DATA_CHART_ID = "chartId";
 
@@ -13,7 +14,10 @@ Template.publish_graph_modal.events({
         publishEditingGraph.call({chartId: tmpl.data[DATA_CHART_ID], comments: comments}, function (err, res) {
             if (err) {
                 console.log(err);
-                // TODO show user
+                Modal.show("message_modal", {
+                    title: TAPi18n.__("error_publish"),
+                    message: TAPi18n.__("error_publish_msg")
+                });
             } else {
                 console.log("Succesfully published graph");
                 location.reload();

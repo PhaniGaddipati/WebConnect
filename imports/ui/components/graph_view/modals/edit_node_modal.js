@@ -1,11 +1,12 @@
 import "./edit_node_modal.html";
 import * as Graphs from "/imports/api/graphs/graphs.js";
+import "/imports/ui/components/modals/message_modal";
 
-export const DATA_NODE = "node";
+export const DATA_NODE          = "node";
 export const DATA_SAVE_CALLBACK = "save_callback";
 
 Template.edit_node_modal.onCreated(function () {
-    let self = Template.instance();
+    let self      = Template.instance();
     let nodeClone = {};
     _.each(_.keys(self.data[DATA_NODE]), function (key) {
         if (Array.isArray(self.data[DATA_NODE][key])) {
@@ -14,7 +15,7 @@ Template.edit_node_modal.onCreated(function () {
             nodeClone[key] = self.data[DATA_NODE][key];
         }
     });
-    self.node = nodeClone;
+    self.node   = nodeClone;
     self.nodeRx = new ReactiveVar(nodeClone);
 });
 
@@ -102,10 +103,16 @@ function onUploadResource(self, files) {
         unique_name: false
     }, function (e, r) {
         // file done uploading, or errored out
-        // TODO show if there's an error
-        if (r.status == "complete") {
-            self.node[Graphs.NODE_RESOURCES].push(r.url);
-            self.nodeRx.set(self.node);
+        if (e) {
+            Modal.show("message_modal", {
+                title: TAPi18n.__("error_upload"),
+                message: TAPi18n.__("error_upload_msg")
+            });
+        } else {
+            if (r.status == "complete") {
+                self.node[Graphs.NODE_RESOURCES].push(r.url);
+                self.nodeRx.set(self.node);
+            }
         }
     });
 }
@@ -117,10 +124,16 @@ function onUploadImage(self, files) {
         path: "images"
     }, function (e, r) {
         // file done uploading, or errored out
-        // TODO show if there's an error
-        if (r.status == "complete") {
-            self.node[Graphs.NODE_IMAGES].push(r.url);
-            self.nodeRx.set(self.node);
+        if (e) {
+            Modal.show("message_modal", {
+                title: TAPi18n.__("error_upload"),
+                message: TAPi18n.__("error_upload_msg")
+            });
+        } else {
+            if (r.status == "complete") {
+                self.node[Graphs.NODE_IMAGES].push(r.url);
+                self.nodeRx.set(self.node);
+            }
         }
     });
 }
@@ -156,7 +169,7 @@ function onAddImage(self) {
 }
 
 function onSaveNode(self) {
-    self.node[Graphs.NODE_NAME] = self.find("#nodeNameField").value;
+    self.node[Graphs.NODE_NAME]    = self.find("#nodeNameField").value;
     self.node[Graphs.NODE_DETAILS] = self.find("#nodeDetailsField").value;
     // images & resources are updated as the user makes changes
 
