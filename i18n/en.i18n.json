@@ -91,5 +91,6 @@
   "new_guide_title": "Guide Name",
   "new_guide_desc": "Description",
   "error_create_guide": "Error",
-  "error_create_guide_msg": "Error creating a new guide. Please try again."
+  "error_create_guide_msg": "Error creating a new guide. Please try again.",
+  "error_create_guide_valid": "Guide title must only be alphanumeric and at least 4 letters long"
 }

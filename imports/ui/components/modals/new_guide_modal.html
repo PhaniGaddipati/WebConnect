@@ -1,6 +1,6 @@
 <template name="new_guide_modal">
     <div class="modal fade" id="new_guide_modal">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">{{_ "create_guide"}}</h4>
@@ -14,6 +14,9 @@
                         <label class="control-label" for="description">{{_ "new_guide_desc"}}</label>
                         <input class="form-control" id="description" type="text">
                     </div>
+                    {{#if hasErrorMsg}}
+                        <p class="text-danger">{{errorMsg}}</p>
+                    {{/if}}
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-default" id="cancelBtn" data-dismiss="modal">{{_ "cancel"}}</button>

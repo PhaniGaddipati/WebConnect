@@ -7,7 +7,9 @@ export const createNewGuide = new ValidatedMethod({
     name: "misc.createNewGuide",
     validate: new SimpleSchema({
         name: {
-            type: String
+            type: String,
+            min: 4,
+            regEx: /^[A-Z a-z0-9]+$/
         },
         description: {
             type: String
