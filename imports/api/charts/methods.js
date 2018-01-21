@@ -6,7 +6,7 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Charts from "./charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
-import {insertGraph, getGraphWithoutLinks, getGraph, validateGraph} from "../graphs/methods.js";
+import {getGraph, getGraphWithoutLinks, insertGraph, validateGraph} from "../graphs/methods.js";
 
 /**
  * Returns the graph associated with the chart's currently editing graph.
@@ -348,7 +348,7 @@ export const getCurrentUserCharts = new ValidatedMethod({
         if (!ownerId) {
             return [];
         }
-        return Charts.Charts.find({_id: ownerId}).fetch();
+        return Charts.Charts.find({owner: ownerId}).fetch();
     }
 });
 

@@ -9,6 +9,9 @@
                             {{#each userCharts}}
                                 <a href="/chart/{{_id}}" class="list-group-item">
                                     <h4 class="list-group-item-heading">{{getChartName this}}</h4>
+                                    {{#if getChartInCatalog this}}
+                                        <span class="label label-primary pull-right">Catalog</span>
+                                    {{/if}}
                                     <p class="list-group-item-text">{{getChartDescription this}}</p>
                                 </a>
                             {{/each}}
