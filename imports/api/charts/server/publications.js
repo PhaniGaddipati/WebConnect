@@ -6,7 +6,7 @@
  */
 import {Meteor} from "meteor/meteor";
 import * as Charts from "/imports/api/charts/charts.js";
-import {findMostDownloadedCharts, getChartsInCatalog} from "/imports/api/charts/methods.js";
+import {findMostDownloadedCharts} from "/imports/api/charts/methods.js";
 
 Meteor.publish("topCharts", function (n) {
     findMostDownloadedCharts.validate(n);
@@ -14,10 +14,13 @@ Meteor.publish("topCharts", function (n) {
 });
 
 Meteor.publish("catalogCharts", function () {
-    getChartsInCatalog.validate();
-    return getChartsInCatalog.run();
+    let sel = {};
+    sel[Charts.IN_CATALOG] = true;
+    return Charts.Charts.find(sel);
 });
 
 Meteor.publish("userCharts", function () {
-    return Charts.Charts.find({owner: this.userId});
+    let sel = {};
+    sel[Charts.OWNER] = this.userId;
+    return Charts.Charts.find(sel);
 });

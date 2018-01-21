@@ -1,0 +1,20 @@
+<template name="catalog_charts">
+    <div class="panel panel-default">
+        <div class="panel-heading"><i class="fa fa-book"></i>&nbsp;{{_ "catalog"}}</div>
+        <div class="panel-body">
+            {{#if Template.subscriptionsReady}}
+                <div class="list-group">
+                    {{#each catalogCharts}}
+                        <a href="/chart/{{_id}}" class="list-group-item">
+                            <span class="badge">{{getChartDownloads this}}</span>
+                            <h4 class="list-group-item-heading">{{getChartName this}}</h4>
+                            <p class="list-group-item-text">{{getChartDescription this}}</p>
+                        </a>
+                    {{/each}}
+                </div>
+            {{else}}
+                {{> app_loading}}
+            {{/if}}
+        </div>
+    </div>
+</template>

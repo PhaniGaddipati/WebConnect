@@ -1,20 +1,17 @@
-import "./user_charts.html";
+import "./catalog_charts.html";
 import "/imports/ui/components/app_loading/app_loading.js";
 import * as Charts from "/imports/api/charts/charts.js";
-import {getCurrentUserCharts} from "/imports/api/charts/methods.js";
+import {getChartsInCatalog} from "/imports/api/charts/methods.js";
 
 const MAX_DESC_LEN = 250;
 
-Template.user_charts.onCreated(function () {
-    this.subscribe("userCharts");
+Template.catalog_charts.onCreated(function () {
+    this.subscribe("catalogCharts");
 });
 
-Template.user_charts.helpers({
-    hasCharts: function () {
-        return getCurrentUserCharts.call().length > 0;
-    },
-    userCharts: function () {
-        return getCurrentUserCharts.call();
+Template.catalog_charts.helpers({
+    catalogCharts: function () {
+        return getChartsInCatalog.call();
     },
     getChartName: function (chart) {
         return chart[Charts.NAME];
@@ -29,7 +26,7 @@ Template.user_charts.helpers({
         }
         return desc;
     },
-    getChartInCatalog: function (chart) {
-        return chart[Charts.IN_CATALOG];
+    getChartDownloads: function (chart) {
+        return chart[Charts.DOWNLOADS];
     }
 });

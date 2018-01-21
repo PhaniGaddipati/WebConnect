@@ -353,7 +353,8 @@ export const getCurrentUserCharts = new ValidatedMethod({
 });
 
 /**
- * Returns all of the charts present in the catalog.
+ * Returns all of the charts present in the catalog,
+ * sorted by number of downloads.
  */
 export const getChartsInCatalog = new ValidatedMethod({
     name: "charts.chartsInCatalog",
@@ -363,7 +364,9 @@ export const getChartsInCatalog = new ValidatedMethod({
     run(){
         let sel                = {};
         sel[Charts.IN_CATALOG] = true;
-        return Charts.Charts.find(sel).fetch();
+        let sortParam = {};
+        sortParam[Charts.DOWNLOADS] = -1;
+        return Charts.Charts.find(sel, {sort: sortParam}).fetch();
     }
 });
 
