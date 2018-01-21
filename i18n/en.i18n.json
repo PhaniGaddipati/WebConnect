@@ -65,6 +65,7 @@
   "upload_resource": "Upload PDFs",
   "view_guide": "View Guide",
   "edit_guide": "Edit Guide",
+  "edit": "edit",
   "invalid_chart": "Invalid Chart",
   "invalid_chart_msg": "The guide couldn't be saved! Please check that the guide meets all of the below requirements and try to save again.",
   "invalid_chart_pt_1": "All steps have are not red and have an incoming edge",

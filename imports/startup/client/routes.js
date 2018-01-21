@@ -11,6 +11,7 @@ import "../../ui/pages/account/account.js";
 import "../../ui/pages/account/logout.js";
 import "/imports/ui/pages/chart/chart.js";
 import {DATA_CHART_ID, DATA_READ_ONLY} from "/imports/ui/components/graph_view/graph_view.js";
+import {DATA_SHOW_GRAPH} from "/imports/ui/pages/chart/chart.js"
 import "/imports/ui/pages/graph_guide/graph_guide.js";
 import {incrementChartDownload} from "/imports/api/charts/methods.js";
 
@@ -47,9 +48,10 @@ FlowRouter.route("/chart/:chartId", {
     name: "App.chart",
     action(params) {
         incrementChartDownload.call(params.chartId);
-        let context             = {};
-        context[DATA_CHART_ID]  = params.chartId;
-        context[DATA_READ_ONLY] = true;
+        let context              = {};
+        context[DATA_CHART_ID]   = params.chartId;
+        context[DATA_READ_ONLY]  = true;
+        context[DATA_SHOW_GRAPH] = false;
         BlazeLayout.render("app_body_fluid",
             {
                 main: "chart",
@@ -63,9 +65,27 @@ FlowRouter.route("/chart/:chartId/edit", {
     name: "App.chart",
     action(params) {
         incrementChartDownload.call(params.chartId);
-        let context             = {};
-        context[DATA_CHART_ID]  = params.chartId;
-        context[DATA_READ_ONLY] = false;
+        let context              = {};
+        context[DATA_CHART_ID]   = params.chartId;
+        context[DATA_READ_ONLY]  = false;
+        context[DATA_SHOW_GRAPH] = true;
+        BlazeLayout.render("app_body_fluid",
+            {
+                main: "chart",
+                dataContext: context
+            }
+        );
+    },
+});
+
+FlowRouter.route("/chart/:chartId/view", {
+    name: "App.chart",
+    action(params) {
+        incrementChartDownload.call(params.chartId);
+        let context              = {};
+        context[DATA_CHART_ID]   = params.chartId;
+        context[DATA_READ_ONLY]  = true;
+        context[DATA_SHOW_GRAPH] = true;
         BlazeLayout.render("app_body_fluid",
             {
                 main: "chart",

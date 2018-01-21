@@ -4,15 +4,23 @@
             {{> app_loading}}
         </div>
     {{else}}
-        {{#if readOnly}}
+        {{#if showGraph}}
+            <div class="container">
+                <h2>{{chartName}}
+                    {{#if canEdit}}
+                        <a href="{{editUrl}}" target=_blank>&nbsp;({{_ "edit"}})</a>
+                    {{/if}}
+                </h2>
+            </div>
+            {{> Template.dynamic template="graph_guide" data=graphParams}}
+        {{else}}
             <div class="container">
                 <h1>{{chartName}}</h1>
                 {{#unless inCatalog}}
                     <div class="alert alert-dismissible alert-info">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         This guide is not currently available in the Catalog. Please contact us to request that this
-                        guide
-                        be publicly visible in the app.
+                        guide be publicly visible in the app.
                     </div>
                 {{/unless}}
                 <div class="well">
@@ -23,15 +31,12 @@
                     {{/if}}
                     <strong>{{_ "last_updated"}}:</strong> {{chartLastUpdated}}
                     <br><br>
-                    <a class="btn btn-default btn-sm" href="#views">{{_ "view_guide"}}</a>
+                    <a class="btn btn-default btn-sm" href="{{viewUrl}}" target=_blank>{{_ "view_guide"}}</a>
                     {{#if canEdit}}
                         <a class="btn btn-default btn-sm" href="{{editUrl}}" target=_blank>{{_ "edit_guide"}}</a>
                     {{/if}}
                 </div>
             </div>
-            <hr>
         {{/if}}
-        <a id="views"></a>
-        {{> Template.dynamic template="graph_guide" data=graphParams}}
     {{/if}}
 </template>

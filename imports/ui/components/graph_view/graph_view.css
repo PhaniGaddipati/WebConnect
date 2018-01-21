@@ -239,8 +239,8 @@
 }
 
 #jsplumbContainer {
-    height: 100%;
-    min-height: 90vh;
+    height: 90%;
+    min-height: 85vh;
     position: relative;
     background-color: #f6f6f6;
 }
