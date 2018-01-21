@@ -46,6 +46,26 @@
                         <a class="btn btn-default btn-sm" href="{{editUrl}}" target=_blank>{{_ "edit_guide"}}</a>
                     {{/if}}
                 </div>
+                {{#if hasHistory}}
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><i class="fa fa-history"></i>&nbsp;{{_ "history"}}</div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                {{#each history}}
+                                    <div class="list-group-item">
+                                        <h4 class="list-group-item-heading">{{this.version}}</h4>
+                                        <p class="list-group-item-text">
+                                            {{this.comments}}
+                                            <br>
+                                            {{formatDate this.date}}
+                                        </p>
+                                    </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                {{/if}}
+
             </div>
         {{/if}}
     {{/if}}

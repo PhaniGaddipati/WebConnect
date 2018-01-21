@@ -112,5 +112,17 @@ Template.chart.helpers({
     },
     editingDesc: function () {
         return Template.instance().editingDesc.get();
+    },
+    hasHistory: function () {
+        return Template.instance().chart.get()[Charts.GRAPH_HIST].length > 0;
+    },
+    history: function () {
+        return _.sortBy(Template.instance().chart.get()[Charts.GRAPH_HIST],
+            function (o) {
+                return -o[Charts.GRAPH_HIST_DATE]
+            });
+    },
+    formatDate: function (date) {
+        return moment(date).format('MM-DD-YYYY');
     }
 });
