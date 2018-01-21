@@ -67,6 +67,9 @@ Template.chart.helpers({
         return FlowRouter.current().path + "/view";
     },
     inCatalog: function () {
-        return Template.instance().chart.get()[Charts.IN_CATALOG]
+        return Template.instance().chart.get()[Charts.IN_CATALOG];
+    },
+    downloads: function () {
+        return Template.instance().chart.get()[Charts.DOWNLOADS];
     }
 });
