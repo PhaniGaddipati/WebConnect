@@ -84,7 +84,12 @@
   "error_upload": "Error",
   "error_upload_msg": "Error uploading the file. Please try again.",
   "error_publish": "Error",
-  "error_publish_msg": "Could not publish the new guide. Please try again/",
+  "error_publish_msg": "Could not publish the new guide. Please try again.",
   "show_flowchart": "Show Flowchart",
-  "hide_flowchart": "Hide Flowchart"
+  "hide_flowchart": "Hide Flowchart",
+  "create_guide": "Create Guide",
+  "new_guide_title": "Guide Name",
+  "new_guide_desc": "Description",
+  "error_create_guide": "Error",
+  "error_create_guide_msg": "Error creating a new guide. Please try again."
 }

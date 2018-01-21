@@ -6,7 +6,7 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import * as Charts from "./charts.js";
 import * as Graphs from "/imports/api/graphs/graphs.js";
 import * as Comments from "/imports/api/comments/comments.js";
-import {getGraph, getGraphWithoutLinks, insertGraph, validateGraph} from "../graphs/methods.js";
+import {getGraph, getGraphWithoutLinks, validateGraph} from "../graphs/methods.js";
 
 /**
  * Returns the graph associated with the chart's currently editing graph.
@@ -141,26 +141,24 @@ export const publishEditingGraph = new ValidatedMethod({
 });
 
 /**
- * Inserts a new chart into the database, given the name and description.
- * A graph is created and associated with the chart automatically.
+ * Inserts a new chart into the database, given the name and description and graph
  *
  * The unique _id of the chart is returned, or null on failure.
  */
 export const insertNewChart = new ValidatedMethod({
     name: "charts.insertNewChart",
     validate: Charts.Charts.simpleSchema()
-        .pick([Charts.NAME, Charts.DESCRIPTION])
+        .pick([Charts.NAME, Charts.DESCRIPTION, Charts.GRAPH_ID])
         .validator({
             clean: true,
             filter: true
         }),
-    run({name, description}) {
+    run({name: name, description: description, graph: graphId}) {
         let ownerId = Meteor.userId();
         if (!ownerId) {
             throw new Meteor.Error("charts.insertNewChart.accessDenied",
                 "A user must be logged in to insert a new Chart");
         }
-        let graphId               = insertGraph.call();
         let chart                 = {};
         chart[Charts.OWNER]       = ownerId;
         chart[Charts.NAME]        = name;

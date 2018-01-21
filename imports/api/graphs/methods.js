@@ -8,10 +8,10 @@ import * as Graphs from "./graphs.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {Random} from "meteor/random";
 
-export const NODE_MAP_NODE       = "node";
+export const NODE_MAP_NODE           = "node";
 export const NODE_MAP_INCOMING_EDGES = "incomingEdges";
 export const NODE_MAP_OUTGOING_EDGES = "outgoingEdges";
-export const NODE_MAP_IS_VIRTUAL = "isVirtual";
+export const NODE_MAP_IS_VIRTUAL     = "isVirtual";
 
 /**
  * Checks that a graph is well formed. This includes:
@@ -145,7 +145,7 @@ export const validateGraph = new ValidatedMethod({
             throw new ValidationError(errors);
         }
     },
-    run(g){
+    run(g) {
         return true;
     }
 });
@@ -160,13 +160,12 @@ export const insertGraph = new ValidatedMethod({
     validate: function (obj) {
         // No arguments to validate
     },
-    run(){
+    run(graph) {
         let ownerId = Meteor.userId();
         if (!ownerId) {
             throw new Meteor.Error("graphs.insert.accessDenied",
                 "A user must be logged in to insert a new Graph");
         }
-        let graph = {};
         graph[Graphs.OWNER] = ownerId;
         return Graphs.Graphs.insert(graph);
     }
@@ -177,7 +176,7 @@ export const getGraph = new ValidatedMethod({
     validate: function (id) {
         // Nothing to validate
     },
-    run(id){
+    run(id) {
         return Graphs.Graphs.findOne({_id: id});
     }
 });
@@ -196,7 +195,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
     validate: function (id) {
         // Nothing to validate
     },
-    run(id){
+    run(id) {
         let graph = Graphs.Graphs.findOne({_id: id});
         if (!graph) {
             // graph wasn't found
@@ -214,8 +213,8 @@ export const getGraphWithoutLinks = new ValidatedMethod({
         // outgoing edge points. There should only be 1 outgoing edge
 
         let nodesToDelete = {};
-        let newNodes = [];
-        let newEdges = [];
+        let newNodes      = [];
+        let newEdges      = [];
         _.each(graph[Graphs.NODES], function (vNode) {
             if (vNode[Graphs.NODE_CHART_ID]) {
                 // Virtual node found
@@ -227,9 +226,9 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                     bypass = true;
                 } else {
                     let vNodeOutEdges = nodeMap[vNode[Graphs.NODE_ID]].outgoingEdges;
-                    let subChartId = vNode[Graphs.NODE_CHART_ID];
-                    let subGraphId = Charts.Charts.findOne({_id: subChartId})[Charts.GRAPH_ID];
-                    let subGraph   = getGraphWithoutLinks.call(subGraphId);
+                    let subChartId    = vNode[Graphs.NODE_CHART_ID];
+                    let subGraphId    = Charts.Charts.findOne({_id: subChartId})[Charts.GRAPH_ID];
+                    let subGraph      = getGraphWithoutLinks.call(subGraphId);
 
                     if (!subGraph) {
                         // Couldn't find subgraph. Ignore it by skipping the virtual node
@@ -269,7 +268,7 @@ export const getGraphWithoutLinks = new ValidatedMethod({
                         let nodesToAdd = _.reject(subGraph[Graphs.NODES], function (node) {
                             return nodesToDelete[node[Graphs.NODE_ID]];
                         });
-                        newNodes = newNodes.concat(nodesToAdd);
+                        newNodes       = newNodes.concat(nodesToAdd);
                     }
                 }
                 if (bypass) {
@@ -349,7 +348,7 @@ export const upsertGraph = new ValidatedMethod({
         clean: true,
         filter: true
     }),
-    run(graph){
+    run(graph) {
         let ownerId = Meteor.userId();
         if (!ownerId) {
             throw new Meteor.Error("graphs.upsertGraph.accessDenied",

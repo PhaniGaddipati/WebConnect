@@ -7,3 +7,4 @@ import "/imports/api/charts/server/publications.js";
 import "/imports/api/sys/methods.js";
 import "/imports/api/jsplumb/graph_utils.js";
 import "/imports/s3/server/S3Interface.js";
+import "/imports/utils/misc/new_guide.js";
