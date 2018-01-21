@@ -24,7 +24,18 @@
                     </div>
                 {{/unless}}
                 <div class="well">
-                    <p><strong>{{_ "description"}}:</strong> {{chartDescription}}</p>
+                    {{#if editingDesc}}
+                        <strong>{{_ "description"}}:</strong>
+                        <textarea class="form-control" rows="3" id="editDescTextArea">{{chartDescription}}</textarea>
+                        <a href="#" class="btn btn-primary pull-right" id="saveDescBtn">{{_ "save"}}</a>
+                    {{else}}
+                        <p>
+                            <strong>{{_ "description"}}:</strong> {{chartDescription}}
+                            {{#if canEdit}}
+                                <a id="editDesc" href="#" target=_blank>&nbsp;{{_ "edit"}}</a>
+                            {{/if}}
+                        </p>
+                    {{/if}}
                     {{#if chartAuthor}}
                         <strong>{{_ "author"}}: </strong>{{chartAuthor}}
                         <br>

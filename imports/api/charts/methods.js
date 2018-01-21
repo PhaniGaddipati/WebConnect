@@ -20,7 +20,7 @@ export const getChartEditingGraphId = new ValidatedMethod({
             regEx: SimpleSchema.RegEx.Id
         }
     }).validator(),
-    run({chartId: chartId}){
+    run({chartId: chartId}) {
         let chart = getChart.call(chartId);
         if (!chart) {
             return null;
@@ -63,14 +63,14 @@ export const getChartEditingGraphId = new ValidatedMethod({
  */
 export const updateChartEditingGraph = new ValidatedMethod({
     name: "updateChartEditingGraph",
-    validate: function ({chartId: chartId, graph:graph}) {
+    validate: function ({chartId: chartId, graph: graph}) {
         // First check to see if the graph is cool with the schema
         Graphs.Graphs.schema.graphSchema.validate(graph);
 
         // Now do our own integrity validation
         validateGraph.call(graph);
     },
-    run({chartId: chartId, graph:graph}){
+    run({chartId: chartId, graph: graph}) {
         let chart = getChart.call(chartId);
         if (!chart) {
             return null;
@@ -111,13 +111,13 @@ export const publishEditingGraph = new ValidatedMethod({
             type: String
         },
     }).validator(),
-    run({chartId: chartId, comments:comments}){
+    run({chartId: chartId, comments: comments}) {
         let chart = getChart.call(chartId);
         if (!chart) {
             return false;
         }
         let editingGraphId = chart[Charts.EDITING_GRAPH_ID];
-        let oldGraphId = chart[Charts.GRAPH_ID];
+        let oldGraphId     = chart[Charts.GRAPH_ID];
         if (!editingGraphId) {
             return false;
         }
@@ -154,7 +154,7 @@ export const insertNewChart = new ValidatedMethod({
             clean: true,
             filter: true
         }),
-    run({name, description}){
+    run({name, description}) {
         let ownerId = Meteor.userId();
         if (!ownerId) {
             throw new Meteor.Error("charts.insertNewChart.accessDenied",
@@ -180,7 +180,10 @@ export const canCurrentUserEditChart = new ValidatedMethod({
     name: "charts.canCurrentUserEditChart",
     validate: function () {
     },
-    run({chartId:chartId}){
+    run({chartId: chartId}) {
+        if (this.isSimulation) {
+            return true;
+        }
         let userId = Meteor.userId();
         if (!userId) {
             // No one is logged in
@@ -204,7 +207,7 @@ export const isCurrentUserChartOwner = new ValidatedMethod({
     name: "charts.isCurrentUserChartOwner",
     validate: function () {
     },
-    run({chartId:chartId}){
+    run({chartId: chartId}) {
         let userId = Meteor.userId();
         if (!userId) {
             // No one is logged in
@@ -230,7 +233,7 @@ export const upsertChart = new ValidatedMethod({
         clean: true,
         filter: true
     }),
-    run(chart){
+    run(chart) {
         let ownerId = Meteor.userId();
         if (!ownerId) {
             throw new Meteor.Error("charts.upsertChart.accessDenied",
@@ -272,7 +275,7 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
             optional: true
         }
     }).validator(),
-    run(params){
+    run(params) {
         let userId = Meteor.userId();
         if (!userId) {
             return null;
@@ -295,7 +298,7 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
         hist[Charts.GRAPH_HIST_GRAPH_ID] = chart[Charts.GRAPH_ID];
         hist[Charts.GRAPH_HIST_COMMENTS] = params.comments;
         hist[Charts.GRAPH_HIST_USER_ID]  = userId;
-        hist[Charts.GRAPH_HIST_DATE] = new Date();
+        hist[Charts.GRAPH_HIST_DATE]     = new Date();
         // Add the history entry
         let
             push                         = {};
@@ -323,7 +326,7 @@ export const removeChart = new ValidatedMethod({
             regEx: SimpleSchema.RegEx.Id
         }
     }).validator(),
-    run({_id:id}){
+    run({_id: id}) {
         let chart = Charts.Charts.findOne({_id: id});
         if (chart && isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
             return Charts.Charts.remove({_id: id});
@@ -343,7 +346,7 @@ export const getCurrentUserCharts = new ValidatedMethod({
     validate: function (obj) {
         // No arguments to validate
     },
-    run(){
+    run() {
         let ownerId = Meteor.userId();
         if (!ownerId) {
             return [];
@@ -361,10 +364,10 @@ export const getChartsInCatalog = new ValidatedMethod({
     validate: function (obj) {
         // No arguments to validate
     },
-    run(){
-        let sel                = {};
-        sel[Charts.IN_CATALOG] = true;
-        let sortParam = {};
+    run() {
+        let sel                     = {};
+        sel[Charts.IN_CATALOG]      = true;
+        let sortParam               = {};
         sortParam[Charts.DOWNLOADS] = -1;
         return Charts.Charts.find(sel, {sort: sortParam}).fetch();
     }
@@ -378,7 +381,7 @@ export const getChart = new ValidatedMethod({
     validate: function (obj) {
         // Nothing to validate
     },
-    run(id){
+    run(id) {
         return Charts.Charts.findOne({_id: id});
     }
 });
@@ -393,7 +396,7 @@ export const getCharts = new ValidatedMethod({
             type: [String]
         }
     }).validator(),
-    run({ids:ids}){
+    run({ids: ids}) {
         return Charts.Charts.find({
             _id: {
                 $in: ids
@@ -410,7 +413,7 @@ export const findMostDownloadedCharts = new ValidatedMethod({
     validate: function (n) {
         check(n, Number);
     },
-    run(n){
+    run(n) {
         let sortParam               = {};
         sortParam[Charts.DOWNLOADS] = -1;
         return Charts.Charts.find({},
@@ -427,7 +430,7 @@ export const incrementChartDownload = new ValidatedMethod({
     validate: function (id) {
         // Nothing to validate
     },
-    run(id){
+    run(id) {
         let incField               = {};
         incField[Charts.DOWNLOADS] = 1;
         let selector               = {};
@@ -448,7 +451,7 @@ export const getAllChartResources = new ValidatedMethod({
     validate: function (id) {
         //Nothing to validate
     },
-    run(id){
+    run(id) {
         let chart = Charts.Charts.findOne({_id: id});
         if (!chart) {
             return null;
@@ -488,7 +491,7 @@ export const getAllChartUsers = new ValidatedMethod({
     validate: function (id) {
         //Nothing to validate
     },
-    run(id){
+    run(id) {
         let chart = Charts.Charts.findOne({_id: id});
         if (!chart) {
             return null;
@@ -505,6 +508,36 @@ export const getAllChartUsers = new ValidatedMethod({
         userList = _.pluck(cmnts, Comments.OWNER);
         userList.push(chart[Charts.OWNER]);
         return _.without(_.uniq(userList), null);
+    }
+});
+
+/**
+ * Updates a particular chart's description
+ */
+export const updateChartDescription = new ValidatedMethod({
+    name: "charts.updateChartDescription",
+    validate: new SimpleSchema({
+        chartId: {
+            type: SimpleSchema.RegEx.Id,
+            optional: false
+        },
+        description: {
+            type: String,
+            optional: false
+        }
+    }).validator(),
+    run({chartId: chartId, description: description}) {
+        let set                 = {};
+        set[Charts.DESCRIPTION] = description;
+        if (canCurrentUserEditChart.call({chartId: chartId})) {
+            Charts.Charts.update({_id: chartId}, {
+                $set: set
+            });
+            return true;
+        } else {
+            throw new Meteor.Error("charts.updateChartDescription.accessDenied",
+                "The given Chart's owner or editors does not match the current user");
+        }
     }
 });
 
@@ -536,7 +569,7 @@ export const updateUserChartFeedback = new ValidatedMethod({
             optional: true
         }
     }).validator(),
-    run({chartId:chartId, userId:userId, feedback:feedback, clear:clear}){
+    run({chartId: chartId, userId: userId, feedback: feedback, clear: clear}) {
         let addToSet = {};
         let pop      = {};
 
@@ -552,9 +585,9 @@ export const updateUserChartFeedback = new ValidatedMethod({
             pop[feedback ? Charts.DOWNVOTED_IDS : Charts.UPVOTED_IDS]      = userId;
 
             return Charts.Charts.update({_id: chartId}, {
-                    $pop: pop,
-                    $addToSet: addToSet
-                }) > 0;
+                $pop: pop,
+                $addToSet: addToSet
+            }) > 0;
         }
     }
 });

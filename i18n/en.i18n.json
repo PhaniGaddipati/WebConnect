@@ -77,5 +77,8 @@
   "version": "Version",
   "comments": "Comments",
   "catalog": "Catalog",
-  "downloads": "Downloads"
+  "downloads": "Downloads",
+  "close": "Close",
+  "error_save_description": "Error",
+  "error_save_description_msg": "Could not save the new guide description. Please try again."
 }

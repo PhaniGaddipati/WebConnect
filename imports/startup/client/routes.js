@@ -47,7 +47,6 @@ FlowRouter.route("/logout", {
 FlowRouter.route("/chart/:chartId", {
     name: "App.chart",
     action(params) {
-        incrementChartDownload.call(params.chartId);
         let context              = {};
         context[DATA_CHART_ID]   = params.chartId;
         context[DATA_READ_ONLY]  = true;
