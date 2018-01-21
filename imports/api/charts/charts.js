@@ -8,7 +8,7 @@ import {Comments} from "/imports/api/comments/comments.js";
 // Constants for document field names
 export const CHART_ID            = "_id";
 export const OWNER               = "owner";
-export const EDITORS          = "editors";
+export const EDITORS             = "editors";
 export const NAME                = "name";
 export const DESCRIPTION         = "description";
 export const CREATED_DATE        = "createdDate";
@@ -17,18 +17,19 @@ export const VERSION             = "version";
 export const UPVOTED_IDS         = "upvoted";
 export const DOWNVOTED_IDS       = "downvoted";
 export const DOWNLOADS           = "downloads";
-export const EDITING_GRAPH_ID = "editingGraph";
+export const EDITING_GRAPH_ID    = "editingGraph";
 export const GRAPH_ID            = "graph";
 export const GRAPH_HIST          = "graphHist";
 export const GRAPH_HIST_VERSION  = "version";
 export const GRAPH_HIST_GRAPH_ID = "graphId";
 export const GRAPH_HIST_COMMENTS = "comments";
 export const GRAPH_HIST_USER_ID  = "userId";
-export const GRAPH_HIST_DATE  = "date";
+export const GRAPH_HIST_DATE     = "date";
 export const COMMENTS            = "comments";
 export const RESOURCES           = "resources";
 export const IMAGE               = "image";
 export const IN_CATALOG          = "inCatalog";
+export const DELETED             = "deleted";
 
 export const TYPE         = "type";
 export const TYPE_MISC    = "misc";
@@ -47,13 +48,13 @@ if (Meteor.isServer) {
 
 // Deny all client updates, everything going to be done through methods
 Charts.deny({
-    insert(){
+    insert() {
         return true;
     },
-    remove(){
+    remove() {
         return true;
     },
-    update(){
+    update() {
         return true;
     }
 });
@@ -194,6 +195,10 @@ Charts.schema = new SimpleSchema({
         type: Boolean,
         optional: false,
         defaultValue: false
+    },
+    deleted: {
+        type: Boolean,
+        optional: true
     }
 });
 

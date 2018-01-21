@@ -6,6 +6,7 @@ import {getUserName} from "/imports/api/users/methods.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {
     canCurrentUserEditChart,
+    deleteChart,
     getChart,
     restoreOldGraph,
     updateChartDescription
@@ -59,6 +60,7 @@ Template.chart.events({
     "click #cancelBtn": function (evt, self) {
         evt.preventDefault();
         $("#restore_modal").modal("hide");
+        $("#delete_modal").modal("hide");
     },
     "click #restoreBtn": function (evt, self) {
         evt.preventDefault();
@@ -72,7 +74,24 @@ Template.chart.events({
                 }
             });
         }
-    }
+    },
+    "click #deleteBtn": function (evt, self) {
+        evt.preventDefault();
+        $("#delete_modal").modal("show");
+    },
+    "click #deleteConfirm": function (evt, self) {
+        evt.preventDefault();
+        $("#delete_modal").modal("hide");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        deleteChart.call({chartId: self.chartId}, function (err, res) {
+            if (err) {
+                console.log(err);
+            } else {
+                FlowRouter.go("/account");
+            }
+        })
+    },
 });
 
 function saveDescription(self, desc) {
@@ -159,5 +178,8 @@ Template.chart.helpers({
     },
     errRestoreMsg: function () {
         return Template.instance().errRestoreMsg.get();
+    },
+    chartInCatalog: function () {
+        return Template.instance().chart.get()[Charts.IN_CATALOG];
     }
 });

@@ -4,15 +4,15 @@
 import {RestAPI} from "/imports/rest/restivus.js";
 import * as Charts from "/imports/api/charts/charts.js";
 import {
-    getChartsInCatalog,
+    deleteChart,
     getChart,
-    removeChart,
     getCharts,
+    getChartsInCatalog,
     incrementChartDownload,
     updateUserChartFeedback
 } from "/imports/api/charts/methods.js";
 import * as Comments from "/imports/api/comments/comments.js";
-import {insertComment, getComment, deleteComment} from "/imports/api/comments/methods.js";
+import {deleteComment, getComment, insertComment} from "/imports/api/comments/methods.js";
 import * as RESTUtils from "/imports/rest/rest_utils.js";
 
 const RESPONSE_STATUS         = "status";
@@ -132,7 +132,7 @@ RestAPI.addRoute("chart/:id", {
                     body: response
                 };
             }
-            removeChart.call({_id: id});
+            deleteChart.call({chartId: id});
             response[RESPONSE_STATUS] = RESPONSE_STATUS_SUCCESS;
             response[RESPONSE_DATA]   = {
                 deletedId: id

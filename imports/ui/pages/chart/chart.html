@@ -4,6 +4,9 @@
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-body">
+                    <div class="modal-header">
+                        {{_ "restore_guide"}}
+                    </div>
                     {{_ "sure_restore_old"}}
                     <br>
                     {{#if hasErrRestoreMsg}}
@@ -19,6 +22,27 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="delete_modal">
+        <div class="modal-dialog modal-sm modal-danger">
+            <div class="modal-content">
+                <div class="modal-header">
+                    {{_ "delete_guide"}}
+                </div>
+                <div class="modal-body">
+                    {{_ "sure_delete_guide"}}
+                    <br>
+                    <br>
+                    <div class="form-group">
+                        <button class="btn btn-primary" id="cancelBtn" data-dismiss="restore_modal">{{_
+                                "cancel"}}</button>
+                        <button class="btn btn-danger pull-right" id="deleteConfirm">{{_ "delete_guide"}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     {{#if chartLoading}}
         <div class="container">
@@ -52,6 +76,10 @@
                             {{/if}}
                         </p>
                     {{/if}}
+                    {{#if chartInCatalog}}
+                        <a class="label label-primary">Catalog</a>
+                        <br>
+                    {{/if}}
                     {{#if chartAuthor}}
                         <strong>{{_ "author"}}: </strong>{{chartAuthor}}
                         <br>
@@ -65,28 +93,33 @@
                     <a class="btn btn-primary btn-sm" href="{{viewUrl}}" target=_blank>{{_ "view_guide"}}</a>
                     {{#if canEdit}}
                         <a class="btn btn-default btn-sm" href="{{editUrl}}" target=_blank>{{_ "edit_guide"}}</a>
+                        {{#unless chartInCatalog}}
+                            <a class="btn btn-danger btn-sm pull-right" href="#" target=_blank id="deleteBtn">{{_
+                                    "delete_guide"}}</a>
+                        {{/unless}}
                     {{/if}}
                 </div>
-                {{#if hasHistory}}
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><i class="fa fa-history"></i>&nbsp;{{_ "history"}}</div>
-                        <div class="panel-body">
-                            <div class="list-group">
-                                {{#each history}}
-                                    <a href="#" class="list-group-item restore-btn" data-hist={{this.graphId}}>
-                                        <strong>{{_ "version"}}: </strong>{{this.version}}
-                                        <br>
-                                        <strong>{{_ "comments"}}: </strong>{{this.comments}}
-                                        <br>
-                                        <strong>{{_ "date"}}: </strong>{{formatDate this.date}}
-                                        <br>
-                                    </a>
-                                {{/each}}
+                {{#if canEdit}}
+                    {{#if hasHistory}}
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><i class="fa fa-history"></i>&nbsp;{{_ "history"}}</div>
+                            <div class="panel-body">
+                                <div class="list-group">
+                                    {{#each history}}
+                                        <a href="#" class="list-group-item restore-btn" data-hist={{this.graphId}}>
+                                            <strong>{{_ "version"}}: </strong>{{this.version}}
+                                            <br>
+                                            <strong>{{_ "comments"}}: </strong>{{this.comments}}
+                                            <br>
+                                            <strong>{{_ "date"}}: </strong>{{formatDate this.date}}
+                                            <br>
+                                        </a>
+                                    {{/each}}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {{/if}}
                 {{/if}}
-
             </div>
         {{/if}}
     {{/if}}

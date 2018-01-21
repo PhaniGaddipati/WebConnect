@@ -261,6 +261,9 @@ export const canCurrentUserEditChart = new ValidatedMethod({
             // Chart doesn't exist
             return false;
         }
+        if (chart[Charts.DELETED]) {
+            return false;
+        }
         // Check if user is the owner or if they are in the editor list
         return chart[Charts.OWNER] == userId || _.contains((chart[Charts.EDITORS] || []), userId);
     }
@@ -354,6 +357,10 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
             throw new Meteor.Error("charts.updateChartGraphWithHistory.badIds",
                 "The supplied chart or graph ID were not found");
         }
+        if (chart[Charts.DELETED]) {
+            throw new Meteor.Error("charts.updateChartGraphWithHistory.deleted",
+                "The supplied chart is marked deleted");
+        }
         if (!canCurrentUserEditChart.call({chartId: chart[Charts.CHART_ID]})) {
             // Someone is up to no good...
             throw new Meteor.Error("charts.updateChartGraphWithHistory.accessDenied",
@@ -383,24 +390,36 @@ export const updateChartGraphWithHistory = new ValidatedMethod({
 });
 
 /**
- * Removes a chart by ID.
+ * Deletes a chart by ID by setting deleted to true.
  */
-export const removeChart = new ValidatedMethod({
-    name: "charts.removeChart",
+export const deleteChart = new ValidatedMethod({
+    name: "charts.deleteChart",
     validate: new SimpleSchema({
-        _id: {
+        chartId: {
             type: String,
             regEx: SimpleSchema.RegEx.Id
         }
     }).validator(),
-    run({_id: id}) {
-        let chart = Charts.Charts.findOne({_id: id});
-        if (chart && isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
-            return Charts.Charts.remove({_id: id});
-        } else {
-            // Either the chart doesn't exist or no permission
-            return null;
+    run({chartId: chartId}) {
+        if (this.isSimulation) {
+            return true;
         }
+        let chart = getChart.call(chartId);
+        if (!chart) {
+            throw new Meteor.Error("charts.deleteChart.chartNotFound",
+                "The given Chart id wasn't found");
+        }
+        if (!isCurrentUserChartOwner.call({chartId: chart[Charts.CHART_ID]})) {
+            throw new Meteor.Error("charts.deleteChart.accessDenied",
+                "The given Chart's owner does not match the current user");
+        }
+        if (chart[Charts.IN_CATALOG]) {
+            throw new Meteor.Error("charts.deleteChart.accessDenied",
+                "The given Chart is in the catalog and cannot be deleted");
+        }
+        let set             = {};
+        set[Charts.DELETED] = true;
+        return Charts.Charts.update({_id: chartId}, {$set: set});
     }
 });
 
@@ -418,7 +437,10 @@ export const findCurrentUserCharts = new ValidatedMethod({
         if (!ownerId) {
             return [];
         }
-        return Charts.Charts.find({owner: ownerId});
+        let sel             = {};
+        sel[Charts.OWNER]   = ownerId;
+        sel[Charts.DELETED] = {$ne: true};
+        return Charts.Charts.find(sel);
     }
 });
 
@@ -448,6 +470,7 @@ export const findChartsInCatalog = new ValidatedMethod({
     run() {
         let sel                     = {};
         sel[Charts.IN_CATALOG]      = true;
+        sel[Charts.DELETED]         = {$ne: true};
         let sortParam               = {};
         sortParam[Charts.DOWNLOADS] = -1;
         return Charts.Charts.find(sel, {sort: sortParam});
@@ -477,7 +500,11 @@ export const getChart = new ValidatedMethod({
         // Nothing to validate
     },
     run(id) {
-        return Charts.Charts.findOne({_id: id});
+        let chart = Charts.Charts.findOne({_id: id});
+        if (!chart || chart[Charts.DELETED]) {
+            return null;
+        }
+        return chart;
     }
 });
 
@@ -492,11 +519,10 @@ export const getCharts = new ValidatedMethod({
         }
     }).validator(),
     run({ids: ids}) {
-        return Charts.Charts.find({
-            _id: {
-                $in: ids
-            }
-        }).fetch();
+        let sel              = {};
+        sel[Charts.CHART_ID] = {$in: ids};
+        sel[Charts.DELETED]  = {$ne: true};
+        return Charts.Charts.find(sel).fetch();
     }
 });
 
@@ -509,9 +535,11 @@ export const findMostDownloadedCharts = new ValidatedMethod({
         check(n, Number);
     },
     run(n) {
+        let sel                     = {};
+        sel[Charts.DELETED]         = {$ne: true};
         let sortParam               = {};
         sortParam[Charts.DOWNLOADS] = -1;
-        return Charts.Charts.find({},
+        return Charts.Charts.find(sel,
             {
                 sort: sortParam,
                 limit: n
@@ -679,7 +707,10 @@ export const updateUserChartFeedback = new ValidatedMethod({
             addToSet[feedback ? Charts.UPVOTED_IDS : Charts.DOWNVOTED_IDS] = userId;
             pop[feedback ? Charts.DOWNVOTED_IDS : Charts.UPVOTED_IDS]      = userId;
 
-            return Charts.Charts.update({_id: chartId}, {
+            let sel              = {};
+            sel[Charts.DELETED]  = {$ne: true};
+            sel[Charts.CHART_ID] = chartId;
+            return Charts.Charts.update(sel, {
                 $pop: pop,
                 $addToSet: addToSet
             }) > 0;
