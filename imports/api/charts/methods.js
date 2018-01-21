@@ -336,6 +336,24 @@ export const removeChart = new ValidatedMethod({
 });
 
 /**
+ * Finds the current user's charts. An empty array
+ * returned if either there is no user logged in or there are no charts.
+ */
+export const findCurrentUserCharts = new ValidatedMethod({
+    name: "charts.findCurrentUsersCharts",
+    validate: function (obj) {
+        // No arguments to validate
+    },
+    run() {
+        let ownerId = Meteor.userId();
+        if (!ownerId) {
+            return [];
+        }
+        return Charts.Charts.find({owner: ownerId});
+    }
+});
+
+/**
  * Returns an array of the current user's charts. An empty array
  * returned if either there is no user logged in or there are no charts.
  */
@@ -345,11 +363,25 @@ export const getCurrentUserCharts = new ValidatedMethod({
         // No arguments to validate
     },
     run() {
-        let ownerId = Meteor.userId();
-        if (!ownerId) {
-            return [];
-        }
-        return Charts.Charts.find({owner: ownerId}).fetch();
+        return findCurrentUserCharts.run().fetch();
+    }
+});
+
+/**
+ * Finds all of the charts present in the catalog,
+ * sorted by number of downloads.
+ */
+export const findChartsInCatalog = new ValidatedMethod({
+    name: "charts.findChartsInCatalog",
+    validate: function (obj) {
+        // No arguments to validate
+    },
+    run() {
+        let sel                     = {};
+        sel[Charts.IN_CATALOG]      = true;
+        let sortParam               = {};
+        sortParam[Charts.DOWNLOADS] = -1;
+        return Charts.Charts.find(sel, {sort: sortParam});
     }
 });
 
@@ -363,11 +395,7 @@ export const getChartsInCatalog = new ValidatedMethod({
         // No arguments to validate
     },
     run() {
-        let sel                     = {};
-        sel[Charts.IN_CATALOG]      = true;
-        let sortParam               = {};
-        sortParam[Charts.DOWNLOADS] = -1;
-        return Charts.Charts.find(sel, {sort: sortParam}).fetch();
+        return findChartsInCatalog.run().fetch();
     }
 });
 
