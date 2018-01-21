@@ -1,4 +1,25 @@
 <template name="chart">
+
+    <div class="modal fade" id="restore_modal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    {{_ "sure_restore_old"}}
+                    <br>
+                    {{#if hasErrRestoreMsg}}
+                        <p class="text-danger">{{errRestoreMsg}}</p>
+                    {{/if}}
+                    <br>
+                    <div class="form-group">
+                        <button class="btn btn-default" id="cancelBtn" data-dismiss="restore_modal">{{_
+                                "cancel"}}</button>
+                        <button class="btn btn-primary pull-right" id="restoreBtn">{{_ "yes"}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{#if chartLoading}}
         <div class="container">
             {{> app_loading}}
@@ -52,14 +73,14 @@
                         <div class="panel-body">
                             <div class="list-group">
                                 {{#each history}}
-                                    <div class="list-group-item">
-                                        <h4 class="list-group-item-heading">{{this.version}}</h4>
-                                        <p class="list-group-item-text">
-                                            {{this.comments}}
-                                            <br>
-                                            {{formatDate this.date}}
-                                        </p>
-                                    </div>
+                                    <a href="#" class="list-group-item restore-btn" data-hist={{this.graphId}}>
+                                        <strong>{{_ "version"}}: </strong>{{this.version}}
+                                        <br>
+                                        <strong>{{_ "comments"}}: </strong>{{this.comments}}
+                                        <br>
+                                        <strong>{{_ "date"}}: </strong>{{formatDate this.date}}
+                                        <br>
+                                    </a>
                                 {{/each}}
                             </div>
                         </div>

@@ -94,5 +94,7 @@
   "error_create_guide": "Error",
   "error_create_guide_msg": "Error creating a new guide. Please try again.",
   "error_create_guide_valid": "Guide title must only be alphanumeric and at least 4 letters long",
-  "history": "History"
+  "history": "History",
+  "sure_restore_old": "Are you sure you want to restore this version of the guide into the currently edited guide? It must be published afterwards. Any current changes to the guide will be saved in the history.",
+  "err_restoring_old": "Error restoring the old guide. Please try again"
 }

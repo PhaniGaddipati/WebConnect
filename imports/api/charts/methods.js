@@ -152,6 +152,64 @@ export const publishEditingGraph = new ValidatedMethod({
 });
 
 /**
+ * Restores a previous graph by making it the new editing graph.
+ * Any old editing graph is put into the history.
+ */
+export const restoreOldGraph = new ValidatedMethod({
+    name: "restoreOldGraph",
+    validate: new SimpleSchema({
+        chartId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        },
+        oldGraphId: {
+            type: String,
+            regEx: SimpleSchema.RegEx.Id
+        }
+    }).validator(),
+    run({chartId: chartId, oldGraphId: oldGraphId}) {
+        let chart = getChart.call(chartId);
+        if (!chart) {
+            return false;
+        }
+        if (!canCurrentUserEditChart.call({chartId: chartId})) {
+            // Someone is up to no good...
+            throw new Meteor.Error("charts.restoreOldGraph.accessDenied",
+                "The current user is not allowed to do this.");
+        }
+
+        let graphHist = _.findWhere(chart[Charts.GRAPH_HIST], {graphId: oldGraphId});
+        if (!graphHist) {
+            throw new Meteor.Error("charts.restoreOldGraph.accessDenied",
+                "The old graph id wasn't found in the history.");
+        }
+
+        let editingGraphId = chart[Charts.EDITING_GRAPH_ID];
+
+        let push = {};
+        if (editingGraphId) {
+            // push the currently editing graph to the history
+            let hist                         = {};
+            hist[Charts.GRAPH_HIST_VERSION]  = chart[Charts.VERSION];
+            hist[Charts.GRAPH_HIST_GRAPH_ID] = editingGraphId;
+            hist[Charts.GRAPH_HIST_COMMENTS] = "Editing graph before restoring version " + graphHist[Charts.GRAPH_HIST_VERSION];
+            hist[Charts.GRAPH_HIST_USER_ID]  = Meteor.userId();
+            hist[Charts.GRAPH_HIST_DATE]     = new Date();
+            push[Charts.GRAPH_HIST]          = hist;
+        }
+
+        // Set the new graph Id and version
+        let set                      = {};
+        set[Charts.EDITING_GRAPH_ID] = oldGraphId;
+
+        return Charts.Charts.update({_id: chartId}, {
+            $push: push,
+            $set: set
+        });
+    }
+});
+
+/**
  * Inserts a new chart into the database, given the name and description and graph
  *
  * The unique _id of the chart is returned, or null on failure.
