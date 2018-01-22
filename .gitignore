@@ -6,3 +6,6 @@ doc/
 **/keys.js
 *.pem
 *.ppk
+mup_config.js
+db_util.py
+mup_config.js
